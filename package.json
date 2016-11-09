@@ -14,5 +14,8 @@
     "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "jshint-stylish": "^2.2.1"
+  },
+  "dependencies": {
+    "grunt": "^1.0.1"
   }
 }
