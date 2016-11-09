@@ -8,13 +8,39 @@ stage.interactive = true;
 
 var texture = PIXI.Texture.fromImage('images/computer.png');
 
+var background = PIXI.Sprite.fromImage('images/hard-drive.png');
+background.interactive = true;
+background.buttonMode = true;
+background
+	.on('mousedown', ds)
+	.on('mouseup', de)
+	.on('mouseupoutside', de)
+	.on('mousemove', dm);
 
-var bunny = new PIXI.Sprite(texture);
-bunny.interactive = true;
-bunny.buttonMode = true;
-bunny.anchor.set(0.5);
-bunny.scale.set(0.06);
-bunny
+var ds = function ds(e) {
+	this.data = e.data;
+	this.alpha = 0.5;
+	this.dragging = true;
+};
+var dm =  function () {
+	if (this.dragging) {
+		var newPosition = this.data.getLocalPosition(this.parent);
+		this.position.x = newPosition.x;
+		this.position.y = newPosition.y;
+	}
+};
+var de =   function () {
+	this.alpha = 1;
+	this.dragging = false;
+	this.data = null;
+};
+
+var sprite = new PIXI.Sprite(texture);
+sprite.interactive = true;
+sprite.buttonMode = true;
+sprite.anchor.set(0.5);
+sprite.scale.set(0.06);
+sprite
 	.on('mousedown', dragstart)
 	.on('touchstart', dragstart)
 	.on('mouseup', dragend)
@@ -23,8 +49,8 @@ bunny
 	.on('touchendoutside', dragend)
 	.on('mousemove', dragmove)
 	.on('touchmove', dragmove);
-bunny.position.x = 200;
-bunny.position.y = 20;
+sprite.position.x = 200;
+sprite.position.y = 20;
 
 var rect = new PIXI.Graphics();
 rect.beginFill(0x0033CC);
@@ -34,14 +60,12 @@ rect.endFill();
 rect.x = 64;
 rect.y = 64;
 rect.alpha = 0.5;
-stage.addChild(rect);
-
-
-
-stage.addChild(bunny);
 
 var text = new PIXI.Text("Hello Pixi!", {font: "48px Impact", fill: "red"});
 
+stage.addChild(background);
+stage.addChild(rect);
+stage.addChild(sprite);
 stage.addChild(text)
 
 requestAnimationFrame( animate );
