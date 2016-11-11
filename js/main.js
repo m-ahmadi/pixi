@@ -1,68 +1,50 @@
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {
-	backgroundColor: 0x1099bb,
-	id: 'abc'
+	backgroundColor: 0x1099bb
 });
 document.body.appendChild(renderer.view);
 
+var tink = new Tink(PIXI, renderer.view);
+
 var stage = new PIXI.Container();
 stage.interactive = true;
+stage.buttonMode = true;
 
+//************************************************************************************************************
 var texture = PIXI.Texture.fromImage('images/computer.png');
-
-var background = PIXI.Sprite.fromImage('images/hard-drive.png');
-background.interactive = true;
-background.buttonMode = true;
-background.x = 100;
-background.y = 250;
-background.anchor.set(0, 0);
-background.scale.set(0.5);
-
-background
-	.on('mousedown', ds)
-	.on('mouseup', de)
-	.on('mouseupoutside', de)
-	.on('mousemove', dm);
-	
-//var newPosition;
-function ds(e) {
-	//newPosition = e.data.getLocalPosition(this.parent);
-	this.data = e.data;
-	this.alpha = 0.5;
-	this.dragging = true;
-	
-	//@@@console.log( e.data.global.x - this.x );
-};
-function dm(e) {
-	if (this.dragging) {
-		var newPosition = e.data.getLocalPosition(this.parent);
-		
-		this.position.x = newPosition.x;
-		this.position.y = newPosition.y;
-	}
-};
-function de() {
-	this.alpha = 1;
-	this.dragging = false;
-	this.data = null;
-};
-
 var sprite = new PIXI.Sprite(texture);
 sprite.interactive = true;
 sprite.buttonMode = true;
 sprite.anchor.set(0.5);
-sprite.scale.set(0.1);
-sprite
-	.on('mousedown', dragstart)
-	.on('touchstart', dragstart)
-	.on('mouseup', dragend)
-	.on('mouseupoutside', dragend)
-	.on('touchend', dragend)
-	.on('touchendoutside', dragend)
-	.on('mousemove', dragmove)
-	.on('touchmove', dragmove);
+sprite.scale.set(0.2);
+// sprite
+	// .on('mousedown', dragstart)
+	// .on('touchstart', dragstart)
+	// .on('mouseup', dragend)
+	// .on('mouseupoutside', dragend)
+	// .on('touchend', dragend)
+	// .on('touchendoutside', dragend)
+	// .on('mousemove', dragmove)
+	// .on('touchmove', dragmove);
 
 sprite.position.x = 200;
 sprite.position.y = 20;
+
+
+var harddrive = PIXI.Sprite.fromImage('images/hard-drive.png');
+harddrive.interactive = true;
+harddrive.buttonMode = true;
+harddrive.backgroundFill = 0x2099bb;
+harddrive.x = 100;
+harddrive.y = 250;
+harddrive.anchor.set(0, 0);
+//harddrive.scale.set(0.5);
+
+// harddrive
+	// .on('mousedown', ds)
+	// .on('mouseup', de)
+	// .on('mouseupoutside', de)
+	// .on('mousemove', dm);
+	
 
 var rect = new PIXI.Graphics();
 rect.interactive = true;
@@ -75,46 +57,32 @@ rect.x = 64;
 rect.y = 64;
 rect.alpha = 0.5;
 
-rect
-	.on('mousedown', ds)
-	.on('mouseup', de)
-	.on('mouseupoutside', de)
-	.on('mousemove', dm);
-var text = new PIXI.Text("salam", {font: "24px Impact", fill: "red"});
+// rect
+	// .on('mousedown', ds)
+	// .on('mouseup', de)
+	// .on('mouseupoutside', de)
+	// .on('mousemove', dm);
 
-stage.addChild(background);
+var text = new PIXI.Text("salam", {fontFamily: "Impact", fontSize: "24px", fill: "red"});
+//************************************************************************************************************
+tink.makeDraggable(harddrive);
+tink.makeDraggable(rect);
+tink.makeDraggable(sprite);
+
+
+stage.addChild(harddrive);
 stage.addChild(rect);
 stage.addChild(sprite);
-stage.addChild(text)
+stage.addChild(text);
 
+//************************************************************************************************************
 requestAnimationFrame( animate );
 
-function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(stage);
-}
+
+renderer.render(stage);
 
 
-function dragstart(e) {
-	console.log(this);
-    this.data = e.data;
-    this.alpha = 0.5;
-    this.dragging = true;
-}
-function dragmove(e) {
-	//console.log(e.data.global.x, e.data.global.y);
-    if (this.dragging) {
-		var newPosition = this.data.getLocalPosition(this.parent);
-		this.position.x = newPosition.x;
-		this.position.y = newPosition.y;
-    }
-}
-function dragend() {
-    this.alpha = 1;
-    this.dragging = false;
-    this.data = null;
-}
-
+/*
 var initX,
 	initY,
 	left = false,
@@ -166,3 +134,4 @@ $('canvas')
 	.on('mouseup', function () {
 		this.dragit = false;
 	});
+*/
