@@ -1,57 +1,47 @@
-function ds(e) {
-	//newPosition = e.data.getLocalPosition(this.parent);
+var asghar;
+function dragStart(e) {
 	this.data = e.data;
 	this.alpha = 0.5;
 	this.dragging = true;
+    this.dragPoint = e.data.getLocalPosition(this.parent);
+    this.dragPoint.x -= this.position.x;
+    this.dragPoint.y -= this.position.y;
+	asghar = this;
 	
-	var pointerX = e.data.global.x;
-	var offsetX = pointerX - this.x; // previousX
-	
-	console.log( this.width, pointerX, offsetX );
-	//@@@console.log( e.data.global.x - this.x );
+	// reorder children for z-index
+	var arr = stage.children;
+	arr.splice( arr.indexOf(this), 1 );
+	arr.push(this);
 }
-function dm(e) {
-	
+function dragMove(e) {
 	if (this.dragging) {
-		var newPosition = e.data.getLocalPosition(this.parent);
-		console.log(this);
-		var pointerX = e.data.global.x;
-		var pointerY = e.data.global.y;
-		var offsetX = newPosition.x;
-		var offsetY = newPosition.y;
-		
-		this.position.x = offsetX;
-		this.position.y = offsetY;
+		var newPosition = this.data.getLocalPosition(this.parent);
+		this.position.x = newPosition.x - this.dragPoint.x;
+		this.position.y = newPosition.y - this.dragPoint.y;
 	}
 }
-function de() {
+function dragEnd() {
 	this.alpha = 1;
 	this.dragging = false;
 	this.data = null;
 }
 
 
-function dragstart(e) {
-    this.data = e.data;
-    this.alpha = 0.5;
-    this.dragging = true;
-}
-function dragmove(e) {
-    if (this.dragging) {
-		var newPosition = this.data.getLocalPosition(this.parent);
-		this.position.x = newPosition.x;
-		this.position.y = newPosition.y;
-    }
-}
-function dragend() {
-    this.alpha = 1;
-    this.dragging = false;
-    this.data = null;
-}
-
-
 function animate() {
     requestAnimationFrame(animate);
-	tink.update();
+	//tink.update();
+	TWEEN.update();
     renderer.render(stage);
+}
+
+function addDragDrop(sprite) {
+	sprite
+		.on('mousedown', dragStart)
+		.on('touchstart', dragStart)
+		.on('mouseup', dragEnd)
+		.on('mouseupoutside', dragEnd)
+		.on('touchend', dragEnd)
+		.on('touchendoutside', dragEnd)
+		.on('mousemove', dragMove)
+		.on('touchmove', dragMove);
 }
