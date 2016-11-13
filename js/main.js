@@ -14,16 +14,16 @@ var background = new PIXI.Container();
 //------------------------------------------------------------------------
 // Line
 
-var line = PIXI.Sprite.fromImage('images/line.png');
-line.interactive = true;
-line.buttonMode = true;
-line.width = 200;
-line.height = 100;
-line.x = 200;
-line.y = 100;
-line.anchor.set(0);
-addDragDrop(line);
-stage.addChild(line);
+var line1 = PIXI.Sprite.fromImage('images/line.png');
+line1.interactive = true;
+line1.buttonMode = true;
+line1.width = 200;
+line1.height = 100;
+line1.x = 900;
+line1.y = 100;
+line1.anchor.set(0);
+addDragDrop(line1);
+stage.addChild(line1);
 
 /*
 	var line = PIXI.Sprite.fromImage('images/line.png');
@@ -62,7 +62,7 @@ sprite.interactive = true;
 sprite.buttonMode = true;
 sprite.anchor.set(0.5);
 sprite.scale.set(0.2);
-sprite.position.x = 200;
+sprite.position.x = 900;
 sprite.position.y = 20;
 //------------------------------------------------------------------------
 
@@ -70,10 +70,10 @@ var harddrive = PIXI.Sprite.fromImage('images/hard-drive.png');
 harddrive.interactive = true;
 harddrive.buttonMode = true;
 harddrive.backgroundFill = 0x2099bb;
-harddrive.x = 100;
+harddrive.x = 900;
 harddrive.y = 250;
 harddrive.anchor.set(0, 0);
-harddrive.scale.set(0.5);
+harddrive.scale.set(0.1);
 
 //------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ graphics.beginFill(0x0033CC);
 graphics.lineStyle(4, 0xFF0000, 1);
 graphics.drawRect(50, 250, 120, 120);
 graphics.endFill();
-graphics.x = 64;
+graphics.x = 900;
 graphics.y = 64;
 
 
@@ -153,17 +153,25 @@ g1.beginFill(0x0033CC);
 g1.lineStyle(2, 0xFF0000, 1);
 g1.drawRect(0, 0, 120, 120);
 g1.endFill();
-g1.x = 600;
-g1.y = 200;
+g1.x = 0;
+g1.y = 100;
 
-var line2 = PIXI.Sprite.fromImage('images/line.png');
-line2.interactive = true;
-line2.buttonMode = true;
-line2.width = 200;
-line2.height = 50;
-line2.x = 720;
-line2.y = 235;
-line2.anchor.set(0);
+var line = PIXI.Sprite.fromImage('images/line.png');
+line.interactive = true;
+line.buttonMode = true;
+line.width = 100;
+line.height = 50;
+line.x = 171;
+line.y = 160;
+line.anchor.set(0.5, 0.5);
+
+/*
+	get two points that needs to be connected
+	calc the x between them
+	rotate but save 2 points of the line
+	rotate and change width if 2 points of line changes
+	
+*/
 
 var g2 = new PIXI.Graphics();
 g2.interactive = true;
@@ -172,15 +180,14 @@ g2.beginFill(0x0033CC);
 g2.lineStyle(1, 0xFF0000, 1);
 g2.drawRect(0, 0, 120, 120);
 g2.endFill();
-g2.x = 920;
-g2.y = 200;
+g2.x = 220;
+g2.y = 100;
 
 stage.addChild(g1);
 stage.addChild(g2);
-stage.addChild(line2);
+stage.addChild(line);
 
 
-		
 function ds(e) {
 	this.data = e.data;
 	this.alpha = 0.5;
@@ -194,7 +201,9 @@ function ds(e) {
 	arr.splice( arr.indexOf(this), 1 );
 	arr.push(this);
 }
-var prev;
+var prev,
+	howmuchUp = 0,
+	howmuchDown = 0;
 function dm(e) {
 	if (this.dragging) {
 		prev = this.y
@@ -205,13 +214,33 @@ function dm(e) {
 		this.position.x = newX;
 		this.position.y = newY;
 		
+		/*
 		//line2.rotation -= 0.01;
-		if (newY < prev) {
-			console.log(0);
-			line2.rotation = prev - newY;
+		var up = newY < prev,
+			down = newY > prev;
+		if (up) {
+			howmuchUp += prev - newY;
+			
+			line.rotation += howmuchUp / 5000;
+			var calc = howmuchUp / 10;
+			if ( a.util.isInt(calc) ) {
+				console.log( howmuchUp);
+				line.x += 10;
+			}
+			//console.log(howmuchUp);
+		} else if (down) {
+			howmuchDown += newY - prev;
+			
+			line.rotation -= howmuchDown / 5000;
+			var calc = howmuchUp / 10;
+			if ( a.util.isInt(calc) ) { // every ten times
+				line.x -= 1;
+			}
+			//console.log(howmuchDown);
 		}
-		line2.x = newX + 120;
-		line2.y = newY + 35;
+		//line2.x = newX + 120;
+		line.y = newY + 35;
+		*/
 	}
 }
 function de() {

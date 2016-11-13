@@ -54,6 +54,9 @@ a.util = {
 	moveArrayItem: function (a, f, t) { // array, from, to
 		a.splice(t, 0, a.splice(f, 1)[0]);
 	},
+	isInt: function (n) {
+		return n % 1 === 0;
+	},
 	isEmptyString: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 ) ? true : false;
 	},
