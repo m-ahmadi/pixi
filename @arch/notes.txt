@@ -1,9 +1,15 @@
 Can a device have more than 3 links?
-
 How many device the user will see If he/she zooms out completly?
-
 Show/hide devices based on the category they belong to.
-
 How many category a device can belong to?
-
 How many zoom level there is in the application?
+
+
+Drag & Drop
+Creating Line using Sprite
+Transition
+Button
+Checkbox
+Mousewheel detection
+Resizing a sprite
+Draw Line to the Node's Perimeter, and Make It Stay There

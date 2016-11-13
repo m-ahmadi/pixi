@@ -31,6 +31,7 @@ function animate() {
     requestAnimationFrame(animate);
 	//tink.update();
 	TWEEN.update();
+	
     renderer.render(stage);
 }
 
