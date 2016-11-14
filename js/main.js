@@ -145,17 +145,6 @@ $(document).on('mousewheel', function (e) {
 
 //************************************************************************************************************
 // connect line to shape
-
-var g1 = new PIXI.Graphics();
-g1.interactive = true;
-g1.buttonMode = true;
-g1.beginFill(0x0033CC);
-g1.lineStyle(2, 0xFF0000, 1);
-g1.drawRect(0, 0, 120, 120);
-g1.endFill();
-g1.x = 0;
-g1.y = 100;
-
 var line = PIXI.Sprite.fromImage('images/line.png');
 line.interactive = true;
 line.buttonMode = true;
@@ -164,29 +153,60 @@ line.height = 50;
 line.x = 171;
 line.y = 160;
 line.anchor.set(0.5, 0.5);
-
 /*
 	get two points that needs to be connected
 	calc the x between them
 	rotate but save 2 points of the line
 	rotate and change width if 2 points of line changes
-	
 */
+
+var g1 = new PIXI.Graphics();
+g1.interactive = true;
+g1.buttonMode = true;
+g1.beginFill(0x0033CC);
+g1.lineStyle(2, 0xFF0000, 1);
+g1.drawRect(0, 0, 100, 100);
+g1.endFill();
+g1.x = 100;
+g1.y = 100;
+
+g1.linkPoints = {
+	first: {
+		get x() { return g1.x; },
+		get y() { return g1.y + 50; }
+	},
+	second: {
+		x: 100,
+		y: 200
+	}
+};
+
 
 var g2 = new PIXI.Graphics();
 g2.interactive = true;
 g2.buttonMode = true;
 g2.beginFill(0x0033CC);
 g2.lineStyle(1, 0xFF0000, 1);
-g2.drawRect(0, 0, 120, 120);
+g2.drawRect(0, 0, 100, 100);
 g2.endFill();
-g2.x = 220;
-g2.y = 100;
+g2.x = 400;
+g2.y = 50;
+
+g2.linkPoints = {
+	first: {
+		get x() { return g2.x + g2.width; },
+		get y() { return g2.y + 50; }
+	}
+};
+
+g1.line = line;
+g2.line = line;
+g1.links = g2;
+g2.links = g1;
 
 stage.addChild(g1);
 stage.addChild(g2);
 stage.addChild(line);
-
 
 function ds(e) {
 	this.data = e.data;
@@ -201,52 +221,88 @@ function ds(e) {
 	arr.splice( arr.indexOf(this), 1 );
 	arr.push(this);
 }
-var prev,
+var prevX,
+	prevY,
 	howmuchUp = 0,
 	howmuchDown = 0;
+
+var fromPoint = {
+	x: 100,
+	y: 150
+},
+toPoint = {
+	x: 500,
+	y: 100
+};
 function dm(e) {
 	if (this.dragging) {
-		prev = this.y
+		prevX = this.x;
+		prevY = this.y;
 		var newPosition = this.data.getLocalPosition(this.parent),
 			newX = newPosition.x - this.dragPoint.x;
 			newY = newPosition.y - this.dragPoint.y;
 		
 		this.position.x = newX;
 		this.position.y = newY;
-		
-		/*
-		//line2.rotation -= 0.01;
-		var up = newY < prev,
-			down = newY > prev;
-		if (up) {
-			howmuchUp += prev - newY;
-			
-			line.rotation += howmuchUp / 5000;
-			var calc = howmuchUp / 10;
-			if ( a.util.isInt(calc) ) {
-				console.log( howmuchUp);
-				line.x += 10;
-			}
-			//console.log(howmuchUp);
-		} else if (down) {
-			howmuchDown += newY - prev;
-			
-			line.rotation -= howmuchDown / 5000;
-			var calc = howmuchUp / 10;
-			if ( a.util.isInt(calc) ) { // every ten times
-				line.x -= 1;
-			}
-			//console.log(howmuchDown);
-		}
-		//line2.x = newX + 120;
-		line.y = newY + 35;
-		*/
 	}
 }
 function de() {
 	this.alpha = 1;
 	this.dragging = false;
 	this.data = null;
+	//console.log(this.links.linkPoints.first);
+	adjustLine(this.line, this.linkPoints.first, this.links.linkPoints.first);
+}
+function adjustLine(line, fromPoint, toPoint) {
+	var x1 = fromPoint.x,
+		y1 = fromPoint.y,
+		x2 = toPoint.x,
+		y2 = toPoint.y,
+		distanceX, distanceY,
+		midX, midY,
+		bigX, smallX,
+		bigY, smallY,
+		diffY,
+		rotation;
+	if (x1 < 0 ||
+		y1 < 0 ||
+		x2 < 0 ||
+		y2 < 0) {
+		throw new Error('adjustLine():  Something\'s not right');
+	}
+		
+	if (x1 > x2) {	
+		bigX = x1;
+		smallX = x2;
+	} else if (x2 > x1) {
+		bigX = x2;
+		smallX = x1;
+	}
+	if (y1 > y2) {
+		bigY = y1;
+		smallY = y2;
+	} else if (y2 > y1) {
+		bigY = y2;
+		smallY = y1;
+	}
+	distanceX = bigX - smallX;
+	distanceY = bigY - smallY; // get diff in positive
+	diffY = y1 - y2;           // get diff positive and negative
+	
+	midX = smallX + (distanceX / 2);
+	midY = smallY + (distanceY / 2);
+	rotation = ( ( (midY - smallY) / 2) + smallY ) / 1000;
+	rotation = distanceY / 1000;
+	
+	
+	line.x = midX;
+	line.y = midY;
+	console.log(  );
+	line.width = distanceX;
+	//line.rotation = a.util.makeNumberNegative( rotation );
+	line.rotation = rotation;
+	
+	// adjust line width in high rotations
 }
 
 g1

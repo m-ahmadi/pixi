@@ -57,6 +57,9 @@ a.util = {
 	isInt: function (n) {
 		return n % 1 === 0;
 	},
+	makeNumberNegative: function (n) {
+		return Math.abs(n) * -1;
+	},
 	isEmptyString: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 ) ? true : false;
 	},
