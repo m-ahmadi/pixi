@@ -149,10 +149,11 @@ var line = PIXI.Sprite.fromImage('images/line.png');
 line.interactive = true;
 line.buttonMode = true;
 line.width = 100;
-line.height = 50;
+line.height = 40;
+line.anchor.set(0.5, 0.5);
 line.x = 171;
 line.y = 160;
-line.anchor.set(0.5, 0.5);
+
 /*
 	get two points that needs to be connected
 	calc the x between them
@@ -170,18 +171,6 @@ g1.endFill();
 g1.x = 100;
 g1.y = 100;
 
-g1.linkPoints = {
-	first: {
-		get x() { return g1.x; },
-		get y() { return g1.y + 50; }
-	},
-	second: {
-		x: 100,
-		y: 200
-	}
-};
-
-
 var g2 = new PIXI.Graphics();
 g2.interactive = true;
 g2.buttonMode = true;
@@ -192,10 +181,17 @@ g2.endFill();
 g2.x = 400;
 g2.y = 50;
 
+
+g1.linkPoints = {
+	first: {
+		get x() { return g1.x + g1.width; },
+		get y() { return g1.y + (g1.y / 2); }
+	}
+};
 g2.linkPoints = {
 	first: {
-		get x() { return g2.x + g2.width; },
-		get y() { return g2.y + 50; }
+		get x() { return g2.x; },
+		get y() { return g2.y + (g2.y / 2); }
 	}
 };
 
@@ -221,19 +217,6 @@ function ds(e) {
 	arr.splice( arr.indexOf(this), 1 );
 	arr.push(this);
 }
-var prevX,
-	prevY,
-	howmuchUp = 0,
-	howmuchDown = 0;
-
-var fromPoint = {
-	x: 100,
-	y: 150
-},
-toPoint = {
-	x: 500,
-	y: 100
-};
 function dm(e) {
 	if (this.dragging) {
 		prevX = this.x;
@@ -250,7 +233,7 @@ function de() {
 	this.alpha = 1;
 	this.dragging = false;
 	this.data = null;
-	//console.log(this.links.linkPoints.first);
+	
 	adjustLine(this.line, this.linkPoints.first, this.links.linkPoints.first);
 }
 function adjustLine(line, fromPoint, toPoint) {
@@ -290,17 +273,21 @@ function adjustLine(line, fromPoint, toPoint) {
 	diffY = y1 - y2;           // get diff positive and negative
 	
 	midX = smallX + (distanceX / 2);
-	midY = smallY + (distanceY / 2);
-	rotation = ( ( (midY - smallY) / 2) + smallY ) / 1000;
+	midY = smallY + (distanceY/ 2);
+	//rotation = ( ( (midY - smallY) / 2) + smallY ) / 1000;
+	//rotation = a.util.makeNumberNegative( rotation )
 	rotation = distanceY / 1000;
 	
-	
+	console.log(distanceX, midX);
 	line.x = midX;
 	line.y = midY;
-	console.log(  );
 	line.width = distanceX;
-	//line.rotation = a.util.makeNumberNegative( rotation );
-	line.rotation = rotation;
+	//line.rotation = rotation;
+	
+	// which point is on left
+	// which one is right
+	// which point is upper
+	// which point is lower
 	
 	// adjust line width in high rotations
 }

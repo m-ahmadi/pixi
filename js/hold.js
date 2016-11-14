@@ -55,7 +55,12 @@ function adjustLine(line, fistPoint, secondPoint) {
 //line.y += newY - prevY;
 
 
-
+/*
+var prevX,
+	prevY,
+	howmuchUp = 0,
+	howmuchDown = 0;
+*/
 /*
 //line2.rotation -= 0.01;
 var up = newY < prev,
