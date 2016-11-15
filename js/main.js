@@ -22,45 +22,11 @@ line1.height = 100;
 line1.x = 900;
 line1.y = 100;
 line1.anchor.set(0);
-addDragDrop(line1);
-stage.addChild(line1);
-
-/*
-	var line = PIXI.Sprite.fromImage('images/line.png');
-	line.interactive = true;
-	line.buttonMode = true;
-
-	line.width = 200;
-	line.height = 10;
-	line.x = Math.random() * window.innerWidth *5;
-	line.y = Math.random() * window.innerHeight *5;
-	line.anchor.set(0);
-	
-	addDragDrop(line);
-	stage.addChild(line);
-	
-	----------------------------------
-	var line = new PIXI.Graphics();
-	line.lineStyle(1, 0x101010, 1);
-	line.beginFill();
-	line.moveTo(Math.random() * window.innerHeight *10, Math.random() * window.innerHeight *10);
-	line.lineTo(Math.random() * window.innerHeight *10, Math.random() * window.innerHeight *10);
-	line.endFill();
-	
-	var newline = line.clone();
-	newline.x = Math.random() * window.innerWidth *5;
-	newline.y = Math.random() * window.innerHeight *5;
-	
-	addDragDrop(line);
-	stage.addChild(line);
-	
-*/
 
 
 // var newline = ll.clone();
 // newline.x = Math.random() * window.innerWidth *5;
 // newline.y = Math.random() * window.innerHeight *5;
-
 //------------------------------------------------------------------------
 var texture = PIXI.Texture.fromImage('images/computer.png');
 var sprite = new PIXI.Sprite(texture);
@@ -100,34 +66,6 @@ var text = new PIXI.Text("salam", {fontFamily: "Impact", fontSize: "24px", fill:
 text.interactive = true;
 text.buttonMode = true;
 //************************************************************************************************************
-// tink.makeDraggable(harddrive);
-//tink.makeDraggable(rect);
-// tink.makeDraggable(sprite);
-addDragDrop(text);
-addDragDrop(sprite);
-addDragDrop(harddrive);
-addDragDrop(graphics);
-
-
-// background.addChild(harddrive);
-// background.addChild(rect);
-// background.addChild(sprite);
-// background.addChild(text);
-
-stage.addChild(harddrive);
-stage.addChild(graphics);
-stage.addChild(sprite);
-stage.addChild(text);
-
-stage.addChild(background);
-
-//************************************************************************************************************
-requestAnimationFrame( animate );
-renderer.render(stage);
-
-
-
-//************************************************************************************************************
 $(document).on('mousewheel', function (e) {
 	// e.deltaX, e.deltaY, e.deltaFactor
 	
@@ -151,21 +89,17 @@ $(document).on('mousewheel', function (e) {
 
 //************************************************************************************************************
 // connect line to shape
-var line = PIXI.Sprite.fromImage('images/line.png');
+var line = new PIXI.Graphics();
 line.interactive = true;
 line.buttonMode = true;
-line.width = 100;
-line.height = 40;
-line.anchor.set(0.5, 0.5);
-line.x = 171;
-line.y = 160;
-
-/*
-	get two points that needs to be connected
-	calc the x between them
-	rotate but save 2 points of the line
-	rotate and change width if 2 points of line changes
-*/
+line.lineStyle(1, 0xff0000, 1);
+line.beginFill();
+line.moveTo(300, 100);
+line.lineTo(291, 400);
+line.lineTo(310, 100);
+line.lineTo(300, 100);
+line.currentPath.shape.closed = false;
+line.endFill();
 
 var g1 = new PIXI.Graphics();
 g1.interactive = true;
@@ -206,145 +140,34 @@ g2.line = line;
 g1.links = g2;
 g2.links = g1;
 
+function adjustLine(line, fromPoint, toPoint) {
+	
+}
+//************************************************************************************************************
+// tink.makeDraggable(harddrive);
+//tink.makeDraggable(rect);
+// tink.makeDraggable(sprite);
+addDragDrop(text);
+addDragDrop(sprite);
+addDragDrop(harddrive);
+addDragDrop(graphics);
+addDragDrop(g1);
+addDragDrop(g2);
+addDragDrop(line);
+addDragDrop(line1);
+// background.addChild(harddrive);
+// background.addChild(rect);
+// background.addChild(sprite);
+// background.addChild(text);
+stage.addChild(harddrive);
+stage.addChild(graphics);
+stage.addChild(sprite);
+stage.addChild(text);
+stage.addChild(background);
+stage.addChild(line1);
 stage.addChild(g1);
 stage.addChild(g2);
 stage.addChild(line);
-
-function ds(e) {
-	this.data = e.data;
-	this.alpha = 0.5;
-	this.dragging = true;
-    this.dragPoint = e.data.getLocalPosition(this.parent);
-    this.dragPoint.x -= this.position.x;
-    this.dragPoint.y -= this.position.y;
-	
-	// reorder children for z-index
-	var arr = stage.children;
-	arr.splice( arr.indexOf(this), 1 );
-	arr.push(this);
-}
-function dm(e) {
-	if (this.dragging) {
-		prevX = this.x;
-		prevY = this.y;
-		var newPosition = this.data.getLocalPosition(this.parent),
-			newX = newPosition.x - this.dragPoint.x;
-			newY = newPosition.y - this.dragPoint.y;
-		
-		this.position.x = newX;
-		this.position.y = newY;
-	}
-}
-function de() {
-	this.alpha = 1;
-	this.dragging = false;
-	this.data = null;
-	
-	adjustLine(this.line, this.linkPoints.first, this.links.linkPoints.first);
-}
-
-var middleY;
-function adjustLine(line, fromPoint, toPoint) {
-	var x1 = fromPoint.x,
-		y1 = fromPoint.y,
-		x2 = toPoint.x,
-		y2 = toPoint.y,
-		distanceX, distanceY,
-		midX, midY,
-		bigX, smallX,
-		bigY, smallY,
-		diffY,
-		toLeftX = false,
-		toRightX = false,	
-		toUpY = false,
-		toDownY = false,
-		rotateCalc,
-		rotation;
-	if (x1 < 0 ||
-		y1 < 0 ||
-		x2 < 0 ||
-		y2 < 0) {
-		throw new Error('adjustLine():  Something\'s not right');
-	}
-		
-	if (x1 > x2) {	
-		bigX = x1;
-		smallX = x2;
-		toLeftX = true;
-	} else if (x2 > x1) {
-		bigX = x2;
-		smallX = x1;
-		toRightX = true;
-	}
-	if (y1 > y2) {
-		bigY = y1;
-		smallY = y2;
-		toUpY = true;
-	} else if (y2 > y1) {
-		bigY = y2;
-		smallY = y1;
-		toDownY = true;
-	}
-	distanceX = bigX - smallX;
-	distanceY = bigY - smallY; // get diff in positive
-	diffY = y1 - y2;           // get diff positive and negative
-	
-	midX = smallX + (distanceX / 2);
-	midY = smallY + (distanceY/ 2);
-	middleY = midY;
-	
-	/* how to rotate it?
-		
-	//rotation = ( ( (midY - smallY) / 2) + smallY ) / 1000;
-	//rotation = a.util.makeNumberNegative( rotation )
-	rotation = distanceY / 1000;
-	*/
-	
-	if (toRightX) {
-		rotateCalc = (y1 - y2) / 800;
-		rotation = a.util.makeNumberNegative( rotateCalc );
-	} else if (toLeftX) {
-		rotation = (y1 - y2) / 800;
-	}
-	if (toUpY) {
-		
-	} else if (toDownY) {
-		
-	}
-	
-	//console.log( rotation );
-	
-	line.x = midX;
-	line.y = midY;
-	line.width = distanceX;
-	line.rotation = rotation;
-	
-	
-	/*
-		which point is on left
-		which one is right
-		which point is upper
-		which point is lower
-		
-		adjust line width in high rotations
-	*/
-}
-
-g1
-	.on('mousedown', ds)
-	.on('touchstart', ds)
-	.on('mouseup', de)
-	.on('mouseupoutside', de)
-	.on('touchend', de)
-	.on('touchendoutside', de)
-	.on('mousemove', dm)
-	.on('touchmove', dm);
-g2
-	.on('mousedown', ds)
-	.on('touchstart', ds)
-	.on('mouseup', de)
-	.on('mouseupoutside', de)
-	.on('touchend', de)
-	.on('touchendoutside', de)
-	.on('mousemove', dm)
-	.on('touchmove', dm);
+//************************************************************************************************************
+requestAnimationFrame( animate );
+renderer.render(stage);
