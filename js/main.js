@@ -1,5 +1,5 @@
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {
-	backgroundColor: 0x1099bb
+	backgroundColor: 0x506699
 });
 document.body.appendChild(renderer.view);
 
@@ -55,6 +55,12 @@ stage.addChild(line1);
 	stage.addChild(line);
 	
 */
+
+
+// var newline = ll.clone();
+// newline.x = Math.random() * window.innerWidth *5;
+// newline.y = Math.random() * window.innerHeight *5;
+
 //------------------------------------------------------------------------
 var texture = PIXI.Texture.fromImage('images/computer.png');
 var sprite = new PIXI.Sprite(texture);
@@ -165,7 +171,7 @@ var g1 = new PIXI.Graphics();
 g1.interactive = true;
 g1.buttonMode = true;
 g1.beginFill(0x0033CC);
-g1.lineStyle(2, 0xFF0000, 1);
+g1.lineStyle(0, 0xFF0000, 1);
 g1.drawRect(0, 0, 100, 100);
 g1.endFill();
 g1.x = 100;
@@ -175,7 +181,7 @@ var g2 = new PIXI.Graphics();
 g2.interactive = true;
 g2.buttonMode = true;
 g2.beginFill(0x0033CC);
-g2.lineStyle(1, 0xFF0000, 1);
+g2.lineStyle(0, 0xFF0000, 1);
 g2.drawRect(0, 0, 100, 100);
 g2.endFill();
 g2.x = 400;
@@ -185,13 +191,13 @@ g2.y = 50;
 g1.linkPoints = {
 	first: {
 		get x() { return g1.x + g1.width; },
-		get y() { return g1.y + (g1.y / 2); }
+		get y() { return g1.y + (g1.height / 2); }
 	}
 };
 g2.linkPoints = {
 	first: {
 		get x() { return g2.x; },
-		get y() { return g2.y + (g2.y / 2); }
+		get y() { return g2.y + (g2.height / 2); }
 	}
 };
 
@@ -236,6 +242,8 @@ function de() {
 	
 	adjustLine(this.line, this.linkPoints.first, this.links.linkPoints.first);
 }
+
+var middleY;
 function adjustLine(line, fromPoint, toPoint) {
 	var x1 = fromPoint.x,
 		y1 = fromPoint.y,
@@ -246,6 +254,11 @@ function adjustLine(line, fromPoint, toPoint) {
 		bigX, smallX,
 		bigY, smallY,
 		diffY,
+		toLeftX = false,
+		toRightX = false,	
+		toUpY = false,
+		toDownY = false,
+		rotateCalc,
 		rotation;
 	if (x1 < 0 ||
 		y1 < 0 ||
@@ -257,16 +270,20 @@ function adjustLine(line, fromPoint, toPoint) {
 	if (x1 > x2) {	
 		bigX = x1;
 		smallX = x2;
+		toLeftX = true;
 	} else if (x2 > x1) {
 		bigX = x2;
 		smallX = x1;
+		toRightX = true;
 	}
 	if (y1 > y2) {
 		bigY = y1;
 		smallY = y2;
+		toUpY = true;
 	} else if (y2 > y1) {
 		bigY = y2;
 		smallY = y1;
+		toDownY = true;
 	}
 	distanceX = bigX - smallX;
 	distanceY = bigY - smallY; // get diff in positive
@@ -274,22 +291,43 @@ function adjustLine(line, fromPoint, toPoint) {
 	
 	midX = smallX + (distanceX / 2);
 	midY = smallY + (distanceY/ 2);
+	middleY = midY;
+	
+	/* how to rotate it?
+		
 	//rotation = ( ( (midY - smallY) / 2) + smallY ) / 1000;
 	//rotation = a.util.makeNumberNegative( rotation )
 	rotation = distanceY / 1000;
+	*/
 	
-	console.log(distanceX, midX);
+	if (toRightX) {
+		rotateCalc = (y1 - y2) / 800;
+		rotation = a.util.makeNumberNegative( rotateCalc );
+	} else if (toLeftX) {
+		rotation = (y1 - y2) / 800;
+	}
+	if (toUpY) {
+		
+	} else if (toDownY) {
+		
+	}
+	
+	//console.log( rotation );
+	
 	line.x = midX;
 	line.y = midY;
 	line.width = distanceX;
-	//line.rotation = rotation;
+	line.rotation = rotation;
 	
-	// which point is on left
-	// which one is right
-	// which point is upper
-	// which point is lower
 	
-	// adjust line width in high rotations
+	/*
+		which point is on left
+		which one is right
+		which point is upper
+		which point is lower
+		
+		adjust line width in high rotations
+	*/
 }
 
 g1

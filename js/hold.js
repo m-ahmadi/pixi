@@ -1,3 +1,60 @@
+/*
+var i;
+for (i = 0; i < 30000; i+=1) {
+	var ll = new PIXI.Graphics();
+	ll.interactive = true;
+	ll.buttonMode = true;
+	ll.lineStyle(2, 0x101010, 1);
+	ll.beginFill();
+
+	ll.moveTo(
+		Math.random() * window.innerWidth *10,
+		Math.random() * window.innerHeight *10
+	);
+	ll.lineTo(
+		Math.random() * window.innerWidth *50,
+		Math.random() * window.innerHeight *50
+	);
+
+
+	// // ll.drawRoundedRect(
+		// // Math.random() * window.innerWidth *5,
+		// // Math.random() * window.innerHeight *5,
+		// // 200, 300, 100, 15);
+	
+	
+	ll.endFill();
+	addDragDrop(ll);
+	stage.addChild(ll);
+	
+	-------------------------------------------------------------------
+	var g = new PIXI.Graphics();
+	g.interactive = true;
+	g.buttonMode = true;
+	g.beginFill(0x28ab99);
+	g.lineStyle(0, 0xFF0000, 1);
+	g.drawRect(
+		Math.random() * window.innerWidth *10,
+		Math.random() * window.innerWidth *10,
+		60, 60);
+	g.endFill();
+	addDragDrop(g);
+	stage.addChild(g);
+	
+	-------------------------------------------------------------------
+	var s = new PIXI.Sprite.fromImage('images/computer.png');
+	s.interactive = true;
+	s.buttonMode = true;
+	s.anchor.set(0.5);
+	s.scale.set(0.09);
+	s.position.x = Math.random() * window.innerWidth *10;
+	s.position.y = Math.random() * window.innerWidth *10;
+	addDragDrop(s);
+	stage.addChild(s);
+}
+*/
+
+
 var firstPoint = {
 	x: 100,
 	y: 150
