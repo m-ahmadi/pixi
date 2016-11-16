@@ -140,6 +140,22 @@ g2.line = line;
 g1.links = g2;
 g2.links = g1;
 
+
+for (var i=0; i<10000; i++) {
+	var layn = new PIXI.Graphics();
+	layn.lineStyle(1, 0xFFFFF);
+	layn.moveTo(
+		Math.random() *window.innerWidth *20,
+		Math.random() *window.innerHeight *20
+	);
+	layn.lineTo(
+		Math.random() *window.innerWidth *40,
+		Math.random() *window.innerHeight *40
+	);
+	stage.addChild(layn);
+}
+
+
 function adjustLine(line, fromPoint, toPoint) {
 	
 }
