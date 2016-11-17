@@ -1,6 +1,9 @@
-var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {
-	backgroundColor: 0x506699
-});
+var renderer = PIXI.autoDetectRenderer(
+	window.innerWidth,
+	window.innerHeight,
+	{
+		backgroundColor: 0x506699
+	});
 document.body.appendChild(renderer.view);
 
 //var tink = new Tink(PIXI, renderer.view);
@@ -12,22 +15,7 @@ stage.buttonMode = true;
 //************************************************************************************************************
 var background = new PIXI.Container();
 //------------------------------------------------------------------------
-// Line
 
-var line1 = PIXI.Sprite.fromImage('images/line.png');
-line1.interactive = true;
-line1.buttonMode = true;
-line1.width = 200;
-line1.height = 100;
-line1.x = 900;
-line1.y = 100;
-line1.anchor.set(0);
-
-
-// var newline = ll.clone();
-// newline.x = Math.random() * window.innerWidth *5;
-// newline.y = Math.random() * window.innerHeight *5;
-//------------------------------------------------------------------------
 var texture = PIXI.Texture.fromImage('images/computer.png');
 var sprite = new PIXI.Sprite(texture);
 sprite.interactive = true;
@@ -72,12 +60,12 @@ $(document).on('mousewheel', function (e) {
 	
 	if (e.deltaY < 0) {
 		console.log( 'Zoom out...');
-		stage.scale.set( stage.scale.x -= 0.01  );
-		stage.scale.set( stage.scale.y -= 0.01  );
+		stage.scale.set( stage.scale.x -= 0.05  );
+		stage.scale.set( stage.scale.y -= 0.05  );
 	} else {
 		console.log( 'Zoom in..' );
-		stage.scale.set( stage.scale.x += 0.01  );
-		stage.scale.set( stage.scale.y += 0.01  );
+		stage.scale.set( stage.scale.x += 0.05  );
+		stage.scale.set( stage.scale.y += 0.05  );
 	}
 	
 });
@@ -92,13 +80,11 @@ $(document).on('mousewheel', function (e) {
 var line = new PIXI.Graphics();
 line.interactive = true;
 line.buttonMode = true;
-line.lineStyle(1, 0xff0000, 1);
 line.beginFill();
-line.moveTo(300, 100);
-line.lineTo(291, 400);
-line.lineTo(310, 100);
-line.lineTo(300, 100);
-line.currentPath.shape.closed = false;
+line.lineStyle(2, 0xFFFFF);
+line.moveTo(0, 0);
+line.lineTo(150, 150);
+line.lineTo(0, 0);
 line.endFill();
 
 var g1 = new PIXI.Graphics();
@@ -141,24 +127,45 @@ g1.links = g2;
 g2.links = g1;
 
 
-for (var i=0; i<10000; i++) {
-	var layn = new PIXI.Graphics();
-	layn.lineStyle(1, 0xFFFFF);
-	layn.moveTo(
-		Math.random() *window.innerWidth *20,
-		Math.random() *window.innerHeight *20
-	);
-	layn.lineTo(
-		Math.random() *window.innerWidth *40,
-		Math.random() *window.innerHeight *40
-	);
-	stage.addChild(layn);
-}
-
-
-function adjustLine(line, fromPoint, toPoint) {
+var n1 = new PIXI.Sprite.fromImage("images/pcb.png");
+n1.interactive = true;
+n1.buttonMode = true;
+n1.anchor.set(0, 0);
+n1.scale.set(0.2);
+n1.position.x = 200;
+n1.position.y = 200;
+n1.TPL_nodeID = "pc_2";
+n1.TPL_node = true;
+n1.TPL_links = {};
+n1.TPL_links.positions = [{
+	x: 500,
+	y: 200
+}, {
 	
-}
+}];
+
+var n2 = new PIXI.Sprite.fromImage("images/pcb.png");
+n2.interactive = true;
+n2.buttonMode = true;
+n2.anchor.set(0, 0);
+n2.scale.set(0.2);
+n2.position.x = 500;
+n2.position.y = 200;
+n2.TPL_nodeID = "pc_3";
+n2.TPL_node = true;
+n2.TPL_links = {};
+n2.TPL_links.positions = [{
+	x: 200,
+	y: 200
+}, {
+	
+}];
+
+addDragDrop(n1);
+addDragDrop(n2);
+stage.addChild(n1);
+stage.addChild(n2);
+
 //************************************************************************************************************
 // tink.makeDraggable(harddrive);
 //tink.makeDraggable(rect);
@@ -170,7 +177,6 @@ addDragDrop(graphics);
 addDragDrop(g1);
 addDragDrop(g2);
 addDragDrop(line);
-addDragDrop(line1);
 // background.addChild(harddrive);
 // background.addChild(rect);
 // background.addChild(sprite);
@@ -180,10 +186,9 @@ stage.addChild(graphics);
 stage.addChild(sprite);
 stage.addChild(text);
 stage.addChild(background);
-stage.addChild(line1);
+stage.addChild(line);
 stage.addChild(g1);
 stage.addChild(g2);
-stage.addChild(line);
 //************************************************************************************************************
 requestAnimationFrame( animate );
 renderer.render(stage);

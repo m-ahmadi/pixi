@@ -6,8 +6,7 @@ function dragStart(e) {
     this.dragPoint = e.data.getLocalPosition(this.parent);
     this.dragPoint.x -= this.position.x;
     this.dragPoint.y -= this.position.y;
-	asghar = this;
-	console.log(this);
+	
 	// reorder children for z-index
 	var arr = stage.children;
 	arr.splice( arr.indexOf(this), 1 );
@@ -26,11 +25,71 @@ function dragEnd() {
 	this.data = null;
 	
 	
-	if (this.deviceNode) {
-		adjustLine(this.line, this.linkPoints.first, this.links.linkPoints.first);
+	if (this.TPL_node) {
+		adjustLines(this);
 	}
 }
 
+function adjustLines(node) {
+	console.log( calcLinkPoints(node) );
+}
+
+function getPerimeterPoints(position) {
+	if ( !position ) { throw new TypeError("getPerimeterPoints():  No argument!"); }
+	if ( !a.util.isObject(position) ) { throw new TypeError("getPerimeterPoints():  Arg must be object"); }
+	
+	var x = position.x,
+		y = position.y,
+		width = position.width,
+		height = position.height,
+		result = {};
+	
+	result.topLeft = {
+		x: x,
+		y: y
+	};
+	result.topRight = {
+		x: x + width,
+		y: y
+	};
+	result.bottomLeft = {
+		x: x,
+		y: y + height
+	};
+	result.bottomRight = {
+		x: x + width,
+		y: y + height
+	};
+	return result;
+}
+function calcLinkPoints(node) {
+	var points = [],
+		source = getPerimeterPoints(node.position);
+	
+	
+	
+	node.TPL_links.positions.forEach(function (item) {
+		var target = getPerimeterPoints(item);
+		
+		// where is this link point in relation to the current node
+		
+		if (target.topRight.x < source.topLeft.x) {
+			console.log('1');
+		} else if (target.topLeft.x > source.topLeft.x) {
+			console.log('2');
+		}
+		
+		if (target.topRight.y < source.topLeft.y) {
+			console.log('3');
+		} else if (target.topRight.y > source.topLeft.y) {
+			console.log('4');
+		}
+		
+		
+	});
+	
+	return points;
+}
 
 function animate() {
     requestAnimationFrame(animate);
