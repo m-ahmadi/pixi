@@ -138,8 +138,10 @@ n1.TPL_nodeID = "pc_2";
 n1.TPL_node = true;
 n1.TPL_links = {};
 n1.TPL_links.positions = [{
-	x: 500,
-	y: 200
+	get x() { return n2.x; },
+	get y() { return n2.y; },
+	get width() { return n2.width; },
+	get height() { return n2.height; }
 }, {
 	
 }];
@@ -155,8 +157,10 @@ n2.TPL_nodeID = "pc_3";
 n2.TPL_node = true;
 n2.TPL_links = {};
 n2.TPL_links.positions = [{
-	x: 200,
-	y: 200
+	get x() { return n1.x; },
+	get y() { return n1.y; },
+	get width() { return n1.width; },
+	get height() { return n1.height; }
 }, {
 	
 }];

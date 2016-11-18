@@ -27,7 +27,7 @@ a.util = {
 			v &&
 			typeof v === 'object' &&
 			typeof v !== null &&
-			Object.prototype.toString.call(v) === "[object Object]"
+			Object.prototype.toString.call(v) === '[object Object]'
 		) ? true : false;
 	},
 	isArray: function (v) {
@@ -40,7 +40,7 @@ a.util = {
 			typeof v.length === 'number' &&
 			typeof v.splice === 'function' &&
 			!v.propertyIsEnumerable('length') &&
-			Object.prototype.toString.call(v) === "[object Array]"
+			Object.prototype.toString.call(v) === '[object Array]'
 		) ? true : false;
 	},
 	getArgs: function (a) {
@@ -52,13 +52,26 @@ a.util = {
 		return args;
 	},
 	moveArrayItem: function (a, f, t) { // array, from, to
-		a.splice(t, 0, a.splice(f, 1)[0]);
+		a.splice( t, 0, a.splice(f, 1)[0] );
 	},
 	isInt: function (n) {
 		return n % 1 === 0;
 	},
 	makeNumberNegative: function (n) {
 		return Math.abs(n) * -1;
+	},
+	isEmptyObject: function (o) {
+		var k;
+		if ( typeof Object.getOwnPropertyNames === 'function' ) {
+			return Object.getOwnPropertyNames(o).length === 0; // ES5
+		} else {
+			for ( k in o ) { 
+				if (  o.hasOwnProperty( k )  ) {
+					return false;
+				}
+			}
+			return true;
+		}
 	},
 	isEmptyString: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 ) ? true : false;
