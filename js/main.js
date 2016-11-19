@@ -2,7 +2,7 @@ var renderer = PIXI.autoDetectRenderer(
 	window.innerWidth,
 	window.innerHeight,
 	{
-		backgroundColor: 0x506699
+		backgroundColor: 0xAB9999
 	});
 document.body.appendChild(renderer.view);
 
@@ -134,17 +134,29 @@ n1.anchor.set(0, 0);
 n1.scale.set(0.2);
 n1.position.x = 200;
 n1.position.y = 200;
-n1.TPL_nodeID = "pc_2";
-n1.TPL_node = true;
-n1.TPL_links = {};
-n1.TPL_links.positions = [{
-	get x() { return n2.x; },
-	get y() { return n2.y; },
-	get width() { return n2.width; },
-	get height() { return n2.height; }
-}, {
-	
-}];
+n1.TPL = {
+	nodeID: 'pc_2',
+	links: [{
+		get x() { return n2.x; },
+		get y() { return n2.y; },
+		get width() { return n2.width; },
+		get height() { return n2.height; },
+		get linkCount() { return n2.TPL.linkCount; },
+		sides: {
+			left: [126],
+			right: [],
+			top: [],
+			bottom: []
+		}
+	}],
+	get linkCount() { return this.links.length; },
+	sides: {
+		left: [],
+		right: [126],
+		top: [],
+		bottom: []
+	}
+};
 
 var n2 = new PIXI.Sprite.fromImage("images/pcb.png");
 n2.interactive = true;
@@ -153,17 +165,29 @@ n2.anchor.set(0, 0);
 n2.scale.set(0.2);
 n2.position.x = 500;
 n2.position.y = 200;
-n2.TPL_nodeID = "pc_3";
-n2.TPL_node = true;
-n2.TPL_links = {};
-n2.TPL_links.positions = [{
-	get x() { return n1.x; },
-	get y() { return n1.y; },
-	get width() { return n1.width; },
-	get height() { return n1.height; }
-}, {
-	
-}];
+n2.TPL = {
+	nodeID: 'pc_3',
+	links: [{
+		get x() { return n1.x; },
+		get y() { return n1.y; },
+		get width() { return n1.width; },
+		get height() { return n1.height; },
+		get linkCount() { return n1.TPL.linkCount },
+		sides: {
+			left: [126],
+			right: [],
+			top: [],
+			bottom: []
+		}
+	}],
+	get linkCount() { return this.links.length; },
+	sides: {
+		left: [],
+		right: [126],
+		top: [],
+		bottom: []
+	}
+};
 
 addDragDrop(n1);
 addDragDrop(n2);
