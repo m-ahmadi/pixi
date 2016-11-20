@@ -17,11 +17,7 @@ if (typeof Object.keys !== 'function') {
 		return keys;
 	}
 }
-
-var a = {};
-
-
-a.util = {
+var util = {
 	isObject: function (v) {
 		return (
 			v &&
@@ -62,15 +58,17 @@ a.util = {
 	},
 	isEmptyObject: function (o) {
 		var k;
-		if ( typeof Object.getOwnPropertyNames === 'function' ) {
-			return Object.getOwnPropertyNames(o).length === 0; // ES5
-		} else {
-			for ( k in o ) { 
-				if (  o.hasOwnProperty( k )  ) {
-					return false;
+		if ( this.isObject(o) ) {
+			if ( typeof Object.getOwnPropertyNames === 'function' ) {
+				return Object.getOwnPropertyNames(o).length === 0; // ES5
+			} else {
+				for ( k in o ) { 
+					if (  o.hasOwnProperty( k )  ) {
+						return false;
+					}
 				}
+				return true;
 			}
-			return true;
 		}
 	},
 	isEmptyString: function (v) {
