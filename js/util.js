@@ -15,7 +15,7 @@ if (typeof Object.keys !== 'function') {
 			}
 		}
 		return keys;
-	}
+	};
 }
 var util = {
 	isObject: function (v) {

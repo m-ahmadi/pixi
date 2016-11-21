@@ -1,3 +1,24 @@
+/*
+sourceSide = '',
+targetSide = '',
+if (farUp || midUp) {
+	sourceSide = 'top';
+	targetSide =  'bottom';
+} else if (farDown || midDown) {
+	sourceSide = 'bottom';
+	targetSide =  'top';
+} else if (farRight || midRight) {
+	sourceSide = 'right';
+	targetSide = 'left';
+} else if (farLeft || midLeft) {
+	sourceSide = 'left';
+	targetSide =  'right';
+}
+source.side = sourceSide;
+target.side = targetSide;
+
+*/
+//calcSidePoints( source, target );
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 var middleY;
 function adjustLine(line, fromPoint, toPoint) {

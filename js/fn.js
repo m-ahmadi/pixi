@@ -1,15 +1,11 @@
-var asghar = 0;
+var s;
 var a = (function () {
 "use strict";
 
 var core = (function () {
 	
-	var adjustLine = function (points, line) {
-		if (!line) { return; }
-		//line.clear();
-		//line.destroy();
-		line = pixi.createLine(points);
-		a.pixi.stage.addChild(line);
+	var adjustLine = function (line, points) {
+		pixi.redrawLine(line, points);
 	},
 	getNodeInfo = function (node) {
 		/*	node: A sprite or a graphics object, or a link object
@@ -18,46 +14,51 @@ var core = (function () {
 			y = node.y,
 			width = node.width,
 			height = node.height,
+			pos = {},
 			result = {};
 		
-		result.left = x;
-		result.right = x + width;
-		result.top = y;
-		result.bottom = y + height;
-		result.midLeft = {
+		result.linkCount = node.linkCount || node.TPL_linkCount;
+		
+		pos.left = x;
+		pos.right = x + width;
+		pos.top = y;
+		pos.bottom = y + height;
+		
+		pos.midLeft = {
 			x: x,
 			y: y + (height / 2)
 		}
-		result.midRight = {
+		pos.midRight = {
 			x: x + width,
 			y: y + (height / 2)
 		};
-		result.midTop = {
+		pos.midTop = {
 			x: x + (width / 2),
 			y: y
 		};
-		result.midBott = {
+		pos.midBott = {
 			x: x + (width / 2),
 			y: y + height
 		};
 		
-		result.topLeft = {
+		pos.topLeft = {
 			x: x,
 			y: y
 		};
-		result.topRight = {
+		pos.topRight = {
 			x: x + width,
 			y: y
 		};
-		result.bottomLeft = {
+		pos.bottomLeft = {
 			x: x,
 			y: y + height
 		};
-		result.bottomRight = {
+		pos.bottomRight = {
 			x: x + width,
 			y: y + height
 		};
-		result.linkCount = node.linkCount || node.TPL_linkCount;
+		
+		result.pos = pos;
 		
 		return result;
 	},
@@ -101,112 +102,199 @@ var core = (function () {
 			
 		};
 	},
-	calcOneLink = function () {
+	getOneLinkRelativePosition = function (source, target) {
+		// where is this link point in relation to the current node
+		// target: one of the links of the dragged node
+		var rel = {};
+		rel.farLeft = false;
+		rel.farRight = false;
+		rel.midLeft = false;
+		rel.midRight = false;
+		rel.farUp = false;
+		rel.farDown = false;
+		rel.midUp = false;
+		rel.midDown = false;
+		rel.sameX = false;
+		rel.sameY = false;
 		
+		if ( target.right < source.left ) { // farLeft
+			rel.farLeft = true;
+		} else if ( target.left > source.right ) { // farRight
+			rel.farRight = true;
+		} else if ( target.left < source.left &&
+				target.right > source.left ) { // midLeft
+			rel.midLeft = true;
+		} else if ( target.left < source.right &&
+				target.right > source.right ) { // midRight
+			rel.midRight = true;
+		} else if ( target.left === source.left ) {
+			rel.sameX = true;
+		}
+		
+		if ( target.bottom < source.top ) { // farUp
+			rel.farUp = true;
+		} else if ( target.top > source.bottom ) { // farDown
+			rel.farDown = true;
+		} else if ( target.bottom > source.top &&
+				target.top < source.top ) { // midUp
+			rel.midUp = true;
+		} else if ( target.bottom > source.top &&
+				target.top > source.top ) { // midDown
+			rel.midDown = true;
+		} else if ( target.top === source.top ) {
+			rel.sameY = true;
+		}
+		
+		target.rel = rel;
+		return target;
+	},
+	calcDistance = function (x, y) {
+		var distance = {},
+			distX,
+			distY;
+		
+		distX = x.bigX - x.smallX;
+		distY = y.bigY - y.smallY;
+		
+		if ( distX > distY ) {
+			
+			distance.largerX = true;
+			
+		} else if ( distY > distX ) {
+			
+			distance.largerY = true;
+			
+		} else if ( distX === distY ) {
+			
+			distance.equalXY = true;
+			
+		}
+		
+		distance.x = distX;
+		distance.y = distY;
+		
+		return distance;
 	},
 	calcLinkPoints = function (node) {
 		var points = [],
 			source = getNodeInfo(node);
 		
 		node.TPL_links.forEach(function (link) {
-			var farLeft = false,
-				farRight = false,
-				midLeft = false,
-				midRight = false,
-				farUp = false,
-				farDown = false,
-				midUp = false,
-				midDown = false,
-				sameX = false,
-				sameY = false,
-				target = getNodeInfo(link),
-				distanceX,
-				distanceY,
+			var target,
+				srcPos,
+				trgPos,
+				rel,
+				dist,
 				frm,
 				to;
+				
+			target = getNodeInfo(link);
+			srcPos = source.pos;
+			trgPos = target.pos
+			target = getOneLinkRelativePosition(srcPos, trgPos);
+			rel = target.rel;
 			
-			// where is this link point in relation to the current node
-			// target: one of the links of the dragged node
+			if (rel.farUp &&
+					rel.farLeft) {
+				
+				dist = calcDistance({
+					bigX: srcPos.left,
+					smallX: trgPos.right
+				}, {
+					bigY: srcPos.top,
+					smallY: trgPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.topLeft;
+					to = trgPos.bottomRight;
+				}
+				
+				
 			
-			if ( target.right < source.left ) { // farLeft
-				farLeft = true;
-			} else if ( target.left > source.right ) { // farRight
-				farRight = true;
-			} else if ( target.left < source.left &&
-					target.right > source.left ) { // midLeft
-				midLeft = true;
-			} else if ( target.left < source.right &&
-					target.right > source.right ) { // midRight
-				midRight = true;
-			} else if ( target.left === source.left ) {
-				sameX = true;
+			} else if (rel.farUp &&
+					rel.farRight) {
+				
+				dist = calcDistance({
+					bigX: trgPos.left,
+					smallX: srcPos.right
+				}, {
+					bigY: srcPos.bottom,
+					smallY: trgPos.top
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.topRight;
+					to = trgPos.bottomLeft;
+				}
+			} else if (rel.farDown &&
+					rel.farLeft) {
+				
+				dist = calcDistance({
+					bigX: srcPos.left,
+					smallX: trgPos.right
+				}, {
+					bigY: trgPos.top,
+					smallY: srcPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.bottomLeft;
+					to = trgPos.topRight;
+				}
+			} else if (rel.farDown &&
+				rel.farRight) {
+				
+				dist = calcDistance({
+					bigX: trgPos.left,
+					smallX: srcPos.right
+				}, {
+					bigY: trgPos.top,
+					smallY: srcPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.bottomRight;
+					to = trgPos.topLeft;
+				}
 			}
 			
-			if ( target.bottom < source.top ) { // farUp
-				farUp = true;
-			} else if ( target.top > source.bottom ) { // farDown
-				farDown = true;
-			} else if ( target.bottom > source.top &&
-					target.top < source.top ) { // midUp
-				midUp = true;
-			} else if ( target.bottom > source.top &&
-					target.top > source.top ) { // midDown
-				midDown = true;
-			} else if ( target.top === source.top ) {
-				sameY = true;
-			}
-			
-			distanceX = source.left - target.left;
-			distanceY = source.top - target.top;
-			
-			var xDistLarger = false,
-				yDistLarger = false,
-				xyDistEqual = false;
-			
-			if (distanceX > distanceY) {
-				xDistLarger = true;
-			} else if (distanceY > distanceX) {
-				yDistLarger = true;
-			} else if (distanceX === distanceY) {
-				xyDistEqual = true;
-			}
-			
-			if (farUp && farLeft) {
-				frm = source.midLeft;
-				if (xDistLarger) {
-					to = target.midRight;
-				} else if (yDistLarger) {
-					to = target.midBott;
-				} else if (xyDistEqual) {
-					to = target.bottomRight;
-				}
-			} else if (farUp && farRight) {
-				frm = source.midRight;
-				if (xDistLarger) {
-					to = target.midLeft;
-				} else if (yDistLarger) {
-					to = target.midBott;
-				} else if (xyDistEqual) {
-					to = target.bottomLeft;
-				}
-			} else if (farDown && farLeft) {
-				frm = source.midLeft;
-				if (xDistLarger) {
-					to = target.midRight;
-				} else if (yDistLarger) {
-					to = target.midTop;
-				} else if (xyDistEqual) {
-					to = target.topRight;
-				}
-			} else if (farDown && farRight) {
-				frm = source.midRight;
-				if (xDistLarger) {
-					to = target.midLeft;
-				} else if (yDistLarger) {
-					to = target.midTop;
-				} else if (xyDistEqual) {
-					to = target.topLeft;
-				}
+			if ( rel.farUp &&
+					(rel.midLeft || rel.midRight) ) {
+				
+			} else if ( rel.farDown &&
+					(rel.midL) ) {
+				
+			} else if ( rel.farLeft &&
+					(rel.midUp || rel.midDown) ) {
+				
+			} else if ( rel.farRight &&
+					(rel.midUp && midRight) ) {
+				
 			}
 			
 			points.push({
@@ -214,30 +302,10 @@ var core = (function () {
 				ferom: frm,
 				to: to
 			});
-			/*
-			sourceSide = '',
-			targetSide = '',
-			if (farUp || midUp) {
-				sourceSide = 'top';
-				targetSide =  'bottom';
-			} else if (farDown || midDown) {
-				sourceSide = 'bottom';
-				targetSide =  'top';
-			} else if (farRight || midRight) {
-				sourceSide = 'right';
-				targetSide = 'left';
-			} else if (farLeft || midLeft) {
-				sourceSide = 'left';
-				targetSide =  'right';
-			}
-			source.side = sourceSide;
-			target.side = targetSide;
 			
-			*/
-			//calcSidePoints( source, target );
 		});
 		
-		console.log(points);
+		
 		return points;
 	},
 	adjustLines = function (node) {
@@ -250,7 +318,7 @@ var core = (function () {
 				item.to.x,
 				item.to.y
 			];
-			adjustLine(points, item.line);
+			adjustLine(item.line, points);
 		});
 	},
 	makeTPLNode = function (node, links, o) {
@@ -269,7 +337,7 @@ var core = (function () {
 			});
 		});
 	},
-	init = function () {
+	crapola = function () {
 		var kids = [];
 		
 		kids.push(pixi.createSprite({
@@ -313,6 +381,13 @@ var core = (function () {
 			width: 100,
 			height: 100
 		}));
+		kids.forEach(function (i) {
+			pixi.stage.addChild(i);
+		});
+	},
+	init = function () {
+		crapola();
+		var kids = [];
 		
 		var line = pixi.createLine({
 			color: 0xFFFFF,
@@ -331,7 +406,8 @@ var core = (function () {
 			x: 500,
 			y: 200
 		});
-		asghar = n2;
+		
+		s = n2;
 		makeTPLNode(n1, [{
 			node: n2,
 			line: line
@@ -473,6 +549,50 @@ var pixi = (function () {
 		
 		return line;
 	}
+	function redrawLine(ctx, o) {
+		var points,
+			i,
+			dirty,
+			clearDirty;
+		
+		if ( util.isObject(o) ) {
+			points = o.points;
+		} else if ( util.isArray(o) ) {
+			points = o;
+		}
+		
+		ctx.clear();
+		ctx.beginFill();
+		ctx.lineStyle(
+			o.thickness || 2,
+			o.color     || 0x000000,
+			o.alpha     || 1
+		);
+		
+		ctx.moveTo( points[0], points[1] );
+		for (i=2; i < points.length ;i+=2) {
+			ctx.lineTo( points[i], points[i+1] );
+		}
+		ctx.lineTo( points[0], points[1] );
+		ctx.endFill();
+		
+		
+		dirty = ctx.dirty;
+		clearDirty = ctx.clearDirty;
+		
+		if (dirty) {
+			dirty = false
+		} else if (!dirty) {
+			dirty = true;
+		}
+		
+		if (clearDirty) {
+			clearDirty = false
+		} else if (!clearDirty) {
+			clearDirty = true;
+		}
+		
+	}
 	function createRect(o, noDrag) {
 		var rect = new PIXI.Graphics();
 		
@@ -522,6 +642,7 @@ var pixi = (function () {
 		addDragDrop: addDragDrop,
 		createSprite: createSprite,
 		createLine: createLine,
+		redrawLine: redrawLine,
 		createRect: createRect,
 		createText: createText
 	};
