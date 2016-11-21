@@ -3,8 +3,9 @@ var a = (function () {
 "use strict";
 
 var core = (function () {
+	var inst = util.extend( util.instantiatePubsub() ),
 	
-	var adjustLine = function (line, points) {
+	adjustLine = function (line, points) {
 		pixi.redrawLine(line, points);
 	},
 	getNodeInfo = function (node) {
@@ -61,46 +62,6 @@ var core = (function () {
 		result.pos = pos;
 		
 		return result;
-	},
-	calcLinksPositions = function (links, source) {
-		/*	INCOMPLETE
-			argument is an array of objects ie: { x: value, y: value}
-			each object in the array represents:
-			x and y of a node that has a link to the current/clicked/dragged node */
-		var result = [];
-		
-		
-		return result;
-	},
-	calcSidePoints = function (source, target) {
-		/*	source: An object representing the clicked/dragged node info.
-			target: An object representing one of the clicked node links.
-			return: An object containing from and to points. */
-		
-		var srcSide = source.sides[source.side],
-			trgSide = target.sides[target.side],
-			srcSideLen = srcSide.length,
-			trgSideLen = trgSide.length;
-		
-		console.log(srcSide, trgSide);
-		
-		if ( target.linkCount === 1 ) {
-			
-		} else if ( target.linkCount > 1 ) {
-			
-			if ( target.linkCount === 2 ) {
-				var i;
-				for (i=0; i < target.linkCout ;i+=1) {
-					
-				}
-			} else if ( target.linkCount > 2 ) {
-				
-			}	
-		}
-		
-		return {
-			
-		};
 	},
 	getOneLinkRelativePosition = function (source, target) {
 		// where is this link point in relation to the current node
@@ -194,9 +155,7 @@ var core = (function () {
 			target = getOneLinkRelativePosition(srcPos, trgPos);
 			rel = target.rel;
 			
-			if (rel.farUp &&
-					rel.farLeft) {
-				
+			if ( rel.farUp  &&  rel.farLeft ) {
 				dist = calcDistance({
 					bigX: srcPos.left,
 					smallX: trgPos.right
@@ -215,12 +174,7 @@ var core = (function () {
 					frm = srcPos.topLeft;
 					to = trgPos.bottomRight;
 				}
-				
-				
-			
-			} else if (rel.farUp &&
-					rel.farRight) {
-				
+			} else if ( rel.farUp  &&  rel.farRight ) {
 				dist = calcDistance({
 					bigX: trgPos.left,
 					smallX: srcPos.right
@@ -239,9 +193,7 @@ var core = (function () {
 					frm = srcPos.topRight;
 					to = trgPos.bottomLeft;
 				}
-			} else if (rel.farDown &&
-					rel.farLeft) {
-				
+			} else if ( rel.farDown  &&  rel.farLeft ) {
 				dist = calcDistance({
 					bigX: srcPos.left,
 					smallX: trgPos.right
@@ -260,9 +212,7 @@ var core = (function () {
 					frm = srcPos.bottomLeft;
 					to = trgPos.topRight;
 				}
-			} else if (rel.farDown &&
-				rel.farRight) {
-				
+			} else if ( rel.farDown  &&  rel.farRight ) {
 				dist = calcDistance({
 					bigX: trgPos.left,
 					smallX: srcPos.right
@@ -283,25 +233,39 @@ var core = (function () {
 				}
 			}
 			
-			if ( rel.farUp &&
-					(rel.midLeft || rel.midRight) ) {
-				
-			} else if ( rel.farDown &&
-					(rel.midL) ) {
-				
-			} else if ( rel.farLeft &&
-					(rel.midUp || rel.midDown) ) {
-				
-			} else if ( rel.farRight &&
-					(rel.midUp && midRight) ) {
-				
+			if ( rel.midLeft  ||  rel.midRight ) {
+				if ( rel.farUp ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+					
+				} else if ( rel.farDown ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				}
 			}
 			
-			points.push({
-				line: link.line,
-				ferom: frm,
-				to: to
-			});
+			if ( rel.midUp  ||  rel.midDown ) {
+				if ( rel.farLeft ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( rel.farRight ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				}
+			}
+			
+			if (  !( (rel.midLeft || rel.midRight) &&
+					(rel.midUp || rel.midDown) )  ) {
+				
+				points.push({
+					line: link.line,
+					ferom: frm,
+					to: to
+				});
+			
+			}
+			
+			
 			
 		});
 		
@@ -311,15 +275,18 @@ var core = (function () {
 	adjustLines = function (node) {
 		var points = calcLinkPoints(node);
 		
-		points.forEach(function (item) {
-			var points = [
-				item.ferom.x,
-				item.ferom.y,
-				item.to.x,
-				item.to.y
-			];
-			adjustLine(item.line, points);
-		});
+		if (points) {
+			points.forEach(function (item) {
+				var points = [
+					item.ferom.x,
+					item.ferom.y,
+					item.to.x,
+					item.to.y
+				];
+				adjustLine(item.line, points);
+			});
+		}
+		
 	},
 	makeTPLNode = function (node, links, o) {
 		node.TPL_node = true;
@@ -424,26 +391,37 @@ var core = (function () {
 		
 	};
 	
-	return {
-		adjustLines: adjustLines,
-		makeTPLNode: makeTPLNode,
-		init: init
-	};
+	Object.defineProperties(inst, {
+		"some": {
+			get: function () { return "some"; }
+		}
+	});
+	inst.adjustLines = adjustLines;
+	inst.makeTPLNode = makeTPLNode;
+	inst.init = init;
+	
+	return inst;
 }());
 
 
 
 var pixi = (function () {
-	var p = {};
+	var inst = util.extend( util.instantiatePubsub() ),
+		p = {};
+	
+	p.defaults = {};
 	p.renderer;
 	p.stage;
 	
-	function init() {
+	function init(o) {
+		if (o) {
+			p.defaults = o;
+		}
 		p.renderer = PIXI.autoDetectRenderer(
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: 0xAB9999
+				backgroundColor: p.defaults.background || 0xAB9999
 			}
 		);
 		document.body.appendChild( p.renderer.view );
@@ -462,10 +440,7 @@ var pixi = (function () {
 		this.dragPoint.x -= this.position.x;
 		this.dragPoint.y -= this.position.y;
 		
-		// reorder children for z-index
-		var arr = p.stage.children;
-		arr.splice( arr.indexOf(this), 1 );
-		arr.push(this);
+		bringToFront(this);
 	}
 	function dragMove(e) {
 		if (this.dragging) {
@@ -500,6 +475,12 @@ var pixi = (function () {
 			.on('touchendoutside', dragEnd)
 			.on('mousemove', dragMove)
 			.on('touchmove', dragMove);
+	}
+	function bringToFront(el) {
+		// reorder children for z-index
+		var arr = p.stage.children;
+		arr.splice( arr.indexOf(el), 1 );
+		arr.push(el);
 	}
 	function createSprite(o, noDrag) {
 		var sprite = new PIXI.Sprite.fromImage(o.image);
@@ -634,18 +615,25 @@ var pixi = (function () {
 		return text;
 	}
 	
-	return {
-		get renderer() { return p.renderer; },
-		get stage() { return p.stage; },
-		init: init,
-		animate: animate,
-		addDragDrop: addDragDrop,
-		createSprite: createSprite,
-		createLine: createLine,
-		redrawLine: redrawLine,
-		createRect: createRect,
-		createText: createText
-	};
+	Object.defineProperties(inst, {
+		"renderer": {
+			get: function () { return p.renderer; }
+		},
+		"stage": {
+			get: function () { return p.stage; }
+		}
+		
+	});
+	inst.init = init;
+	inst.animate = animate;
+	inst.addDragDrop = addDragDrop;
+	inst.createSprite = createSprite;
+	inst.createLine = createLine;
+	inst.redrawLine = redrawLine;
+	inst.createRect = createRect;
+	inst.createText = createText;
+	
+	return inst;
 }());
 	
 

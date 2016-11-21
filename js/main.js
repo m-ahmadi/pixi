@@ -2,7 +2,7 @@ $(function () {
 	a.pixi.init();
 	a.core.init();
 	
-})
+});
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);
 
@@ -27,3 +27,23 @@ $(document).on('mousewheel', function (e) {
 // var tween = new TWEEN.Tween( graphics.position );
 // tween.to( {x: 500}, 1000);
 // tween.start();
+
+
+$('#add_device').on('click', function (e) {
+	var name,
+		x, y,
+		type;
+		
+	e.preventDefault();
+	
+	name = $('input[type="text"][name="name"]').val();
+	x = $('input[type="text"][name="x"]').val();
+	y = $('input[type="text"][name="y"]').val();
+	type = $('select').find(':selected').val();
+	
+	if (name && x && y && type) {
+		$('#devices').append('<label><input type="checkbox"> '+name+'</label>');
+	}
+	
+	
+});
