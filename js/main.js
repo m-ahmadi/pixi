@@ -37,25 +37,30 @@ $('#add_device').on('click', function (e) {
 		
 	e.preventDefault();
 	
-	name = $('input[type="text"][name="name"]').val();
+	name = $('input[type="text"][name="id"]').val();
+	id = $('input[type="text"][name="id"]').val();
 	x = $('input[type="text"][name="x"]').val();
 	y = $('input[type="text"][name="y"]').val();
 	type = $('select').find(':selected').val().trim();
 	links = [];
 	$('input[type="checkbox"]').each(function () {
-		links.push(this.name);
+		var id = this.id;
+		if (id) {
+			links.push(id);
+		}
 	});
-	if (name && type) {
+	console.log(links);
+	if (type) {
 		$('input[type="checkbox"]').prop({checked: false});
-		$('#devices').append('<label><input type="checkbox" name="'+name+'"> '+name+'</label>');
-		console.log(links);
-		a.core.createTplNode({
-			nodeName: name, 
+		var finished = a.core.createTplNode({
+			id: id,
+			name: name,
 			type: type,
 			x: (x) ? x : undefined,
 			y: (y) ? y : undefined,
 			links: links
 		});
+		$('#devices').append('<label><input type="checkbox" id="'+finished+'"> '+finished+'</label>');
 	}
 	
 	

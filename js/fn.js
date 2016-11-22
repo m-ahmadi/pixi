@@ -5,8 +5,10 @@ var a = (function () {
 var core = (function () {
 	var inst = util.extend( util.instantiatePubsub() ),
 	tplNodes = {},
+	idCounter = 0, // createTplNode uses this
 	
 	adjustLine = function (line, points) {
+		console.log(points);
 		pixi.redrawLine(line, points);
 	},
 	getNodeInfo = function (node) {
@@ -141,7 +143,7 @@ var core = (function () {
 		var points = [],
 			source = getNodeInfo(node);
 		
-		node.TPL_links.forEach(function (link) {
+		node.TPL_Stuff.links.forEach(function (link) {
 			var target,
 				srcPos,
 				trgPos,
@@ -376,82 +378,67 @@ var core = (function () {
 	addTplLink = function () {
 		
 	},
-	createTplNode = function (o) {
-		if (!o) { var o = {}; }
-		
-		var img = '',
+	createTplNode = function (conf) {
+		if ( !conf ) { var conf = {}; }
+		var imgPath = 'images/',
 			sprite = null,
 			line = null,
 			hasLinks = false,
-			node = null,
-			linksStrArr = o.links,
-			linksObjArr,
+			links = conf.links,
+			id,
 			tplNode = {};
-		
-		if ( linksStrArr &&
-				util.isArray(linksStrArr) &&
-				linksStrArr.length > 0 ) {
+		if ( links &&
+				util.isArray( links ) &&
+				links.length > 0 ) {
 			hasLinks = true;
 		}
-		
-		if (o.type === 'computer') {
-			img = 'images/pcb.png';
-		} else if (o.type === 'hard') {
-			img = 'images/hard.png';
-		} else if (!o.type) {
-			img = 'images/pcb.png';
-		}
-		
+		imgPath += conf.type || 'computer';
+		imgPath += '.png';
 		sprite = pixi.createSprite({
-			image: img,
+			image: imgPath,
 			scale: 0.2,
-			x: o.x || 0,
-			y: o.x || 0
+			x: conf.x || 0,
+			y: conf.x || 0
 		});
 		
-		node = sprite;
-		
-		// for now infromation about the node is in tplNode.node.TPL_nodeName
-		// future: tplNode.name id etc.
-		tplNode.name = o.name || 'no_name';
-		tplNode.id = o.id || 'no_id';
+		id = conf.id || 'tpl_node_'+(idCounter+=1);
+		tplNode.name = conf.name || 'no_name';
+		tplNode.id = id;
 		tplNode.node = sprite;
-		tplNode.line = (hasLinks) ? line : undefined;
-		
-		tplNodes[tplNode.id] = tplNode;
-		
 		if (hasLinks) {
-			tplNode.linkCount = linksStrArr.length;
-		}
-		
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		node.TPL_node = true;
-		
-		if (hasLinks) {
-			node.TPL_links = [];
-			node.TPL_linkCount = linksStrArr.length;
+			tplNode.links = [];
+			tplNode.linkCount = links.length;
 			
-			linksStrArr.forEach(function (item) {
-				var linkNode = tplNodes[item];
-				node.TPL_links.push({
-					get x() { return linkNode.node.x; },
-					get y() { return linkNode.node.y; },
-					get width() { return linkNode.node.width; },
-					get height() { return linkNode.node.height; },
-					get linkCount() { return linkNode.node.TPL_linkCount; },
-					get line() { return linkNode.line; }
+			links.forEach(function (linkStr) {
+				
+				var target = tplNodes[linkStr]; // tplNodes["device_14"]
+				
+				line = pixi.createLine({
+					color: 0xFFFFF,
+					thickness: 2
 				});
+				
+				tplNode.links.push({
+					get x() { return target.node.x; },
+					get y() { return target.node.y; },
+					get width() { return target.node.width; },
+					get height() { return target.node.height; },
+					line: pixi.createLine()
+				});
+				pixi.addStageChild( line );
 			});
 		} else {
-			node.TPL_links = false;
+			tplNode.links = false;
 		}
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		
+		tplNodes[ tplNode.id ] = tplNode;
+		sprite.TPL_Stuff = tplNode;
 		
-		pixi.addStageChild(tplNode.node);
+		pixi.addStageChild( tplNode.node );
 		if ( hasLinks ) {
-			pixi.addStageChild(tplNode.line);
+			
 		}
+		return id;
 	},
 	init = function () {
 		crapola();
@@ -465,20 +452,20 @@ var core = (function () {
 			points: [0, 0, 150, 150]
 		});
 		var n1 = pixi.createSprite({
-			image: 'images/pcb.png',
+			image: 'images/computer.png',
 			scale: 0.2,
 			x: 200,
 			y: 200
 		});
 		var n2 = pixi.createSprite({
-			image: 'images/pcb.png',
+			image: 'images/computer.png',
 			scale: 0.2,
 			x: 500,
 			y: 200
 		});
 		
 		s = n2;
-		
+		/*
 		tplNode1 = {
 			node: n1,
 			line: line
@@ -501,7 +488,7 @@ var core = (function () {
 		kids.forEach(function (i) {
 			pixi.stage.addChild(i);
 		});
-		
+		*/
 		
 	};
 	
@@ -571,7 +558,7 @@ var pixi = (function () {
 		this.data = null;
 		
 		
-		if (this.TPL_node  &&  this.TPL_links) {
+		if (this.TPL_Stuff  &&  this.TPL_Stuff.links) {
 			core.adjustLines(this);
 		}
 	}
@@ -613,28 +600,31 @@ var pixi = (function () {
 		
 		return sprite;
 	}
-	function createLine(o, noDrag) {
+	function createLine(conf, noDrag) {
 		var line = new PIXI.Graphics(),
 			points,
 			i;
 		
-		if ( util.isObject(o) ) {
-			points = o.points;
-		} else if ( util.isArray(o) ) {
-			points = o;
+		if (!conf) { var conf = {}; }
+		if ( util.isObject(conf) ) {
+			points = conf.points || [];
+		} else if ( util.isArray(conf) ) {
+			points = conf;
 		}
 		
+		
 		if ( points.length === 0 ) {
-			points = [0, 0, 0, 0];
+			points = [0, 0, 1, 1];
 		}
+		
 		
 		line.interactive = true;
 		line.buttonMode = true;
 		line.beginFill();
 		line.lineStyle(
-			o.thickness || 2,
-			o.color || 0x000000,
-			o.alpha || 1
+			conf.thickness || 2,
+			conf.color || 0x000000,
+			conf.alpha || 1
 		);
 		
 		line.moveTo( points[0], points[1] );
