@@ -4,6 +4,7 @@ var a = (function () {
 
 var core = (function () {
 	var inst = util.extend( util.instantiatePubsub() ),
+	tplNodes = {},
 	
 	adjustLine = function (line, points) {
 		pixi.redrawLine(line, points);
@@ -288,21 +289,41 @@ var core = (function () {
 		}
 		
 	},
-	makeTPLNode = function (node, links, o) {
-		node.TPL_node = true;
-		node.TPL_nodeID = 'no_id';
-		node.TPL_linkCount = links.length;
-		node.TPL_links = [];
-		links.forEach(function (item) {
-			node.TPL_links.push({
-				get x() { return item.node.x; },
-				get y() { return item.node.y; },
-				get width() { return item.node.width; },
-				get height() { return item.node.height; },
-				get linkCount() { return item.node.TPL_linkCount; },
-				get line() { return item.line; }
+	makeTplNode = function (pixiElement, links, o) {
+		/*
+			links: [{
+				node: pixiElement,
+				line: pixiElement
+			}, {}, {}]
+			
+		*/
+		var hasLinks = false;
+		if ( !o ) { var o = {}; }
+		if ( links  &&  util.isArray(links) ) {
+			hasLinks = true;
+		}
+		
+		pixiElement.TPL_node = true;
+		pixiElement.TPL_nodeID = o.nodeId || 'no_id';
+		pixiElement.TP_nodeName = o.nodeName || 'no_name';
+		
+		if (hasLinks) {
+			pixiElement.TPL_links = [];
+			pixiElement.TPL_linkCount = links.length;
+			links.forEach(function (item) {
+				pixiElement.TPL_links.push({
+					get x() { return item.node.x; },
+					get y() { return item.node.y; },
+					get width() { return item.node.width; },
+					get height() { return item.node.height; },
+					get linkCount() { return item.node.TPL_linkCount; },
+					get line() { return item.line; }
+				});
 			});
-		});
+		} else {
+			pixiElement.TPL_links = false;
+		}
+		
 	},
 	crapola = function () {
 		var kids = [];
@@ -314,7 +335,7 @@ var core = (function () {
 			y: 20
 		}));
 		kids.push(pixi.createSprite({
-			image: 'images/hard-drive.png',
+			image: 'images/hard.png',
 			scale: 0.1,
 			x: 900,
 			y: 250
@@ -352,9 +373,91 @@ var core = (function () {
 			pixi.stage.addChild(i);
 		});
 	},
+	addTplLink = function () {
+		
+	},
+	createTplNode = function (o) {
+		if (!o) { var o = {}; }
+		
+		var img = '',
+			sprite = null,
+			line = null,
+			hasLinks = false,
+			node = null,
+			linksStrArr = o.links,
+			linksObjArr,
+			tplNode = {};
+		
+		if ( linksStrArr &&
+				util.isArray(linksStrArr) &&
+				linksStrArr.length > 0 ) {
+			hasLinks = true;
+		}
+		
+		if (o.type === 'computer') {
+			img = 'images/pcb.png';
+		} else if (o.type === 'hard') {
+			img = 'images/hard.png';
+		} else if (!o.type) {
+			img = 'images/pcb.png';
+		}
+		
+		sprite = pixi.createSprite({
+			image: img,
+			scale: 0.2,
+			x: o.x || 0,
+			y: o.x || 0
+		});
+		
+		node = sprite;
+		
+		// for now infromation about the node is in tplNode.node.TPL_nodeName
+		// future: tplNode.name id etc.
+		tplNode.name = o.name || 'no_name';
+		tplNode.id = o.id || 'no_id';
+		tplNode.node = sprite;
+		tplNode.line = (hasLinks) ? line : undefined;
+		
+		tplNodes[tplNode.id] = tplNode;
+		
+		if (hasLinks) {
+			tplNode.linkCount = linksStrArr.length;
+		}
+		
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		node.TPL_node = true;
+		
+		if (hasLinks) {
+			node.TPL_links = [];
+			node.TPL_linkCount = linksStrArr.length;
+			
+			linksStrArr.forEach(function (item) {
+				var linkNode = tplNodes[item];
+				node.TPL_links.push({
+					get x() { return linkNode.node.x; },
+					get y() { return linkNode.node.y; },
+					get width() { return linkNode.node.width; },
+					get height() { return linkNode.node.height; },
+					get linkCount() { return linkNode.node.TPL_linkCount; },
+					get line() { return linkNode.line; }
+				});
+			});
+		} else {
+			node.TPL_links = false;
+		}
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		
+		
+		pixi.addStageChild(tplNode.node);
+		if ( hasLinks ) {
+			pixi.addStageChild(tplNode.line);
+		}
+	},
 	init = function () {
 		crapola();
-		var kids = [];
+		var kids = [],
+			tplNode1,
+			tplNode2;
 		
 		var line = pixi.createLine({
 			color: 0xFFFFF,
@@ -375,19 +478,30 @@ var core = (function () {
 		});
 		
 		s = n2;
-		makeTPLNode(n1, [{
-			node: n2,
-			line: line
-		}]);
-		makeTPLNode(n2, [{
+		
+		tplNode1 = {
 			node: n1,
 			line: line
-		}]);
+		};
+		tplNode2 = {
+			node: n2,
+			line: line
+		};
+		
+		makeTplNode(n1, [tplNode2], {
+			nodeName: 'device_1'
+		});
+		makeTplNode(n2, [tplNode1], {
+			nodeName: 'device_2'
+		});
+		
 		kids.push(n1, n2, line);
+		
 		
 		kids.forEach(function (i) {
 			pixi.stage.addChild(i);
 		});
+		
 		
 	};
 	
@@ -397,7 +511,8 @@ var core = (function () {
 		}
 	});
 	inst.adjustLines = adjustLines;
-	inst.makeTPLNode = makeTPLNode;
+	inst.createTplNode = createTplNode;
+	inst.tplNodes = tplNodes;
 	inst.init = init;
 	
 	return inst;
@@ -421,7 +536,8 @@ var pixi = (function () {
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: p.defaults.background || 0xAB9999
+				backgroundColor: p.defaults.background || 0xAB9999,
+				antialias: true,
 			}
 		);
 		document.body.appendChild( p.renderer.view );
@@ -455,7 +571,7 @@ var pixi = (function () {
 		this.data = null;
 		
 		
-		if (this.TPL_node) {
+		if (this.TPL_node  &&  this.TPL_links) {
 			core.adjustLines(this);
 		}
 	}
@@ -506,6 +622,10 @@ var pixi = (function () {
 			points = o.points;
 		} else if ( util.isArray(o) ) {
 			points = o;
+		}
+		
+		if ( points.length === 0 ) {
+			points = [0, 0, 0, 0];
 		}
 		
 		line.interactive = true;
@@ -614,6 +734,9 @@ var pixi = (function () {
 		
 		return text;
 	}
+	function addStageChild(child) {
+		p.stage.addChild( child );
+	}
 	
 	Object.defineProperties(inst, {
 		"renderer": {
@@ -632,6 +755,7 @@ var pixi = (function () {
 	inst.redrawLine = redrawLine;
 	inst.createRect = createRect;
 	inst.createText = createText;
+	inst.addStageChild = addStageChild;
 	
 	return inst;
 }());

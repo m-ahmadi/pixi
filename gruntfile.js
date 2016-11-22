@@ -55,8 +55,9 @@ module.exports = function(grunt) {
 			scripts: {
 				files: [
 					'sass/**/*.scss',
-					'js/app/**/*.js',
-					'gruntfile.js'
+					'js/**/*.js',
+					'gruntfile.js',
+					'test/**/*'
 				],
 				tasks: ['sass', 'jshint'], // 'concat'
 				options: {
@@ -69,7 +70,8 @@ module.exports = function(grunt) {
 				files: [
 					'**/*.htm',
 					'sass/**/*.scss',
-					'js/**/*.js'
+					'js/**/*.js',
+					'test/**/*'
 				]
 			}
 		}

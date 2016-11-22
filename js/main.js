@@ -32,17 +32,30 @@ $(document).on('mousewheel', function (e) {
 $('#add_device').on('click', function (e) {
 	var name,
 		x, y,
-		type;
+		type,
+		links;
 		
 	e.preventDefault();
 	
 	name = $('input[type="text"][name="name"]').val();
 	x = $('input[type="text"][name="x"]').val();
 	y = $('input[type="text"][name="y"]').val();
-	type = $('select').find(':selected').val();
-	
-	if (name && x && y && type) {
-		$('#devices').append('<label><input type="checkbox"> '+name+'</label>');
+	type = $('select').find(':selected').val().trim();
+	links = [];
+	$('input[type="checkbox"]').each(function () {
+		links.push(this.name);
+	});
+	if (name && type) {
+		$('input[type="checkbox"]').prop({checked: false});
+		$('#devices').append('<label><input type="checkbox" name="'+name+'"> '+name+'</label>');
+		console.log(links);
+		a.core.createTplNode({
+			nodeName: name, 
+			type: type,
+			x: (x) ? x : undefined,
+			y: (y) ? y : undefined,
+			links: links
+		});
 	}
 	
 	
