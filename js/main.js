@@ -28,7 +28,14 @@ $(document).on('mousewheel', function (e) {
 // tween.to( {x: 500}, 1000);
 // tween.start();
 
-
+$('#select_all').on('click', function (e) {
+	e.preventDefault();
+	var chks = $('input[type="checkbox"]');
+	if (chks.length > 0) {
+		chks.prop({checked: true});
+	}
+	
+});
 $('#add_device').on('click', function (e) {
 	var name,
 		x, y,
@@ -45,11 +52,10 @@ $('#add_device').on('click', function (e) {
 	links = [];
 	$('input[type="checkbox"]').each(function () {
 		var id = this.id;
-		if (id) {
+		if ( $(this).is(':checked')  &&  id ) {
 			links.push(id);
 		}
 	});
-	console.log(links);
 	if (type) {
 		$('input[type="checkbox"]').prop({checked: false});
 		var finished = a.core.createTplNode({
