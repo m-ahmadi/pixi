@@ -11,7 +11,11 @@ var stage = new PIXI.Container();
 
 
 
+
 var box = new PIXI.Container();
+box.interactive = true;
+box.buttonMode = true;
+
 
 var pc = new PIXI.Sprite.fromImage('images/pcb.png');
 pc.interactive = true;
@@ -22,15 +26,15 @@ pc.x = 0;
 pc.y = 0;
 
 
-
 var text = new PIXI.Text('Router 24S-Hi23');
+text.interactive = true;
+text.buttonMode = true;
 
 box.addChild(pc);
 box.addChild(text);
 
 
-
-
+addDragDrop(box);
 stage.addChild(box);
 
 
@@ -39,13 +43,15 @@ stage.addChild(box);
 
 
 
-
+var t;
 animate();
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
 }
 function dragStart(e) {
+	t = this;
+	console.log(this);
 	this.data = e.data;
 	this.alpha = 0.5;
 	this.dragging = true;
@@ -53,7 +59,7 @@ function dragStart(e) {
 	this.dragPoint.x -= this.position.x;
 	this.dragPoint.y -= this.position.y;
 	
-	bringToFront(this);
+	//bringToFront(this);
 }
 function dragMove(e) {
 	if (this.dragging) {
@@ -66,11 +72,6 @@ function dragEnd() {
 	this.alpha = 1;
 	this.dragging = false;
 	this.data = null;
-	
-	
-	if (this.TPL_Stuff  &&  this.TPL_Stuff.links) {
-		core.adjustLines(this);
-	}
 }
 function addDragDrop(sprite) {
 	sprite
@@ -91,6 +92,9 @@ function bringToFront(el) {
 }
 
 $(function () {
+	console.log(pc.height);
+	box.hitArea = new PIXI.Rectangle( 0, 0, renderer.width / renderer.resolution, renderer.height / renderer.resolution );
+	
 	text.x += pc.width /2;
 	text.y = pc.y + pc.height;
 });

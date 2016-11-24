@@ -24,13 +24,41 @@ var pixi = (function () {
 		);
 		document.body.appendChild( p.renderer.view );
 		p.stage = new PIXI.Container();
-		p.stage.interactive = true;
+		//@@@@@@@@@@@ test
 		p.stage.buttonMode = true;
-		
+		p.stage.interactive = true;
+		p.stage.hitArea = new PIXI.Rectangle( 0, 0, p.renderer.width / p.renderer.resolution, p.renderer.height / p.renderer.resolution );
+		p.stage
+			.on('mousedown', stageMd)
+			.on('mousemove', stageMm)
+			.on('mouseup', stageMu);
+		//@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 	}
+	function stageMd(e) {
+		console.log(this);
+		/*
+		this.data = e.data;
+		this.dragging = true;
+		this.dragPoint = e.data.getLocalPosition(this);
+		this.dragPoint.x -= this.position.x;
+		this.dragPoint.y -= this.position.y;
+		*/
+	}
+	function stageMm(e) {
+		if (this.dragging) {
+			var newPosition = e.data.getLocalPosition(this);
+			this.position.x = newPosition.x - this.dragPoint.x;
+			this.position.y = newPosition.y - this.dragPoint.y;
+		}
+	}
+	function stageMu() {
+		this.dragging = false;
+		this.data = null;
+	}
 	function dragStart(e) {
+		e.stopPropagation();
 		this.data = e.data;
 		this.alpha = 0.5;
 		this.dragging = true;
@@ -40,7 +68,7 @@ var pixi = (function () {
 		
 		bringToFront(this);
 	}
-	function dragMove(e) {
+	function dragMove() {
 		if (this.dragging) {
 			var newPosition = this.data.getLocalPosition(this.parent);
 			this.position.x = newPosition.x - this.dragPoint.x;
