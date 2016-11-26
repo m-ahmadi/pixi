@@ -10,6 +10,59 @@ var pixi = (function () {
 	p.renderer;
 	p.stage;
 	
+	/*
+	var initX,
+	initY,
+	left = false,
+	right = false,
+	up = false,
+	down = false;
+	
+$('canvas')
+	.on('mousedown', function (e) {
+		this.dragit = true;
+		initX = e.pageX;
+		initY = e.pageY
+	})
+	.on('mousemove', function (e) {
+		var x = e.pageX,
+			y = e.pageY;
+		
+		if (!this.dragit) { return; }
+		
+		
+		if (x < initX) { // left
+			right = false;
+			left= true;
+		} else if (x > initX) { // right
+			right = true;
+			left = false;
+		}
+		if (y < initY) { // up
+			down = false;
+			up = true;
+		} else if (y >  initY) { // down
+			up = false;
+			down = true
+		}
+		
+		if (left) {
+			stage.x += 1;
+		}
+		if (right) {
+			stage.x -= 1;
+		}
+		if (up) {
+			stage.y += 1;
+		}
+		if (down) {
+			stage.y -= 1;
+		}
+	})
+	.on('mouseup', function () {
+		this.dragit = false;
+	});
+	*/
 	function init(o) {
 		if (o) {
 			p.defaults = o;
@@ -25,7 +78,7 @@ var pixi = (function () {
 		document.body.appendChild( p.renderer.view );
 		p.stage = new PIXI.Container();
 		//@@@@@@@@@@@ test
-		p.stage.buttonMode = true;
+		//p.stage.buttonMode = true;
 		p.stage.interactive = true;
 		p.stage.hitArea = new PIXI.Rectangle( 0, 0, p.renderer.width / p.renderer.resolution, p.renderer.height / p.renderer.resolution );
 		p.stage
@@ -114,6 +167,8 @@ var pixi = (function () {
 		sprite.buttonMode = true;
 		sprite.anchor.set(0, 0);
 		sprite.scale.set(o.scale);
+		sprite.alpha = o.alpha || 0;
+		sprite.rotation = o.rotation || 0;
 		sprite.position.x = o.x;
 		sprite.position.y = o.y;
 		
@@ -281,6 +336,26 @@ var core = (function () {
 	t = function () { return tplNodes; }; // testing purposes
 	
 	var
+	animateNode = function (element, o) {
+		if ( !o ) { var o = {}; }
+		var box = element;
+		
+		TweenLite.to(box, 0.3, {
+			alpha: 1,
+			yoyo: true,
+			ease: Linear.easeInOut
+		});
+
+		TweenLite.to(box.scale, 0.3, {
+			x: 0.2,
+			y: 0.2,
+			yoyo: true,
+			ease: Linear.easeInOut,
+			onComplete: o.done,
+			onCompleteParams: o.doneParams,
+			onCompleteScope: o.doneCtx
+		});
+	},
 	adjustLine = function (line, points) {
 		pixi.redrawLine(line, {
 			points: points
@@ -676,7 +751,8 @@ var core = (function () {
 		imgPath += '.png';
 		sprite = pixi.createSprite({
 			image: imgPath,
-			scale: 0.2,
+			scale: 0,
+			alpha: 0,
 			x: conf.x || 0,
 			y: conf.x || 0
 		});
@@ -724,7 +800,11 @@ var core = (function () {
 		
 		pixi.addStageChild( tplNode.node );
 		
-		adjustLines(tplNode.node);
+		//adjustLines(tplNode.node);
+		animateNode(tplNode.node, {
+			done: adjustLines,
+			doneParams: [tplNode.node]
+		});
 		return id;
 	},
 	init = function () {

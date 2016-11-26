@@ -1,0 +1,101 @@
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+/*
+	One way (not completely sure):
+	Using node and link ids for the property names. (avoiding array searchs)
+	Note: ids need to be js-friendly, and not containing special/unusual characters.
+*/
+{
+	"node_46": {
+		"name": "router d-link",
+		"links": { // or false if doesn't have any links	
+			// each object represents a node that this node has a link to.
+			"node_23": {
+				// each object represents a link between the node_46 and node_23 (linkId used for prop name)
+				"link_42": {
+					"status":
+					"info":
+				},
+				"link_51": {
+					"status": 
+					"info": 
+				}
+			},
+			"node_12": {
+				"status": 
+				"info": 
+			}
+		},
+		"info": {
+			
+		}
+	}
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+/*
+	Another way:
+	Using two objects (assoc arrs), one for nodes, one for links.
+	(broken for now)
+*/
+{
+	"nodes": {
+		"node_23": {
+			"status": ,
+			"info": ,
+			"links": ["node_71", "node_14", "node_98", "node_66"]
+		}
+	},
+	
+	
+	"links": {
+		"link_42": {
+			"status": ,
+			"info": ,
+			"source": ,
+			"destination": 
+		},
+		"link_96": {
+			"status": ,
+			"info": ,
+			"source": ,
+			"destination": 
+		}
+	}
+	
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+/*
+	JavaScript Friendly Var/Prop Names:
+	
+	Starts with a letter or a dollar-sign or an underscore.
+	Optionaly Followed by one or more letters, digits or dollar-signs or underscores.
+	abc
+	$bc
+	_bc
+	
+	Also the names shouldn't be any of the following:
+	
+	Note a reserve word:
+		abstract
+		boolean break byte
+		case catch char class const continue
+		debugger default delete do double
+		else enum export extends
+		false final finally float for function
+		goto
+		if implements import in instanceof int interface
+		long
+		native new null
+		package private protected public
+		return
+		short static super switch synchronized
+		this throw throws transient true try typeof
+		var volatile void
+		while with
+	
+	Not these either:
+		undefined
+		NaN
+		Infinity
+*/

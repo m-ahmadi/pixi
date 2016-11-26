@@ -15,7 +15,8 @@ var stage = new PIXI.Container();
 var box = new PIXI.Container();
 box.interactive = true;
 box.buttonMode = true;
-
+box.scale.set(0.5, 0.5);
+box.alpha = 0;
 
 var pc = new PIXI.Sprite.fromImage('images/pcb.png');
 pc.interactive = true;
@@ -41,6 +42,18 @@ stage.addChild(box);
 
 
 
+var tweenAlpha = TweenLite.to(box, 0.4, {
+	alpha: 1,
+	yoyo: true,
+	ease: Linear.easeInOut
+});
+
+var tweenScale = TweenLite.to(box.scale, 0.4, {
+	x: 1,
+	y: 1,
+	yoyo: true,
+	ease: Linear.easeInOut
+});
 
 
 var t;
@@ -92,9 +105,8 @@ function bringToFront(el) {
 }
 
 $(function () {
-	console.log(pc.height);
-	box.hitArea = new PIXI.Rectangle( 0, 0, renderer.width / renderer.resolution, renderer.height / renderer.resolution );
+	box.hitArea = new PIXI.Rectangle( 0, 0, pc.width, pc.height);
 	
-	text.x += pc.width /2;
+	text.x += pc.width / 2;
 	text.y = pc.y + pc.height;
 });
