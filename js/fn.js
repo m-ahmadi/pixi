@@ -10,59 +10,11 @@ var pixi = (function () {
 	p.renderer;
 	p.stage;
 	
-	/*
-	var initX,
-	initY,
-	left = false,
-	right = false,
-	up = false,
-	down = false;
+	p.pan = {
+		initX: undefined,
+		initY: undefined
+	};
 	
-$('canvas')
-	.on('mousedown', function (e) {
-		this.dragit = true;
-		initX = e.pageX;
-		initY = e.pageY
-	})
-	.on('mousemove', function (e) {
-		var x = e.pageX,
-			y = e.pageY;
-		
-		if (!this.dragit) { return; }
-		
-		
-		if (x < initX) { // left
-			right = false;
-			left= true;
-		} else if (x > initX) { // right
-			right = true;
-			left = false;
-		}
-		if (y < initY) { // up
-			down = false;
-			up = true;
-		} else if (y >  initY) { // down
-			up = false;
-			down = true
-		}
-		
-		if (left) {
-			stage.x += 1;
-		}
-		if (right) {
-			stage.x -= 1;
-		}
-		if (up) {
-			stage.y += 1;
-		}
-		if (down) {
-			stage.y -= 1;
-		}
-	})
-	.on('mouseup', function () {
-		this.dragit = false;
-	});
-	*/
 	function init(o) {
 		if (o) {
 			p.defaults = o;
@@ -83,32 +35,65 @@ $('canvas')
 		p.stage.hitArea = new PIXI.Rectangle( 0, 0, p.renderer.width / p.renderer.resolution, p.renderer.height / p.renderer.resolution );
 		p.stage
 			.on('mousedown', stageMd)
+			.on('touchstart', stageMd)
+			.on('mouseup', stageMu)
+			.on('mouseupoutside', stageMu)
+			.on('touchend', stageMu)
+			.on('touchendoutside', stageMu)
 			.on('mousemove', stageMm)
-			.on('mouseup', stageMu);
+			.on('touchmove', stageMm);
 		//@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 	}
 	function stageMd(e) {
-		console.log(this);
-		/*
-		this.data = e.data;
-		this.dragging = true;
-		this.dragPoint = e.data.getLocalPosition(this);
-		this.dragPoint.x -= this.position.x;
-		this.dragPoint.y -= this.position.y;
-		*/
+		this.dragit = true;
+		p.pan.initX = e.data.global.x;
+		p.pan.initY = e.data.global.y;
 	}
 	function stageMm(e) {
-		if (this.dragging) {
-			var newPosition = e.data.getLocalPosition(this);
-			this.position.x = newPosition.x - this.dragPoint.x;
-			this.position.y = newPosition.y - this.dragPoint.y;
+		var x = e.data.global.x,
+			y = e.data.global.y,
+			initX = p.pan.initX,
+			initY = p.pan.initY,
+			left = false,
+			right = false,
+			up = false,
+			down = false;
+		
+		if ( !this.dragit ) { return; }
+		
+		if (x < initX) { // left
+			right = false;
+			left= true;
+		} else if (x > initX) { // right
+			right = true;
+			left = false;
+		}
+		if (y < initY) { // up
+			down = false;
+			up = true;
+		} else if (y >  initY) { // down
+			up = false;
+			down = true;
+		}
+		
+		if (left) { 
+			p.stage.x -= 2;
+			p.stage.width -= 2;
+		}
+		if (right) {
+			p.stage.x += 2;
+		}
+		if (up) {
+			p.stage.y -= 2;
+		}
+		if (down) {
+			p.stage.y += 2;
 		}
 	}
 	function stageMu() {
-		this.dragging = false;
-		this.data = null;
+		this.dragit = false;
 	}
 	function dragStart(e) {
 		e.stopPropagation();

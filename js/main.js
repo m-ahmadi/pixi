@@ -1,7 +1,6 @@
 $(function () {
 	a.pixi.init();
 	a.core.init();
-	
 });
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);
@@ -27,6 +26,8 @@ $(document).on('mousewheel', function (e) {
 // var tween = new TWEEN.Tween( graphics.position );
 // tween.to( {x: 500}, 1000);
 // tween.start();
+
+
 
 $('#select_all').on('click', function (e) {
 	e.preventDefault();
