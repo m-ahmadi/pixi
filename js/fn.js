@@ -10,11 +10,6 @@ var pixi = (function () {
 	p.renderer;
 	p.stage;
 	
-	p.pan = {
-		initX: undefined,
-		initY: undefined
-	};
-	
 	function init(o) {
 		if (o) {
 			p.defaults = o;
@@ -32,69 +27,106 @@ var pixi = (function () {
 		//@@@@@@@@@@@ test
 		//p.stage.buttonMode = true;
 		p.stage.interactive = true;
-		p.stage.hitArea = new PIXI.Rectangle( 0, 0, p.renderer.width / p.renderer.resolution, p.renderer.height / p.renderer.resolution );
+		p.stage.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
 		p.stage
-			.on('mousedown', stageMd)
-			.on('touchstart', stageMd)
-			.on('mouseup', stageMu)
-			.on('mouseupoutside', stageMu)
-			.on('touchend', stageMu)
-			.on('touchendoutside', stageMu)
-			.on('mousemove', stageMm)
-			.on('touchmove', stageMm);
+			.on('mousedown', pan.start)
+			.on('touchstart', pan.start)
+			.on('mouseup', pan.end)
+			.on('mouseupoutside', pan.end)
+			.on('touchend', pan.end)
+			.on('touchendoutside', pan.end)
+			.on('mousemove', pan.move)
+			.on('touchmove', pan.move);
+			
+		$(document).on('mousewheel', function (e) {
+			// e.deltaX, e.deltaY, e.deltaFactor
+			zoom(e.pageX, e.pageY, e.deltaY > 0);
+		});
 		//@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 	}
-	function stageMd(e) {
-		this.dragit = true;
-		p.pan.initX = e.data.global.x;
-		p.pan.initY = e.data.global.y;
-	}
-	function stageMm(e) {
-		var x = e.data.global.x,
-			y = e.data.global.y,
-			initX = p.pan.initX,
-			initY = p.pan.initY,
-			left = false,
-			right = false,
-			up = false,
-			down = false;
+	
+	
+	var zoom = (function () {
+		var direction;
 		
-		if ( !this.dragit ) { return; }
+		var getGraphCoordinates = (function() {
+			var ctx = {
+				global: {
+					x: 0,
+					y: 0
+				} // store it inside closure to avoid GC pressure
+			};
+
+			return function (x, y) {
+				ctx.global.x = x;
+				ctx.global.y = y;
+				return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.stage);
+			}
+		}());
+
+		function zoom(x, y, isZoomIn) {
+			var stage = p.stage;
+			
+			direction = isZoomIn ? 1 : -1;
+			var factor = (1 + direction * 0.1);
+			stage.scale.x *= factor;
+			stage.scale.y *= factor;
+
+			// Technically code below is not required, but helps to zoom on mouse
+			// cursor, instead center of graphGraphics coordinates
+			/*
+			var beforeTransform = getGraphCoordinates(x, y);
+			stage.updateTransform();
+			var afterTransform = getGraphCoordinates(x, y);
+
+			stage.position.x += (afterTransform.x - beforeTransform.x) * stage.scale.x;
+			stage.position.y += (afterTransform.y - beforeTransform.y) * stage.scale.y;
+			stage.updateTransform();
+			*/
+		}
 		
-		if (x < initX) { // left
-			right = false;
-			left= true;
-		} else if (x > initX) { // right
-			right = true;
-			left = false;
+		return zoom;
+		
+	}());
+	var pan = (function () {
+		var isDragging = false,
+			prevX,
+			prevY;
+		
+		function down(e) {
+			isDragging = true;
+			//downX = e.data.global.x;
+			//downY = e.data.global.y;
+			
+			var pos = e.data.global;
+			prevX = pos.x;
+			prevY = pos.y;
+			isDragging = true;
 		}
-		if (y < initY) { // up
-			down = false;
-			up = true;
-		} else if (y >  initY) { // down
-			up = false;
-			down = true;
+		function move(e) {
+			if ( !isDragging ) { return; }
+			var pos = e.data.global,
+				dx = pos.x - prevX,
+				dy = pos.y - prevY;
+
+			p.stage.position.x += dx;
+			p.stage.position.y += dy;
+			prevX = pos.x;
+			prevY = pos.y;
+		}
+		function up() {
+			isDragging= false;
 		}
 		
-		if (left) { 
-			p.stage.x -= 2;
-			p.stage.width -= 2;
-		}
-		if (right) {
-			p.stage.x += 2;
-		}
-		if (up) {
-			p.stage.y -= 2;
-		}
-		if (down) {
-			p.stage.y += 2;
-		}
-	}
-	function stageMu() {
-		this.dragit = false;
-	}
+		return {
+			start: down,
+			move: move,
+			end: up
+		};
+		
+	}());
 	function dragStart(e) {
 		e.stopPropagation();
 		this.data = e.data;
@@ -309,6 +341,7 @@ var pixi = (function () {
 	inst.createRect = createRect;
 	inst.createText = createText;
 	inst.addStageChild = addStageChild;
+	inst.zoom = zoom;
 	
 	return inst;
 }());
@@ -619,7 +652,7 @@ var core = (function () {
 		
 		if (points) {
 			points.forEach(function (item) {
-				if (!item.ferom  ||  !item.to) { throw new Error("Bad points"); return; }
+				if (!item.ferom  ||  !item.to) { throw new Error("adjustLine(): Bad points olaghe sag"); return; }
 				var points = [
 					item.ferom.x,
 					item.ferom.y,

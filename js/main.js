@@ -8,6 +8,9 @@ $(function () {
 $(document).on('mousewheel', function (e) {
 	// e.deltaX, e.deltaY, e.deltaFactor
 	
+	a.pixi.zoom(e.pageX, e.pageY, e.deltaY > 0);
+	
+	/*
 	var	stage = a.pixi.stage;
 	
 	if (e.deltaY < 0) {
@@ -19,6 +22,7 @@ $(document).on('mousewheel', function (e) {
 		stage.scale.set( stage.scale.x += 0.05  );
 		stage.scale.set( stage.scale.y += 0.05  );
 	}
+	*/
 	
 });
 
