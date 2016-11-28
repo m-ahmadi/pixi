@@ -11,7 +11,6 @@ var stage = new PIXI.Container();
 
 
 
-
 var box = new PIXI.Container();
 box.interactive = true;
 box.buttonMode = true;
@@ -22,7 +21,7 @@ var pc = new PIXI.Sprite.fromImage('images/pcb.png');
 pc.interactive = true;
 pc.buttonMode = true;
 pc.anchor.set(0, 0);
-pc.scale.set(1);
+pc.scale.set(0.5);
 pc.x = 0;
 pc.y = 0;
 

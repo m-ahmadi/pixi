@@ -40,6 +40,8 @@ var pixi = (function () {
 			
 		$(document).on('mousewheel', function (e) {
 			// e.deltaX, e.deltaY, e.deltaFactor
+			// zoom(e.pageX, e.pageY, e.deltaY > 0);
+			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
 		//@@@@@@@@@@@
@@ -65,7 +67,6 @@ var pixi = (function () {
 				return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.stage);
 			}
 		}());
-
 		function zoom(x, y, isZoomIn) {
 			var stage = p.stage;
 			
@@ -76,7 +77,7 @@ var pixi = (function () {
 
 			// Technically code below is not required, but helps to zoom on mouse
 			// cursor, instead center of graphGraphics coordinates
-			/*
+			
 			var beforeTransform = getGraphCoordinates(x, y);
 			stage.updateTransform();
 			var afterTransform = getGraphCoordinates(x, y);
@@ -84,11 +85,44 @@ var pixi = (function () {
 			stage.position.x += (afterTransform.x - beforeTransform.x) * stage.scale.x;
 			stage.position.y += (afterTransform.y - beforeTransform.y) * stage.scale.y;
 			stage.updateTransform();
-			*/
+		}
+		function zam( e ) {
+			var factor = 1,
+				delta = e.deltaY,
+				local_pt = new PIXI.Point(),
+				point = new PIXI.Point(e.pageX, e.pageY),
+				stage = p.stage;
+
+			PIXI.interaction.InteractionData.prototype.getLocalPosition(stage, local_pt, point);
+
+			if ( delta > 0 ) {
+				// Zoom in
+				factor = 1.1;
+			} else {
+				// Zoom out
+				factor = 1 / 1.1;
+			}
+
+			stage.pivot = local_pt;
+			stage.position = point;
+			stage.scale.set(stage.scale.x * factor);
+		}
+		function zoomba(x, y, isZoomIn) {
+			var direction = (isZoomIn) ? 1 : -1,
+				factor = (1 + direction * 0.1),
+				local_pt = new PIXI.Point(),
+				point = new PIXI.Point(x, y),
+				stage = p.stage;
+				
+			PIXI.interaction.InteractionData.prototype.getLocalPosition(stage, local_pt, point);
+			
+			stage.scale.x *= factor;
+			stage.scale.y *= factor;
+			stage.pivot = local_pt;
+			stage.position = point;
 		}
 		
-		return zoom;
-		
+		return zoomba;
 	}());
 	var pan = (function () {
 		var isDragging = false,
