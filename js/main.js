@@ -29,7 +29,7 @@ $('#add_device').on('click', function (e) {
 		
 	e.preventDefault();
 	
-	name = $('input[type="text"][name="id"]').val();
+	name = $('input[type="text"][name="name"]').val();
 	id = $('input[type="text"][name="id"]').val();
 	x = $('input[type="text"][name="x"]').val();
 	y = $('input[type="text"][name="y"]').val();

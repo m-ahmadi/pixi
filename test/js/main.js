@@ -27,8 +27,8 @@ pc.y = 0;
 
 
 var text = new PIXI.Text('Router 24S-Hi23');
-text.interactive = true;
-text.buttonMode = true;
+//text.interactive = true;
+//text.buttonMode = true;
 
 box.addChild(pc);
 box.addChild(text);

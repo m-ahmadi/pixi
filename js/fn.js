@@ -24,7 +24,7 @@ var pixi = (function () {
 		);
 		document.body.appendChild( p.renderer.view );
 		p.stage = new PIXI.Container();
-		//@@@@@@@@@@@ test
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.stage.interactive = true;
 		p.stage.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
@@ -44,11 +44,10 @@ var pixi = (function () {
 			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
-		//@@@@@@@@@@@
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 	}
-	
 	
 	var zoom = (function () {
 		var direction;
@@ -173,7 +172,7 @@ var pixi = (function () {
 		bringToFront(this);
 	}
 	function dragMove() {
-		if (this.dragging) {
+		if ( this.dragging ) {
 			var newPosition = this.data.getLocalPosition(this.parent);
 			this.position.x = newPosition.x - this.dragPoint.x;
 			this.position.y = newPosition.y - this.dragPoint.y;
@@ -185,7 +184,7 @@ var pixi = (function () {
 		this.data = null;
 		
 		
-		if (this.TPL_Stuff  &&  this.TPL_Stuff.links) {
+		if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
 			core.adjustLines(this);
 		}
 	}
@@ -223,7 +222,7 @@ var pixi = (function () {
 		sprite.position.x = o.x;
 		sprite.position.y = o.y;
 		
-		if (!noDrag) {
+		if ( !noDrag ) {
 			addDragDrop(sprite);
 		}
 		
@@ -263,7 +262,7 @@ var pixi = (function () {
 		line.lineTo( points[0], points[1] );
 		line.endFill();
 		
-		if (!noDrag) {
+		if ( !noDrag ) {
 			addDragDrop(line);
 		}
 		
@@ -300,15 +299,15 @@ var pixi = (function () {
 		dirty = ctx.dirty;
 		clearDirty = ctx.clearDirty;
 		
-		if (dirty) {
+		if ( dirty ) {
 			dirty = false
-		} else if (!dirty) {
+		} else if ( !dirty ) {
 			dirty = true;
 		}
 		
-		if (clearDirty) {
+		if ( clearDirty ) {
 			clearDirty = false
-		} else if (!clearDirty) {
+		} else if ( !clearDirty ) {
 			clearDirty = true;
 		}
 		
@@ -332,22 +331,25 @@ var pixi = (function () {
 		);
 		rect.endFill();
 		
-		if (!noDrag) {
+		if ( !noDrag ) {
 			addDragDrop(rect);
 		}
 		
 		return rect;
 	}
 	function createText(o, noDrag) {
-		var text = new PIXI.Text(o.text, {
-			fontFamily: o.font || 'Impact',
-			fontSize: o.size || '12px',
+		if ( !o ) {	var o = {}; }
+		var txt = util.isString( o ) ? o : o.text;
+		
+		var text = new PIXI.Text(txt, {
+			fontFamily: o.font || 'Arial',
+			fontSize: o.size || '20px',
 			fill: o.color || 'black'
 		});
 		text.interactive = true;
 		text.buttonMode = true;
 		
-		if (!noDrag) {
+		if ( !noDrag ) {
 			addDragDrop(text);
 		}
 		
@@ -399,8 +401,8 @@ var core = (function () {
 		});
 
 		TweenLite.to(box.scale, 0.3, {
-			x: 0.2,
-			y: 0.2,
+			x: 1,
+			y: 1,
 			yoyo: true,
 			ease: Linear.easeInOut,
 			onComplete: o.done,
@@ -686,7 +688,7 @@ var core = (function () {
 		
 		if (points) {
 			points.forEach(function (item) {
-				if (!item.ferom  ||  !item.to) { throw new Error("adjustLine(): Bad points olaghe sag"); return; }
+				if (!item.ferom  ||  !item.to) { console.warn("adjustLine(): Bad points olaghe sag"); return; }
 				var points = [
 					item.ferom.x,
 					item.ferom.y,
@@ -789,6 +791,8 @@ var core = (function () {
 		if ( !conf ) { var conf = {}; }
 		var imgPath = 'images/',
 			sprite = null,
+			text = null,
+			box = null,
 			line = null,
 			hasLinks = false,
 			links = conf.links,
@@ -799,20 +803,36 @@ var core = (function () {
 				links.length > 0 ) {
 			hasLinks = true;
 		}
+		
+		//---------------------------------------------------------------
+		//	Creating Pixi Elements
 		imgPath += conf.type || 'computer';
 		imgPath += '.png';
 		sprite = pixi.createSprite({
 			image: imgPath,
-			scale: 0,
-			alpha: 0,
+			scale: 0.2,
+			alpha: 1,
 			x: conf.x || 0,
 			y: conf.x || 0
-		});
+		}, true);
+		text = pixi.createText( conf.name || 'no_name', true );
+		text.y = sprite.y + sprite.height;
+		
+		box = new PIXI.Container();
+		box.interactive = true;
+		box.buttonMode = true;
+		box.scale.set(0); 
+		box.alpha = 1;
+		box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
+		box.addChild(sprite);
+		box.addChild(text);
+		pixi.addDragDrop(box);
+		//---------------------------------------------------------------
 		
 		id = conf.id || 'tpl_node_'+(idCounter+=1);
 		tplNode.name = conf.name || 'no_name';
 		tplNode.id = id;
-		tplNode.node = sprite;
+		tplNode.node = box;
 		if (hasLinks) {
 			tplNode.links = {};
 			tplNode.linkCount = links.length;
@@ -848,7 +868,7 @@ var core = (function () {
 		}
 		
 		tplNodes[ tplNode.id ] = tplNode;
-		sprite.TPL_Stuff = tplNode;
+		box.TPL_Stuff = tplNode;
 		
 		pixi.addStageChild( tplNode.node );
 		

@@ -71,8 +71,11 @@ var util = {
 			}
 		}
 	},
+	isString: function (v) {
+		return ( typeof v === 'string' );
+	},
 	isEmptyString: function (v) {
-		return ( typeof v === 'string'  &&  v.length === 0 ) ? true : false;
+		return ( typeof v === 'string'  &&  v.length === 0 );
 	},
 	objectLength: function (o) {
 		if ( this.isObject(o) ) {
