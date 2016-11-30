@@ -8,6 +8,44 @@ var renderer = PIXI.autoDetectRenderer(
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
+var rect = new PIXI.Graphics();
+rect.interactive = true;
+rect.buttonMode = true;
+rect.beginFill(0xFFFF00, 1);
+rect.lineStyle(60, 0xFF0000, 1);
+rect.drawRect(0, 20, 400, 400);
+rect.endFill();
+addDragDrop(rect);
+stage.addChild(rect);
+
+var pol = new PIXI.Graphics();
+pol.interactive = true;
+pol.buttonMode = true;
+pol.beginFill(0xFFFF00, 1);
+pol.lineStyle(10, 0xFF0000, 1);
+pol.drawPolygon([
+	200, 100,
+	210, 110,
+	110, 210,
+	100, 200
+]);
+/*
+150, 100,
+	170, 150,
+	230, 155,
+	185, 195,
+	200, 250,
+	150, 220,
+	100, 250,
+	115, 195,
+	070, 155,
+	130, 150
+*/
+
+pol.endFill();
+addDragDrop(pol);
+stage.addChild(pol);
+
 
 
 
@@ -35,7 +73,7 @@ box.addChild(text);
 
 
 addDragDrop(box);
-stage.addChild(box);
+//stage.addChild(box);
 
 
 
