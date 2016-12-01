@@ -194,8 +194,8 @@ var pixi = (function () {
 		//TWEEN.update();
 		p.renderer.render(p.stage);
 	}
-	function addDragDrop(sprite) {
-		sprite
+	function addDragDrop(element) {
+		element
 			.on('mousedown', dragStart)
 			.on('touchstart', dragStart)
 			.on('mouseup', dragEnd)

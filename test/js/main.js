@@ -123,8 +123,8 @@ function dragEnd() {
 	this.dragging = false;
 	this.data = null;
 }
-function addDragDrop(sprite) {
-	sprite
+function addDragDrop(el) {
+	el
 		.on('mousedown', dragStart)
 		.on('touchstart', dragStart)
 		.on('mouseup', dragEnd)
