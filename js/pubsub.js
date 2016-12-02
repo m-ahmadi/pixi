@@ -1,12 +1,18 @@
-util.instantiatePubsub = function () {
+function instantiatePubsub() {
+	"use strict";
+	if ( this instanceof instantiatePubsub ) { throw new Error('instantiatePubsub() was called with new'); }
+	
 	var subscribers = {},
-	getSubscribers = function () {
+		inst = {};
+	
+	inst.getSubscribers = function () {
 		return subscribers;
-	},
-	subscribe = function (evt, fn, par) {
+	};
+	
+	inst.subscribe = function (evt, fn, par) {
 		var events,
 			add = function (str) {
-				if (typeof subscribers[str] === 'undefined') {
+				if ( typeof subscribers[str] === 'undefined' ) {
 					subscribers[str] = [];
 				}
 				subscribers[str].push({
@@ -24,17 +30,17 @@ util.instantiatePubsub = function () {
 					add(el);
 				});
 			}
-		} else if ( isObject(evt) ) {
+		} else if ( util.isObject(evt) ) {
 			Object.keys(evt).forEach(function (i) {
 				if (typeof subscribers[i] === 'undefined') {
 					subscribers[i] = [];
 				}
-				if (typeof evt[i] === 'function') {
+				if ( typeof evt[i] === 'function' ) {
 					subscribers[i].push({
 						fn: evt[i],
 						par: undefined
 					});
-				} else if ( isObject(evt[i]) ) {
+				} else if ( util.isObject(evt[i]) ) {
 					subscribers[i].push({
 						fn: evt[i].fn,
 						par: evt[i].par
@@ -42,21 +48,19 @@ util.instantiatePubsub = function () {
 				}
 			});
 		}
-	},
-	on = function (evt, fn, par) { // alias
-		subscribe(evt, fn, par);
-	},
-	publish = function (evtName, evtData) {
+	};
+	
+	inst.on = function (evt, fn, par) { // alias
+		this.subscribe(evt, fn, par);
+	};
+	
+	inst.publish = function (evtName, evtData) {
 		if (typeof subscribers[evtName] !== 'undefined') {
 			subscribers[evtName].forEach(function (i) {
 				i.fn(evtData, i.par);
 			});
 		}
-	};
-	return {
-		getSubscribers: getSubscribers,
-		subscribe: subscribe,
-		on: on,
-		publish: publish
-	};
+	}
+	
+	return inst;
 };

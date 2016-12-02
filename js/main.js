@@ -1,6 +1,5 @@
 $(function () {
-	a.pixi.init();
-	a.core.init();
+	a.mediator.init();
 });
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);

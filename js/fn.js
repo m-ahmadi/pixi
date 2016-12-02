@@ -3,7 +3,7 @@ var a = (function () {
 "use strict";
 
 var pixi = (function () {
-	var inst = util.extend( util.instantiatePubsub() ),
+	var inst = util.extend( instantiatePubsub() ),
 		p = {};
 	
 	p.defaults = {};
@@ -47,6 +47,8 @@ var pixi = (function () {
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
+		
+		inst.publish('init');
 	}
 	
 	var zoom = (function () {
@@ -384,7 +386,7 @@ var pixi = (function () {
 
 
 var core = (function () {
-	var inst = util.extend( util.instantiatePubsub() ),
+	var inst = util.extend( instantiatePubsub() ),
 	tplNodes = {},
 	idCounter = 0; // createTplNode uses this
 	t = function () { return tplNodes; }; // testing purposes
@@ -945,15 +947,30 @@ var core = (function () {
 }());
 
 
+var navigation = (function () {
+	var inst = util.extend( instantiatePubsub() );
+	
+}());
 
-
+var mediator = (function () {
+	var i = {};
+	
+	i.init = function () {
+		
+		pixi.init();
+		core.init();
+	};
+	
+	return i;
+}());
 	
 
 
 
 return {
 	pixi: pixi,
-	core: core
+	core: core,
+	mediator: mediator
 };
 	
 
