@@ -792,14 +792,15 @@ var core = (function () {
 	createTplNode = function (conf) {
 		if ( !conf ) { var conf = {}; }
 		var imgPath = 'images/',
-			sprite = null,
-			text = null,
-			box = null,
-			line = null,
 			hasLinks = false,
 			links = conf.links,
-			id,
-			tplNode = {};
+			tplNode = {},
+			sprite,
+			text,
+			box,
+			line,
+			id;
+		
 		if ( links &&
 				util.isArray( links ) &&
 				links.length > 0 ) {

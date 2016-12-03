@@ -9,45 +9,67 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
 
-var box = new PIXI.Container();
 
 
-var rect = new PIXI.Graphics();
+
+var panel = new PIXI.Graphics(),
+	panelWidth = 300,
+	panelHeight = 200,
+	panelOffset = 200;
+	
+panel.beginFill(0xE3E3E3);
+panel.lineStyle(0);
+panel.drawRect(0, 0, panelWidth, panelHeight);
+panel.endFill();
+//panel.position.set( panelPos.x, panelPos.y ); 
+
+
+
+var rect = new PIXI.Graphics(),
+	rectWidth = renderer.width / 10,
+	rectHeight = renderer.height / 3;
 rect.interactive = true;
 rect.buttonMode = true;
 rect.beginFill(0x3F51B5, 1);
 rect.lineStyle(0);
-rect.drawRect(0, 0, 200, 200);
+rect.drawRect(0, 0, 150, 150);
 rect.endFill();
-rect.alpha = 0.5; 
-rect.position.x = 50;
-rect.position.y = 50;
+rect.alpha = 0.5;
 rect.TPL_nav = 'box';
 
-var dot = new PIXI.Graphics();
+var dot = new PIXI.Graphics(),
+	dotWH = 6,
+	dotHalf = dotWH / 2,
+	dotPos = {
+		get x() { return (rect.x + rect.width) - dotHalf; },
+		get y() { return (rect.y + rect.height) - dotHalf; }
+	};
 dot.interactive = true;
 dot.buttonMode = true;
-dot.beginFill(0x000000, 1);
+dot.beginFill(0x0000FF, 1);
 dot.lineStyle(0);
-dot.drawRect(0, 0, 10, 10);
+dot.drawRect(0, 0, dotWH, dotWH);
 dot.endFill();
-dot.position.x = (rect.x + rect.width) -5;
-dot.position.y = (rect.y + rect.height) -5;
+dot.position.set( dotPos.x, dotPos.y );
 dot.TPL_nav = 'dot';
 
 
 
+var nav = new PIXI.Container();
+var navPos = new PIXI.Point(
+		renderer.width - (panelWidth + panelOffset),
+		50
+	);
+nav.position.set( navPos.x, navPos.y );
 
 
-
-box.addChild(rect);
-box.addChild(dot);
+nav.addChild(panel);
+nav.addChild(rect);
+nav.addChild(dot);
 
 addDragDrop(rect);
 addDragDrop(dot);
-stage.addChild(box);
-
-
+stage.addChild(nav);
 
 
 
@@ -94,8 +116,7 @@ function mousedown(e) {
 		this.clickPoint = e.data.global;
 	}
 }
-var initX,
-	initY;
+
 function mousemove(e) {
 	
 	if (this.TPL_nav === 'box') {
@@ -104,14 +125,51 @@ function mousemove(e) {
 		if (this.dragging) {
 			var newPosition = this.data.getLocalPosition(this.parent),
 				newX = newPosition.x - this.dragPoint.x,
-				newY = newPosition.y - this.dragPoint.y;
-				
-			this.position.x = newX;
-			this.position.y = newY;
+				newY = newPosition.y - this.dragPoint.y,
+				dotNewX = newX + (rect.width - dotHalf),
+				dotNewY = newY + (rect.height - dotHalf);
 			
-			dot.position.x = newX + (rect.width - 5);
-			dot.position.y = newY + (rect.height - 5);
+			var min = 0,
+				maxX = panel.width - rect.width,
+				maxY = panel.height - rect.height,
+				rectNewPos = new PIXI.Point(),
+				dotNewPos = new PIXI.Point();
 			
+			if ( newX > min  &&  newX <= maxX ) {
+				rectNewPos.x = newX
+			} else if ( newX < min ) {
+				rectNewPos.x = min;
+			} else if ( newX > maxX ) {
+				rectNewPos.x = maxX;
+			}
+			
+			if ( newY > min  &&  newY <= maxY ) {
+				rectNewPos.y = newY;
+			} else if ( newY < min ) {
+				rectNewPos.y = min;
+			} else if ( newY > maxY ) {
+				rectNewPos.y = maxY;
+			}
+			
+			dotNewPos.x = ( newX > min  &&  newX <= maxX ) ? dotNewX : dotPos.x;
+			dotNewPos.y = ( newY > min  &&  newY <= maxY ) ? dotNewY : dotPos.y;
+			
+			
+			
+			rect.position.x = rectNewPos.x;
+			rect.position.y = rectNewPos.y;
+			dot.position.x = dotNewPos.x;
+			dot.position.y = dotNewPos.y;
+			
+			//dot.position.x = (newX > 0) ? dotNewX: dotPos.x;
+			//dot.position.y = (newY > 0) ? dotNewY : dotPos.y;
+			
+			/*
+			rect.position.x = newX;
+			rect.position.y = newY;
+			dot.position.x = newX + (rect.width - dotHalf);
+			dot.position.y = newY + (rect.height - dotHalf);
+			*/
 		}
 		
 		
@@ -120,14 +178,48 @@ function mousemove(e) {
 	if (this.TPL_nav === 'dot') {
 		this.defaultCursor = 'nwse-resize';
 		if (this.mouseIsDown) {
-			var currentCursor = e.data.global,
+			var currentCursor = e.data.getLocalPosition(this.parent),
 				resizeX = ( currentCursor.x - this.x ),
 				resizeY = ( currentCursor.y - this.y );
 				halfX = resizeX / 2,
 				halfY = resizeY / 2;
 			
-			console.log(halfX);
+			var rectRight = rect.x + rect.width,
+				rectBott = rect.y + rect.height,
+				panelRight = panel.x + panel.width,
+				panelBott = panel.y + panel.height,
+				min = 0,
+				maxX = panel.width - rect.width;
+				
+			if ( rectRight <= panelRight ) {
+				if ( rect.x > min ) {
+					rect.width += resizeX;
+					rect.position.x -= halfX;
+				} else if ( rect.x <= min ) {
+					rect.width += resizeX;
+				}
+			}
 			
+			//rect.width += resizeX;
+			//rect.position.x -= halfX;
+			
+			if ( rectBott <= panelBott ) {
+				if ( rect.y > min ) {
+					rect.height += resizeX;
+					rect.position.y -= halfX;
+					
+				} else if ( rect.y <= min ) {
+					rect.height += resizeX;
+				}
+			}
+			
+			
+			
+			dot.position.x += halfX;
+			dot.position.y += halfX; // halfY
+			rect.defaultCursor = 'nwse-resize';
+			
+			/*
 			rect.width += resizeX;
 			rect.position.x -= halfX;
 			
@@ -137,6 +229,7 @@ function mousemove(e) {
 			dot.position.x += halfX;
 			dot.position.y += halfX; // halfY
 			rect.defaultCursor = 'nwse-resize';
+			*/
 		}
 	}
 	
@@ -158,7 +251,7 @@ function bringToFront(el) {
 }
 
 $(function () {
-	box.hitArea = new PIXI.Rectangle(0, 0, rect.width, rect.height);
+	// box.hitArea = new PIXI.Rectangle(0, 0, rect.width, rect.height);
 });
 
 /*
