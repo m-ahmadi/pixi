@@ -15,7 +15,7 @@ var stage = new PIXI.Container();
 var panel = new PIXI.Graphics(),
 	panelWidth = 300,
 	panelHeight = 200,
-	panelOffset = 200;
+	panelOffset = 100;
 	
 panel.beginFill(0xE3E3E3);
 panel.lineStyle(0);
@@ -116,7 +116,14 @@ function mousedown(e) {
 		this.clickPoint = e.data.global;
 	}
 }
-
+function getFullPositions(el) {
+	return {
+		left: el.position.x,
+		right: el.position.x + el.width,
+		top: el.position.y,
+		bott: el.position.y + el.height
+	};
+}
 function mousemove(e) {
 	
 	if (this.TPL_nav === 'box') {
@@ -184,14 +191,17 @@ function mousemove(e) {
 				halfX = resizeX / 2,
 				halfY = resizeY / 2;
 			
-			var rectRight = rect.x + rect.width,
-				rectBott = rect.y + rect.height,
-				panelRight = panel.x + panel.width,
-				panelBott = panel.y + panel.height,
+			var rectPos = getFullPositions(rect),
+				panelPos = getFullPositions(panel),
 				min = 0,
 				maxX = panel.width - rect.width;
-				
-			if ( rectRight <= panelRight ) {
+			
+			var leftReach = false,
+				rightReach = false,
+				topReach = false,
+				bottReach = false;
+			
+			if ( rectPos.right <= panelPos.right ) {
 				if ( rect.x > min ) {
 					rect.width += resizeX;
 					rect.position.x -= halfX;
@@ -203,7 +213,7 @@ function mousemove(e) {
 			//rect.width += resizeX;
 			//rect.position.x -= halfX;
 			
-			if ( rectBott <= panelBott ) {
+			if ( rectPos.bott <= panelPos.bott ) {
 				if ( rect.y > min ) {
 					rect.height += resizeX;
 					rect.position.y -= halfX;
