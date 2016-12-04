@@ -13,9 +13,9 @@ var stage = new PIXI.Container();
 
 
 var panel = new PIXI.Graphics(),
-	panelWidth = 300,
-	panelHeight = 200,
-	panelOffset = 100;
+	panelWidth = 600,
+	panelHeight = 400,
+	panelOffset = 200;
 	
 panel.beginFill(0xE3E3E3);
 panel.lineStyle(0);
@@ -30,7 +30,7 @@ var rect = new PIXI.Graphics(),
 	rectHeight = renderer.height / 3;
 rect.interactive = true;
 rect.buttonMode = true;
-rect.beginFill(0x3F51B5, 1);
+rect.beginFill(0x2196F3, 1);
 rect.lineStyle(0);
 rect.drawRect(0, 0, 150, 150);
 rect.endFill();
@@ -90,39 +90,42 @@ function addDragDrop(el) {
 		.on('mousemove', mousemove)
 		.on('touchmove', mousemove);
 }
-function mousedown(e) {
-	//bringToFront(this);
-	if (this.TPL_nav === 'box') {
-		this.data = e.data;
-		this.dragging = true;
-		
-		this.dragPoint = e.data.getLocalPosition(this.parent);
-		
-		/*
-		console.log(
-			this.position.x,
-			this.dragPoint.x,
-			this.dragPoint.x - this.position.x
-		);
-		*/
-		
-		this.dragPoint.x -= this.position.x;
-		this.dragPoint.y -= this.position.y;
-		
-	}
+function addCustomPos(el) {
+	el.left = el.position.x;
+	el.right = el.position.x + el.width;
+	el.top = el.position.y;
+	el.bott = el.position.y + el.height;
 	
-	if (this.TPL_nav === 'dot') {
-		this.mouseIsDown = true;
-		this.clickPoint = e.data.global;
-	}
-}
-function getFullPositions(el) {
+	/*
 	return {
 		left: el.position.x,
 		right: el.position.x + el.width,
 		top: el.position.y,
 		bott: el.position.y + el.height
 	};
+	*/
+}
+function mousedown(e) {
+	//bringToFront(this);
+	this.data = e.data;
+	this.dragPoint = e.data.getLocalPosition(this.parent);
+	/*
+	console.log(
+		this.position.x,
+		this.dragPoint.x,
+		this.dragPoint.x - this.position.x
+	);
+	*/
+	this.dragPoint.x -= this.position.x;
+	this.dragPoint.y -= this.position.y;
+
+	if (this.TPL_nav === 'box') {
+		this.dragging = true;
+	}
+	
+	if (this.TPL_nav === 'dot') {
+		this.mouseIsDown = true;
+	}
 }
 function mousemove(e) {
 	
@@ -191,55 +194,37 @@ function mousemove(e) {
 				halfX = resizeX / 2,
 				halfY = resizeY / 2;
 			
-			var rectPos = getFullPositions(rect),
-				panelPos = getFullPositions(panel),
-				min = 0,
-				maxX = panel.width - rect.width;
+			addCustomPos(rect);
+			addCustomPos(panel);
+			var	min = 0;
+				nextRight = rect.width + resizeX,
+				nextLeft = rect.position.x - halfX,
+				nextBott = rect.height + resizeX,
+				nextTop = rect.position.y - halfX,
+				reachedRight = !(nextRight <= panel.right),
+				reachedLeft = !(nextLeft > min),
+				reachedBott = !(nextBott <= panel.bott),
+				reachedTop = !(nextTop > min);
 			
-			var leftReach = false,
-				rightReach = false,
-				topReach = false,
-				bottReach = false;
-			
-			if ( rectPos.right <= panelPos.right ) {
-				if ( rect.x > min ) {
-					rect.width += resizeX;
-					rect.position.x -= halfX;
-				} else if ( rect.x <= min ) {
-					rect.width += resizeX;
-				}
+			if ( !reachedRight  &&  !reachedLeft ) {
+				rect.width += resizeX;
+				rect.position.x -= halfX;
+				dot.position.x += halfX;
+			} else if ( !reachedRight  &&  reachedLeft ) {
+				rect.width += resizeX;
+				dot.position.x += resizeX;
 			}
 			
-			//rect.width += resizeX;
-			//rect.position.x -= halfX;
-			
-			if ( rectPos.bott <= panelPos.bott ) {
-				if ( rect.y > min ) {
-					rect.height += resizeX;
-					rect.position.y -= halfX;
-					
-				} else if ( rect.y <= min ) {
-					rect.height += resizeX;
-				}
+			if ( !reachedBott  &&  !reachedTop ) {
+				rect.height += resizeX;
+				rect.position.y -= halfX;
+				dot.position.y += halfX;
+			} else if ( !reachedBott  &&  reachedTop ) {
+				rect.height += resizeX;
+				dot.position.y += resizeX;
 			}
 			
-			
-			
-			dot.position.x += halfX;
-			dot.position.y += halfX; // halfY
 			rect.defaultCursor = 'nwse-resize';
-			
-			/*
-			rect.width += resizeX;
-			rect.position.x -= halfX;
-			
-			rect.height += resizeX; // resizeY
-			rect.position.y -= halfX; // halfY
-			
-			dot.position.x += halfX;
-			dot.position.y += halfX; // halfY
-			rect.defaultCursor = 'nwse-resize';
-			*/
 		}
 	}
 	

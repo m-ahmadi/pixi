@@ -9,6 +9,7 @@ var pixi = (function () {
 	p.defaults = {};
 	p.renderer;
 	p.stage;
+	p.mainContainer;
 	
 	function init(o) {
 		if (o) {
@@ -24,11 +25,13 @@ var pixi = (function () {
 		);
 		document.body.appendChild( p.renderer.view );
 		p.stage = new PIXI.Container();
+		
+		p.mainContainer = new PIXI.Container();
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
-		p.stage.interactive = true;
-		p.stage.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
-		p.stage
+		p.mainContainer.interactive = true;
+		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
+		p.mainContainer
 			.on('mousedown', pan.start)
 			.on('touchstart', pan.start)
 			.on('mouseup', pan.end)
@@ -44,6 +47,7 @@ var pixi = (function () {
 			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
+		p.stage.addChild( p.mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
@@ -65,36 +69,36 @@ var pixi = (function () {
 			return function (x, y) {
 				ctx.global.x = x;
 				ctx.global.y = y;
-				return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.stage);
+				return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.mainContainer);
 			}
 		}());
 		function zoom(x, y, isZoomIn) {
-			var stage = p.stage;
+			var mainContainer = p.mainContainer;
 			
 			direction = isZoomIn ? 1 : -1;
 			var factor = (1 + direction * 0.1);
-			stage.scale.x *= factor;
-			stage.scale.y *= factor;
+			mainContainer.scale.x *= factor;
+			mainContainer.scale.y *= factor;
 
 			// Technically code below is not required, but helps to zoom on mouse
 			// cursor, instead center of graphGraphics coordinates
 			
 			var beforeTransform = getGraphCoordinates(x, y);
-			stage.updateTransform();
+			mainContainer.updateTransform();
 			var afterTransform = getGraphCoordinates(x, y);
 
-			stage.position.x += (afterTransform.x - beforeTransform.x) * stage.scale.x;
-			stage.position.y += (afterTransform.y - beforeTransform.y) * stage.scale.y;
-			stage.updateTransform();
+			mainContainer.position.x += (afterTransform.x - beforeTransform.x) * mainContainer.scale.x;
+			mainContainer.position.y += (afterTransform.y - beforeTransform.y) * mainContainer.scale.y;
+			mainContainer.updateTransform();
 		}
 		function zam( e ) {
 			var factor = 1,
 				delta = e.deltaY,
 				local_pt = new PIXI.Point(),
 				point = new PIXI.Point(e.pageX, e.pageY),
-				stage = p.stage;
+				mainContainer = p.mainContainer;
 
-			PIXI.interaction.InteractionData.prototype.getLocalPosition(stage, local_pt, point);
+			PIXI.interaction.InteractionData.prototype.getLocalPosition(mainContainer, local_pt, point);
 
 			if ( delta > 0 ) {
 				// Zoom in
@@ -104,23 +108,23 @@ var pixi = (function () {
 				factor = 1 / 1.1;
 			}
 
-			stage.pivot = local_pt;
-			stage.position = point;
-			stage.scale.set(stage.scale.x * factor);
+			mainContainer.pivot = local_pt;
+			mainContainer.position = point;
+			mainContainer.scale.set(mainContainer.scale.x * factor);
 		}
 		function zoomba(x, y, isZoomIn) {
 			var direction = (isZoomIn) ? 1 : -1,
 				factor = (1 + direction * 0.1),
 				local_pt = new PIXI.Point(),
 				point = new PIXI.Point(x, y),
-				stage = p.stage;
+				mainContainer = p.mainContainer;
 				
-			PIXI.interaction.InteractionData.prototype.getLocalPosition(stage, local_pt, point);
+			PIXI.interaction.InteractionData.prototype.getLocalPosition(mainContainer, local_pt, point);
 			
-			stage.scale.x *= factor;
-			stage.scale.y *= factor;
-			stage.pivot = local_pt;
-			stage.position = point;
+			mainContainer.scale.x *= factor;
+			mainContainer.scale.y *= factor;
+			mainContainer.pivot = local_pt;
+			mainContainer.position = point;
 		}
 		
 		return zoomba;
@@ -146,8 +150,8 @@ var pixi = (function () {
 				dx = pos.x - prevX,
 				dy = pos.y - prevY;
 
-			p.stage.position.x += dx;
-			p.stage.position.y += dy;
+			p.mainContainer.position.x += dx;
+			p.mainContainer.position.y += dy;
 			prevX = pos.x;
 			prevY = pos.y;
 		}
@@ -209,7 +213,7 @@ var pixi = (function () {
 	}
 	function bringToFront(el) {
 		// reorder children for z-index
-		var arr = p.stage.children;
+		var arr = p.mainContainer.children;
 		arr.splice( arr.indexOf(el), 1 );
 		arr.push(el);
 	}
@@ -357,8 +361,11 @@ var pixi = (function () {
 		
 		return text;
 	}
-	function addStageChild(child) {
-		p.stage.addChild( child );
+	function addStageChild(el) {
+		p.stage.addChild(el);
+	}
+	function addMainChild(el) {
+		p.mainContainer.addChild(el);
 	}
 	
 	Object.defineProperties(inst, {
@@ -367,6 +374,9 @@ var pixi = (function () {
 		},
 		"stage": {
 			get: function () { return p.stage; }
+		},
+		"mainContainer": {
+			get: function () { return p.mainContainer }
 		}
 		
 	});
@@ -378,9 +388,9 @@ var pixi = (function () {
 	inst.redrawLine = redrawLine;
 	inst.createRect = createRect;
 	inst.createText = createText;
-	inst.addStageChild = addStageChild;
 	inst.zoom = zoom;
-	
+	inst.addStageChild = addStageChild;
+	inst.addMainChild = addMainChild;
 	return inst;
 }());
 
@@ -783,7 +793,7 @@ var core = (function () {
 			height: 100
 		}));
 		kids.forEach(function (i) {
-			pixi.stage.addChild(i);
+			pixi.mainContainer.addChild(i);
 		});
 	},
 	addTplLink = function () {
@@ -864,7 +874,7 @@ var core = (function () {
 					
 				}
 				*/
-				pixi.addStageChild( line );
+				pixi.addMainChild( line );
 			});
 		} else {
 			tplNode.links = false;
@@ -873,7 +883,7 @@ var core = (function () {
 		tplNodes[ tplNode.id ] = tplNode;
 		box.TPL_Stuff = tplNode;
 		
-		pixi.addStageChild( tplNode.node );
+		pixi.addMainChild( tplNode.node );
 		
 		//adjustLines(tplNode.node);
 		animateNode(tplNode.node, {
@@ -928,7 +938,7 @@ var core = (function () {
 		
 		
 		kids.forEach(function (i) {
-			pixi.stage.addChild(i);
+			pixi.mainContainer.addChild(i);
 		});
 		*/
 		
@@ -949,17 +959,236 @@ var core = (function () {
 
 
 var navigation = (function () {
-	var inst = util.extend( instantiatePubsub() );
+	var inst = util.extend( instantiatePubsub() ),
+		p = {};
 	
+	function init() {
+		var nav,
+			panel,
+			rect,
+			dot;
+		
+		p.panel = new PIXI.Graphics(),
+		p.panelWidth = 400;
+		p.panelHeight = 200;
+		p.panelOffset = 100;
+		panel = p.panel;
+		
+		panel.beginFill(0xE3E3E3);
+		panel.lineStyle(0);
+		panel.drawRect(0, 0, p.panelWidth, p.panelHeight);
+		panel.endFill();
+		//panel.position.set( panelPos.x, panelPos.y ); 
+
+
+
+		p.rect = new PIXI.Graphics();
+		p.rectWidth = pixi.renderer.width / 10;
+		p.rectHeight = pixi.renderer.height / 3;
+		rect = p.rect;
+		
+		rect.interactive = true;
+		rect.buttonMode = true;
+		rect.beginFill(0x2196F3, 1);
+		rect.lineStyle(0);
+		rect.drawRect(0, 0, 150, 150);
+		rect.endFill();
+		rect.alpha = 0.5;
+		rect.TPL_nav = 'box';
+
+		p.dot = new PIXI.Graphics();
+		p.dotWH = 6;
+		p.dotHalf = p.dotWH / 2;
+		p.dotPos = {
+			get x() { return (rect.x + rect.width) - p.dotHalf; },
+			get y() { return (rect.y + rect.height) - p.dotHalf; }
+		};
+		dot = p.dot
+		
+		dot.interactive = true;
+		dot.buttonMode = true;
+		dot.beginFill(0x0000FF, 1);
+		dot.lineStyle(0);
+		dot.drawRect(0, 0, p.dotWH, p.dotWH);
+		dot.endFill();
+		dot.position.set( p.dotPos.x, p.dotPos.y );
+		dot.TPL_nav = 'dot';
+		
+		
+		p.nav = new PIXI.Container();
+		p.navPos = new PIXI.Point(
+			pixi.renderer.width - (p.panelWidth + p.panelOffset),
+			50
+		);
+		nav = p.nav;
+		
+		nav.position.set( p.navPos.x, p.navPos.y );
+		nav.addChild(panel);
+		nav.addChild(rect);
+		nav.addChild(dot);
+		addDragDrop(rect, 'rect');
+		addDragDrop(dot, 'dot');
+		pixi.addStageChild(nav);
+	}
+	
+	function addDragDrop(el, name) {
+		if (name === 'rect') {
+			el
+				.on('mousedown', rectDown)
+				.on('touchstart', rectDown)
+				.on('mouseup', rectUp)
+				.on('mouseupoutside', rectUp)
+				.on('touchend', rectUp)
+				.on('touchendoutside', rectUp)
+				.on('mousemove', rectMove)
+				.on('touchmove', rectMove);
+		} else if ( name === 'dot' ) {
+			el
+				.on('mousedown', dotDown)
+				.on('touchstart', dotDown)
+				.on('mouseup', dotUp)
+				.on('mouseupoutside', dotUp)
+				.on('touchend', dotUp)
+				.on('touchendoutside', dotUp)
+				.on('mousemove', dotMove)
+				.on('touchmove', dotMove);
+		}
+	}
+	function addCustomPos(el) {
+		el.left = el.position.x;
+		el.right = el.position.x + el.width;
+		el.top = el.position.y;
+		el.bott = el.position.y + el.height;
+	}
+	function panelDown(e) {
+		e.stopPropagation();
+	}
+	function rectDown(e) {
+		this.data = e.data;
+		this.dragging = true;
+		this.dragPoint = e.data.getLocalPosition(this.parent);
+		this.dragPoint.x -= this.position.x;
+		this.dragPoint.y -= this.position.y;
+	}
+	function dotDown() {
+		this.mouseIsDown = true;
+	}
+	function rectUp() {
+		this.dragging = false;
+		this.data = null;
+	}
+	function dotUp() {
+		this.mouseIsDown = false;
+	}
+	function rectMove() {
+		this.defaultCursor = 'move';
+		if (this.dragging) {
+			var panel = p.panel,
+				rect = p.rect,
+				dot = p.dot,
+				dotPos = p.dotPos,
+				dotHalf = p.dotHalf,
+				newPosition = this.data.getLocalPosition(this.parent),
+				newX = newPosition.x - this.dragPoint.x,
+				newY = newPosition.y - this.dragPoint.y,
+				dotNewX = newX + (rect.width - dotHalf),
+				dotNewY = newY + (rect.height - dotHalf);
+				
+			
+			var min = 0,
+				maxX = panel.width - rect.width,
+				maxY = panel.height - rect.height,
+				rectNewPos = new PIXI.Point(),
+				dotNewPos = new PIXI.Point();
+			
+			if ( newX > min  &&  newX <= maxX ) {
+				rectNewPos.x = newX
+			} else if ( newX < min ) {
+				rectNewPos.x = min;
+			} else if ( newX > maxX ) {
+				rectNewPos.x = maxX;
+			}
+			
+			if ( newY > min  &&  newY <= maxY ) {
+				rectNewPos.y = newY;
+			} else if ( newY < min ) {
+				rectNewPos.y = min;
+			} else if ( newY > maxY ) {
+				rectNewPos.y = maxY;
+			}
+			
+			dotNewPos.x = ( newX > min  &&  newX <= maxX ) ? dotNewX : dotPos.x;
+			dotNewPos.y = ( newY > min  &&  newY <= maxY ) ? dotNewY : dotPos.y;
+			
+			rect.position.x = rectNewPos.x;
+			rect.position.y = rectNewPos.y;
+			dot.position.x = dotNewPos.x;
+			dot.position.y = dotNewPos.y;
+		}
+	}
+	function dotMove(e) {
+		this.defaultCursor = 'nwse-resize';
+		if (this.mouseIsDown) {
+			var currentCursor = e.data.getLocalPosition(this.parent),
+				resizeX = ( currentCursor.x - this.x ),
+				resizeY = ( currentCursor.y - this.y ),
+				halfX = resizeX / 2,
+				halfY = resizeY / 2,
+				panel = p.panel,
+				rect = p.rect,
+				dot = p.dot;
+				
+			rect.defaultCursor = 'nwse-resize';
+			addCustomPos(rect);
+			addCustomPos(panel);
+			var	min = 0,
+				nextRight = rect.width + resizeX,
+				nextLeft = rect.position.x - halfX,
+				nextBott = rect.height + resizeX,
+				nextTop = rect.position.y - halfX,
+				reachedRight = !(nextRight <= panel.right),
+				reachedLeft = !(nextLeft > min),
+				reachedBott = !(nextBott <= panel.bott),
+				reachedTop = !(nextTop > min);
+			
+			if ( !reachedRight  &&  !reachedLeft ) {
+				rect.width += resizeX;
+				rect.position.x -= halfX;
+				dot.position.x += halfX;
+			} else if ( !reachedRight  &&  reachedLeft ) {
+				rect.width += resizeX;
+				dot.position.x += resizeX;
+			}
+			
+			if ( !reachedBott  &&  !reachedTop ) {
+				rect.height += resizeX;
+				rect.position.y -= halfX;
+				dot.position.y += halfX;
+			} else if ( !reachedBott  &&  reachedTop ) {
+				rect.height += resizeX;
+				dot.position.y += resizeX;
+			}
+			inst.publish('zoom');
+		}
+	}
+	
+	
+	inst.init = init;
+	return inst;
 }());
+
 
 var mediator = (function () {
 	var i = {};
 	
 	i.init = function () {
-		
 		pixi.init();
 		core.init();
+		navigation.init();
+		
+		navigation.on('zoom', function () {
+			console.log('zoom');
+		});
 	};
 	
 	return i;

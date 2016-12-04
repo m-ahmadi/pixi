@@ -1,3 +1,41 @@
+var rectPos = getFullPositions(rect),
+	panelPos = getFullPositions(panel),
+	min = 0,
+	maxX = panel.x + panel.width;
+
+if ( rectPos.right <= panelPos.right ) {
+	if ( rect.x > min ) {
+		rect.width += resizeX;
+		rect.position.x -= halfX;
+	} else if ( rect.x <= min ) { // left reached
+		rect.width += resizeX;
+	} else if ( rectPos.right >= maxX ) {
+		//rect.width -= resizeX;
+	}
+}
+
+
+if ( rectPos.bott <= panelPos.bott ) {
+	if ( rect.y > min ) {
+		rect.height += resizeX;
+		rect.position.y -= halfX;
+		
+	} else if ( rect.y <= min ) {
+		rect.height += resizeX;
+	}
+}
+/*
+rect.width += resizeX;
+rect.position.x -= halfX;
+
+rect.height += resizeX; // resizeY
+rect.position.y -= halfX; // halfY
+
+dot.position.x += halfX;
+dot.position.y += halfX; // halfY
+rect.defaultCursor = 'nwse-resize';
+*/
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 /*
 sourceSide = '',
 targetSide = '',
