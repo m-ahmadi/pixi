@@ -23,7 +23,8 @@ var pixi = (function () {
 				antialias: true,
 			}
 		);
-		document.body.appendChild( p.renderer.view );
+		// document.body.appendChild( p.renderer.view );
+		$('#contents').append( p.renderer.view );
 		p.stage = new PIXI.Container();
 		
 		p.mainContainer = new PIXI.Container();
@@ -31,15 +32,7 @@ var pixi = (function () {
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
 		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
-		p.mainContainer
-			.on('mousedown', pan.start)
-			.on('touchstart', pan.start)
-			.on('mouseup', pan.end)
-			.on('mouseupoutside', pan.end)
-			.on('touchend', pan.end)
-			.on('touchendoutside', pan.end)
-			.on('mousemove', pan.move)
-			.on('touchmove', pan.move);
+		pan.add( p.mainContainer );
 			
 		$(document).on('mousewheel', function (e) {
 			// e.deltaX, e.deltaY, e.deltaFactor
@@ -158,42 +151,73 @@ var pixi = (function () {
 		function up() {
 			isDragging= false;
 		}
+		function pan(x, y) {
+			if ( x  &&  y ) {
+				p.mainContainer.position.x += x;
+				p.mainContainer.position.y += y;
+			}
+		}
+		function add(el) {
+			el
+				.on('mousedown', down)
+				.on('touchstart', down)
+				.on('mouseup', up)
+				.on('mouseupoutside', up)
+				.on('touchend', up)
+				.on('touchendoutside', up)
+				.on('mousemove', move)
+				.on('touchmove', move);
+		}
 		
 		return {
-			start: down,
-			move: move,
-			end: up
-		};
-		
+			pan: pan,
+			add: add
+		}
 	}());
-	function dragStart(e) {
-		e.stopPropagation();
-		this.data = e.data;
-		this.alpha = 0.5;
-		this.dragging = true;
-		this.dragPoint = e.data.getLocalPosition(this.parent);
-		this.dragPoint.x -= this.position.x;
-		this.dragPoint.y -= this.position.y;
-		
-		bringToFront(this);
-	}
-	function dragMove() {
-		if ( this.dragging ) {
-			var newPosition = this.data.getLocalPosition(this.parent);
-			this.position.x = newPosition.x - this.dragPoint.x;
-			this.position.y = newPosition.y - this.dragPoint.y;
+	var addDragDrop = (function () {
+		function down(e) {
+			e.stopPropagation();
+			this.data = e.data;
+			this.alpha = 0.5;
+			this.dragging = true;
+			this.dragPoint = e.data.getLocalPosition(this.parent);
+			this.dragPoint.x -= this.position.x;
+			this.dragPoint.y -= this.position.y;
+			
+			bringToFront(this);
 		}
-	}
-	function dragEnd() {
-		this.alpha = 1;
-		this.dragging = false;
-		this.data = null;
-		
-		
-		if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
-			core.adjustLines(this);
+		function up() {
+			this.alpha = 1;
+			this.dragging = false;
+			this.data = null;
+			
+			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
+				core.adjustLines(this);
+			}
 		}
-	}
+		function move() {
+			if ( this.dragging ) {
+				var newPosition = this.data.getLocalPosition(this.parent);
+				this.position.x = newPosition.x - this.dragPoint.x;
+				this.position.y = newPosition.y - this.dragPoint.y;
+			}
+		}
+		
+		function add(el) {
+			el
+				.on('mousedown', down) 
+				.on('touchstart', down)
+				.on('mouseup', up)
+				.on('mouseupoutside', up)
+				.on('touchend', up)
+				.on('touchendoutside', up)
+				.on('mousemove', move)
+				.on('touchmove', move);
+		}
+		
+		
+		return add;
+	}());
 	function animate() {
 		requestAnimationFrame(animate);
 		//tink.update();
@@ -389,6 +413,7 @@ var pixi = (function () {
 	inst.createRect = createRect;
 	inst.createText = createText;
 	inst.zoom = zoom;
+	inst.pan = pan;
 	inst.addStageChild = addStageChild;
 	inst.addMainChild = addMainChild;
 	return inst;
@@ -973,20 +998,17 @@ var navigation = (function () {
 		p.panelHeight = 200;
 		p.panelOffset = 100;
 		panel = p.panel;
-		
+		panel.interactive = true;
 		panel.beginFill(0xE3E3E3);
 		panel.lineStyle(0);
 		panel.drawRect(0, 0, p.panelWidth, p.panelHeight);
 		panel.endFill();
 		//panel.position.set( panelPos.x, panelPos.y ); 
-
-
-
+		
 		p.rect = new PIXI.Graphics();
 		p.rectWidth = pixi.renderer.width / 10;
 		p.rectHeight = pixi.renderer.height / 3;
 		rect = p.rect;
-		
 		rect.interactive = true;
 		rect.buttonMode = true;
 		rect.beginFill(0x2196F3, 1);
@@ -1003,8 +1025,7 @@ var navigation = (function () {
 			get x() { return (rect.x + rect.width) - p.dotHalf; },
 			get y() { return (rect.y + rect.height) - p.dotHalf; }
 		};
-		dot = p.dot
-		
+		dot = p.dot;
 		dot.interactive = true;
 		dot.buttonMode = true;
 		dot.beginFill(0x0000FF, 1);
@@ -1014,23 +1035,21 @@ var navigation = (function () {
 		dot.position.set( p.dotPos.x, p.dotPos.y );
 		dot.TPL_nav = 'dot';
 		
-		
 		p.nav = new PIXI.Container();
 		p.navPos = new PIXI.Point(
 			pixi.renderer.width - (p.panelWidth + p.panelOffset),
 			50
 		);
 		nav = p.nav;
-		
 		nav.position.set( p.navPos.x, p.navPos.y );
 		nav.addChild(panel);
 		nav.addChild(rect);
 		nav.addChild(dot);
+		addDragDrop(panel, 'panel');
 		addDragDrop(rect, 'rect');
 		addDragDrop(dot, 'dot');
 		pixi.addStageChild(nav);
 	}
-	
 	function addDragDrop(el, name) {
 		if (name === 'rect') {
 			el
@@ -1061,7 +1080,14 @@ var navigation = (function () {
 		el.bott = el.position.y + el.height;
 	}
 	function panelDown(e) {
-		e.stopPropagation();
+		//e.stopPropagation();
+		
+	}
+	function panelUp() {
+		
+	}
+	function panelMove() {
+		
 	}
 	function rectDown(e) {
 		this.data = e.data;
@@ -1124,6 +1150,8 @@ var navigation = (function () {
 			rect.position.y = rectNewPos.y;
 			dot.position.x = dotNewPos.x;
 			dot.position.y = dotNewPos.y;
+			
+			inst.publish('pan');
 		}
 	}
 	function dotMove(e) {
@@ -1172,9 +1200,35 @@ var navigation = (function () {
 		}
 	}
 	
-	
 	inst.init = init;
 	return inst;
+}());
+
+
+var dataBuilder = (function () {
+	
+	function build(d) {
+		var devices = d.device,
+			links = d.circuits,
+			tplNodes = {};
+		
+		links.forEach(function () {
+			
+		});
+		devices.forEach(function (item) {
+			var id = 'node_'+item.id;
+			
+			tplNodes[id] = 'a';
+		});
+		
+		console.log(tplNodes);
+		return tplNodes;
+	}
+	
+	return {
+		build: build
+	}
+	
 }());
 
 
@@ -1188,6 +1242,10 @@ var mediator = (function () {
 		
 		navigation.on('zoom', function () {
 			console.log('zoom');
+			pixi.zoom();
+		});
+		navigation.on('pan', function () {
+			pixi.pan.pan(1, 1);
 		});
 	};
 	
@@ -1198,6 +1256,7 @@ var mediator = (function () {
 
 
 return {
+	dataBuilder: dataBuilder,
 	pixi: pixi,
 	core: core,
 	mediator: mediator

@@ -1,5 +1,32 @@
 $(function () {
-	a.mediator.init();
+	// http://192.168.10.13:2000/device/map/data?Token=1d729566c74d10037c4d&page=1&is_violated=false
+	$.ajax({
+		url : 'http://192.168.10.13:2000/device/map/data',
+		type : 'GET',
+		dataType : 'json',
+		data: {
+			Token: '1d729566c74d10037c4d',
+			page: '1',
+			is_violated: 'false'
+		},
+		beforeSend : function () {
+			console.log('before send');
+		}
+	})
+	.done(function ( data, textStatus, jqXHR ) {
+		console.log( data );
+		a.dataBuilder.build( data );
+		
+		
+		a.mediator.init();
+	})
+	.fail(function ( data, textStatus, jqXHR ) {
+		
+	})
+	.always(function ( data, textStatus, errorThrown ) {
+		
+	})
+	
 });
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);

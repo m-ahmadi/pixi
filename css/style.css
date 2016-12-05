@@ -1,7 +1,6 @@
 body {
   width: 100%;
   margin: 0 auto;
-  background: wheat;
 }
 
 #opt {
@@ -12,6 +11,10 @@ body {
 
 #devices label {
   padding: 5px;
+}
+
+.no-display {
+  display: none;
 }
 
 /*# sourceMappingURL=style.css.map */

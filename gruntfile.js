@@ -55,6 +55,7 @@ module.exports = function(grunt) {
 			scripts: {
 				files: [
 					'sass/**/*.scss',
+					'css/**/*.css',
 					'js/**/*.js',
 					'gruntfile.js',
 					'test/**/*'
@@ -70,6 +71,7 @@ module.exports = function(grunt) {
 				files: [
 					'**/*.htm',
 					'sass/**/*.scss',
+					'css/**/*.css',
 					'js/**/*.js',
 					'test/**/*'
 				]
