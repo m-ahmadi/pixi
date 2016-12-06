@@ -10,11 +10,10 @@ $(function () {
 			is_violated: 'false'
 		},
 		beforeSend : function () {
-			console.log('before send');
+			
 		}
 	})
 	.done(function ( data, textStatus, jqXHR ) {
-		console.log( data );
 		a.dataBuilder.build( data );
 		
 		

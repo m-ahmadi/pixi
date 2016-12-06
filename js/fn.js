@@ -1221,7 +1221,7 @@ var dataBuilder = (function () {
 			tplNodes[id] = 'a';
 		});
 		
-		console.log(tplNodes);
+		
 		return tplNodes;
 	}
 	

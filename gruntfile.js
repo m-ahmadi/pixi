@@ -60,7 +60,7 @@ module.exports = function(grunt) {
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass', 'jshint'], // 'concat'
+				tasks: ['sass'], // , 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
