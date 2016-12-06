@@ -12,10 +12,10 @@ var stage = new PIXI.Container();
 
 
 
-var lineWidth = 20,
+var lineWidth = 2,
 	half = lineWidth / 2,
-    start = {x: 500, y: 150},
-    end = {x: 1000, y: 700};
+    start = {x: 600, y: 100},
+    end = {x: 50, y: 100};
 var line = new PIXI.Graphics();
 line.beginFill(0xFF0000, 1);
 line.interactive = true;
@@ -33,21 +33,35 @@ var polygonPoints,
 	eX = end.x,
 	eY = end.y;
 
-if ( sX < eX  &&  sY < eY) { // topLeft to bottRight
+if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
+		(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
 	sLeft = new PIXI.Point( sX-half, sY+half );
 	sRight = new PIXI.Point( sX+half, sY-half );
-	eRight = new PIXI.Point( eX+half, sY-half );
+	eRight = new PIXI.Point( eX+half, eY-half );
 	eLeft = new PIXI.Point( eX-half, eY+half );
-} else if ( sX > eX  &&  sY > eY ) { // topRight to bottLeft
+} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
+		(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
+	sLeft = new PIXI.Point( sX-half, sY-half );
+	sRight = new PIXI.Point( sX+half, sY+half );
+	eRight = new PIXI.Point( eX+half, eY+half );
+	eLeft = new PIXI.Point( eX-half, eY-half );
+} else if ( sX === eX  &&
+		(sY > eY  ||  sY < eY) ) { // vertical
+	sLeft = new PIXI.Point( sX-half, sY );
+	sRight = new PIXI.Point( sX+half, sY);
+	eRight = new PIXI.Point( eX+half, eY );
+	eLeft = new PIXI.Point( eX-half, eY );
 	
-} else if ( sX === sY  &&  sY > eY ) { // vertical
-	
-} else if ( sX < eX  &&  sY === eY) { // horizontal
-	
+} else if ( sY === eY  &&
+		(sX < eX  ||  sX > eX) ) { // horizontal
+	sLeft = new PIXI.Point( sX, sY+half );
+	sRight = new PIXI.Point( sX, sY-half );
+	eRight = new PIXI.Point( eX, eY-half );
+	eLeft = new PIXI.Point( eX, eY+half );
 }
 
 
-
+console.log(sLeft, sRight, eRight, eLeft);
 
 
 // line.lineStyle( lineWidth, 0x000000, 1 );
