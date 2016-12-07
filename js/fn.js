@@ -3,7 +3,7 @@ var a = (function () {
 "use strict";
 
 var pixi = (function () {
-	var inst = util.extend( instantiatePubsub() ),
+	var inst = util.extend( coPubsub() ),
 		p = {};
 	
 	p.defaults = {};
@@ -560,7 +560,7 @@ var pixi = (function () {
 
 
 var core = (function () {
-	var inst = util.extend( instantiatePubsub() ),
+	var inst = util.extend( coPubsub() ),
 	tplNodes = {},
 	idCounter = 0; // createTplNode uses this
 	t = function () { return tplNodes; }; // testing purposes
@@ -1137,7 +1137,7 @@ var core = (function () {
 
 
 var navigation = (function () {
-	var inst = util.extend( instantiatePubsub() ),
+	var inst = util.extend( coPubsub() ),
 		p = {};
 	
 	function init() {

@@ -51,6 +51,16 @@ module.exports = function(grunt) {
 			}
 		},
 		*/
+		browserify: {
+			all: {
+				files: {
+					// "js/bundle.js": ["js/main.js"]
+				},
+				options: {
+					watch: true
+				}
+			}
+		},
 		watch: {
 			scripts: {
 				files: [
@@ -60,7 +70,7 @@ module.exports = function(grunt) {
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass'], // , 'jshint', 'concat'
+				tasks: ['sass', 'browserify'], // , 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
@@ -79,6 +89,7 @@ module.exports = function(grunt) {
 		}
 	});
 	
+	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
