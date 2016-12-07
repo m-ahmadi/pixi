@@ -1,5 +1,6 @@
 $(function () {
 	// http://192.168.10.13:2000/device/map/data?Token=1d729566c74d10037c4d&page=1&is_violated=false
+	/*
 	$.ajax({
 		url : 'http://192.168.10.13:2000/device/map/data',
 		type : 'GET',
@@ -25,6 +26,9 @@ $(function () {
 	.always(function ( data, textStatus, errorThrown ) {
 		
 	})
+	*/
+	
+	a.mediator.init();
 	
 });
 //var background = new PIXI.Container();
