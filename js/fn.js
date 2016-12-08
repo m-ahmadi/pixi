@@ -12,6 +12,7 @@ var pixi = (function () {
 	p.mainContainer;
 	
 	function init(o) {
+		PIXI.utils.skipHello();
 		if (o) {
 			p.defaults = o;
 		}
@@ -380,30 +381,52 @@ var pixi = (function () {
 	}());
 	function createTwoPointLine(conf) {
 		if ( !conf ) { var conf = {}; }
-			
+		
 		var line,
 			start,
 			end,
 			lineWidth,
-			color;
-			
-		function settings(conf) {
+			color,
+			p;
+		
+		function setThings() {
 			start     =  conf.start     ||  {x: 0, y: 0},
-			end       =  conf.end       ||  {x: 1, y: 1},
+			end       =  conf.end       ||  {x: 0, y: 0},
 			lineWidth =  conf.lineWidth ||  2,
 			color     =  conf.color     ||  0x000000;
+			p = calcPoints(start, end, lineWidth);
+		}
+		function setStart(s) {
+			if (s) {
+				start = s;
+			}
+		}
+		function setEnd(e) {
+			if (e) {
+				end = e;
+			}
+		}
+		function setLineWidth(w) {
+			if (w) {
+				lineWidth = w;
+			}
+		}
+		function setColor(c) {
+			if (c) {
+				color = c;
+			}
 		}
 		function down() {
-			console.log('down');
+			this.alpha = 0.5;
 		}
 		function up() {
-			console.log('up');
+			this.alpha = 1;
 		}
 		function move() {
 			//console.log('move');
 		}
-		function addEvent(el) {
-			el
+		function addEvents() {
+			line
 				.on('mousedown', down) 
 				.on('touchstart', down)
 				.on('mouseup', up)
@@ -412,6 +435,13 @@ var pixi = (function () {
 				.on('touchendoutside', up)
 				.on('mousemove', move)
 				.on('touchmove', move);
+		}
+		function toggleDirties() {
+			var dirty = line.dirty,
+				clearDirty = line.clearDirty;
+			
+			dirty = (dirty) ? false : true;
+			clearDirty = (clearDirty) ? false : true;
 		}
 		function calcPoints() {
 			var half = lineWidth / 2,
@@ -459,43 +489,21 @@ var pixi = (function () {
 			
 			return results;
 		}
-		function changeColor() {
-			
-		}
-		function redraw() {
-			var dirty,
-				clearDirty;
-			
+		function changeColor(c) {
+			setColor(c);
 			line.clear();
-			
-			var p = calcPoints(start, end, lineWidth);
-			
-			line.beginFill( color );
-			line.moveTo( p.sLeft.x, p.sLeft.y );
-			line.lineTo( p.sRight.x, p.sRight.y );
-			line.lineTo( p.eRight.x, p.eRight.y );
-			line.lineTo( p.eLeft.x, p.eLeft.y );
-			line.endFill();
-			
-			
-			dirty = ctx.dirty;
-			clearDirty = ctx.clearDirty;
-			
-			if ( dirty ) {
-				dirty = false
-			} else if ( !dirty ) {
-				dirty = true;
-			}
-			
-			if ( clearDirty ) {
-				clearDirty = false
-			} else if ( !clearDirty ) {
-				clearDirty = true;
-			}
+			draw();
+			toggleDirties();
+		}
+		function changePoints(s, e) {
+			setStart(s);
+			setEnd(e);
+			p = calcPoints(start, end, lineWidth);
+			line.clear();
+			draw();
+			toggleDirties();
 		}
 		function draw() {
-			var p = calcPoints(start, end, lineWidth);
-			
 			line.beginFill( color );
 			line.moveTo( p.sLeft.x, p.sLeft.y );
 			line.lineTo( p.sRight.x, p.sRight.y );
@@ -515,19 +523,16 @@ var pixi = (function () {
 		}
 		function create() {
 			line = createElement();
-			addEvent( line );
+			addEvents( line );
 			draw();
-			return line;
-		}
-		function instantiate(conf) {
-			settings(conf);
-			
-			var line = create();
-			line.redraw = redraw;
-			line.changeColor = changeColor;
 		}
 		
-		return instantiate;
+		setThings();
+		create();
+		line.changePoints = changePoints;
+		line.changeColor = changeColor;
+		
+		return line;
 	}
 	function bringToFront(el) {
 		// reorder children for z-index
@@ -747,9 +752,12 @@ var core = (function () {
 		});
 	},
 	adjustLine = function (line, points) {
-		pixi.twoPointsLine.adjust(line, {
-			start: {x: points[0], y: points[1]},
-			end: {x: points[2], y: points[3]}
+		line.changePoints({
+			x: points[0],
+			y: points[1]
+		}, {
+			x: points[2],
+			y: points[3]
 		});
 		/*
 		pixi.redrawLine(line, {
@@ -1182,7 +1190,7 @@ var core = (function () {
 			links.forEach(function (linkIdStr) {
 				var target = tplNodes[linkIdStr]; // tplNodes["device_14"]
 				// line = pixi.createLine();
-				line = pixi.twoPointsLine.create();
+				line = pixi.createTwoPointLine();
 				if ( !target.links ) {
 					target.links = {};
 				}

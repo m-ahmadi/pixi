@@ -17,6 +17,7 @@
     "jshint-stylish": "^2.2.1"
   },
   "dependencies": {
-    "grunt": "^1.0.1"
+    "grunt": "^1.0.1",
+    "pixi.js": "^4.2.3"
   }
 }

@@ -1,3 +1,4 @@
+PIXI.utils.skipHello();
 var renderer = PIXI.autoDetectRenderer(
 	window.innerWidth,
 	window.innerHeight,

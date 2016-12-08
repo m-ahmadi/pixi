@@ -1,3 +1,4 @@
+PIXI.utils.skipHello();
 var renderer = PIXI.autoDetectRenderer(
 	window.innerWidth,
 	window.innerHeight,
@@ -16,10 +17,10 @@ line.lineStyle(4, 0x00FFFF, 1);
 line.moveTo(50, 50);
 line.quadraticCurveTo(100, 200, 400, 100);
 
-// line.quadraticCurveTo();
 
 
 
+addDragDrop(line);
 stage.addChild(line);
 
 animate();
@@ -70,5 +71,15 @@ function bringToFront(el) {
 }
 
 $(function () {
+	line.hitArea = new PIXI.Polygon( line.currentPath.points );
 	
+	var pol = new PIXI.Graphics();
+	pol.interactive = true;
+	pol.buttonMode = true;
+	pol.beginFill(0xFFFF00, 1);
+	pol.lineStyle(10, 0xFF0000, 1);
+	pol.drawPolygon( line.currentPath.points );
+	pol.endFill();
+	addDragDrop(pol);
+	stage.addChild(pol);
 });
