@@ -54,7 +54,7 @@ module.exports = function(grunt) {
 		browserify: {
 			all: {
 				files: {
-					// "js/bundle.js": ["js/main.js"]
+					"js/app/app.js": ["js/app/src/main.js"]
 				},
 				options: {
 					watch: true

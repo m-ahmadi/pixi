@@ -300,15 +300,14 @@ var pixi = (function () {
 				clearDirty;
 			
 			line.clear();
-			line.beginFill();
-			line.lineStyle(
-				o.thickness || 2,
-				o.color     || 0x000000,
-				o.alpha     || 1
-			);
 			
-			line.moveTo(  );
-			line.lineTo(  );
+			var p = calcPoints(start, end, lineWidth);
+			
+			line.beginFill( color );
+			line.moveTo( p.sLeft.x, p.sLeft.y );
+			line.lineTo( p.sRight.x, p.sRight.y );
+			line.lineTo( p.eRight.x, p.eRight.y );
+			line.lineTo( p.eLeft.x, p.eLeft.y );
 			line.endFill();
 			
 			
@@ -364,12 +363,172 @@ var pixi = (function () {
 			return line;
 		}
 		
+		function instantiate(conf) {
+			var line = create(conf);
+			line.redraw = redraw;
+			line.changeColor = changeColor;
+		}
+		
+		
+		//return instantiate;
+		
 		return {
 			create: create,
 			adjust: redraw
 			
 		}
 	}());
+	function createTwoPointLine(conf) {
+		if ( !conf ) { var conf = {}; }
+			
+		var line,
+			start,
+			end,
+			lineWidth,
+			color;
+			
+		function settings(conf) {
+			start     =  conf.start     ||  {x: 0, y: 0},
+			end       =  conf.end       ||  {x: 1, y: 1},
+			lineWidth =  conf.lineWidth ||  2,
+			color     =  conf.color     ||  0x000000;
+		}
+		function down() {
+			console.log('down');
+		}
+		function up() {
+			console.log('up');
+		}
+		function move() {
+			//console.log('move');
+		}
+		function addEvent(el) {
+			el
+				.on('mousedown', down) 
+				.on('touchstart', down)
+				.on('mouseup', up)
+				.on('mouseupoutside', up)
+				.on('touchend', up)
+				.on('touchendoutside', up)
+				.on('mousemove', move)
+				.on('touchmove', move);
+		}
+		function calcPoints() {
+			var half = lineWidth / 2,
+				sLeft = {},
+				sRight = {},
+				eRight = {},
+				eLeft = {},
+				sX = start.x,
+				sY = start.y,
+				eX = end.x,
+				eY = end.y,
+				results = {};
+
+			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
+					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
+				sLeft = new PIXI.Point( sX-half, sY+half );
+				sRight = new PIXI.Point( sX+half, sY-half );
+				eRight = new PIXI.Point( eX+half, eY-half );
+				eLeft = new PIXI.Point( eX-half, eY+half );
+			} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
+					(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
+				sLeft = new PIXI.Point( sX-half, sY-half );
+				sRight = new PIXI.Point( sX+half, sY+half );
+				eRight = new PIXI.Point( eX+half, eY+half );
+				eLeft = new PIXI.Point( eX-half, eY-half );
+			} else if ( sX === eX  &&
+					(sY > eY  ||  sY < eY) ) { // vertical
+				sLeft = new PIXI.Point( sX-half, sY );
+				sRight = new PIXI.Point( sX+half, sY);
+				eRight = new PIXI.Point( eX+half, eY );
+				eLeft = new PIXI.Point( eX-half, eY );
+				
+			} else if ( sY === eY  &&
+					(sX < eX  ||  sX > eX) ) { // horizontal
+				sLeft = new PIXI.Point( sX, sY+half );
+				sRight = new PIXI.Point( sX, sY-half );
+				eRight = new PIXI.Point( eX, eY-half );
+				eLeft = new PIXI.Point( eX, eY+half );
+			}
+			
+			results.sLeft = sLeft;
+			results.sRight = sRight;
+			results.eRight = eRight;
+			results.eLeft = eLeft;
+			
+			return results;
+		}
+		function changeColor() {
+			
+		}
+		function redraw() {
+			var dirty,
+				clearDirty;
+			
+			line.clear();
+			
+			var p = calcPoints(start, end, lineWidth);
+			
+			line.beginFill( color );
+			line.moveTo( p.sLeft.x, p.sLeft.y );
+			line.lineTo( p.sRight.x, p.sRight.y );
+			line.lineTo( p.eRight.x, p.eRight.y );
+			line.lineTo( p.eLeft.x, p.eLeft.y );
+			line.endFill();
+			
+			
+			dirty = ctx.dirty;
+			clearDirty = ctx.clearDirty;
+			
+			if ( dirty ) {
+				dirty = false
+			} else if ( !dirty ) {
+				dirty = true;
+			}
+			
+			if ( clearDirty ) {
+				clearDirty = false
+			} else if ( !clearDirty ) {
+				clearDirty = true;
+			}
+		}
+		function draw() {
+			var p = calcPoints(start, end, lineWidth);
+			
+			line.beginFill( color );
+			line.moveTo( p.sLeft.x, p.sLeft.y );
+			line.lineTo( p.sRight.x, p.sRight.y );
+			line.lineTo( p.eRight.x, p.eRight.y );
+			line.lineTo( p.eLeft.x, p.eLeft.y );
+			line.endFill();
+		}
+		function createElement() {
+			var line;
+			
+			line = new PIXI.Graphics();
+			line.interactive = true;
+			line.buttonMode = true;
+			line.lineStyle(0);
+			
+			return line;
+		}
+		function create() {
+			line = createElement();
+			addEvent( line );
+			draw();
+			return line;
+		}
+		function instantiate(conf) {
+			settings(conf);
+			
+			var line = create();
+			line.redraw = redraw;
+			line.changeColor = changeColor;
+		}
+		
+		return instantiate;
+	}
 	function bringToFront(el) {
 		// reorder children for z-index
 		var arr = p.mainContainer.children;
@@ -547,6 +706,7 @@ var pixi = (function () {
 	inst.addDragDrop = addDragDrop;
 	inst.createSprite = createSprite;
 	inst.twoPointsLine = twoPointsLine;
+	inst.createTwoPointLine = createTwoPointLine;
 	inst.createLine = createLine;
 	inst.redrawLine = redrawLine;
 	inst.createRect = createRect;
@@ -587,16 +747,9 @@ var core = (function () {
 		});
 	},
 	adjustLine = function (line, points) {
-		pixi.twoPointsLine.adjust({
-			shape: line,
-			start: {
-				x: points[0],
-				y: points[1]
-			},
-			end: {
-				x: points[2],
-				y: points[3]
-			}
+		pixi.twoPointsLine.adjust(line, {
+			start: {x: points[0], y: points[1]},
+			end: {x: points[2], y: points[3]}
 		});
 		/*
 		pixi.redrawLine(line, {
