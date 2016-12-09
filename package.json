@@ -1,12 +1,17 @@
 {
   "name": "pixi",
+  "title": "Argus Topology",
+  "description": "Topology network visualizer and tools",
   "version": "1.0.0",
-  "description": "",
   "main": "index.htm",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Mohammad Ahmadi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/m-ahmadi/pixi.git"
+  },
   "license": "ISC",
   "devDependencies": {
     "grunt-browserify": "^5.0.0",

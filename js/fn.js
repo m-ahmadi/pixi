@@ -416,7 +416,8 @@ var pixi = (function () {
 				color = c;
 			}
 		}
-		function down() {
+		function down(e) {
+			e.stopPropagation();
 			this.alpha = 0.5;
 		}
 		function up() {
