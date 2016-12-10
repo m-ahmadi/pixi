@@ -2,7 +2,10 @@ var t,s;
 var a = (function () {
 "use strict";
 
-var pixi = (function () {
+define('PIXI', function () {
+	return PIXI;
+});
+define('pixi', ['PIXI'], function (PIXI) {
 	var inst = util.extend( coPubsub() ),
 		p = {};
 	
@@ -225,6 +228,160 @@ var pixi = (function () {
 		
 		return add;
 	}());
+	var twoPointsLine = (function () {
+		
+		function down() {
+			console.log('down');
+		}
+		function up() {
+			console.log('up');
+		}
+		function move() {
+			//console.log('move');
+		}
+		function addEvent(el) {
+			el
+				.on('mousedown', down) 
+				.on('touchstart', down)
+				.on('mouseup', up)
+				.on('mouseupoutside', up)
+				.on('touchend', up)
+				.on('touchendoutside', up)
+				.on('mousemove', move)
+				.on('touchmove', move);
+		}
+		function calcPoints(start, end, lineWidth) {
+			var half = lineWidth / 2,
+				sLeft = {},
+				sRight = {},
+				eRight = {},
+				eLeft = {},
+				sX = start.x,
+				sY = start.y,
+				eX = end.x,
+				eY = end.y,
+				results = {};
+
+			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
+					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
+				sLeft = new PIXI.Point( sX-half, sY+half );
+				sRight = new PIXI.Point( sX+half, sY-half );
+				eRight = new PIXI.Point( eX+half, eY-half );
+				eLeft = new PIXI.Point( eX-half, eY+half );
+			} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
+					(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
+				sLeft = new PIXI.Point( sX-half, sY-half );
+				sRight = new PIXI.Point( sX+half, sY+half );
+				eRight = new PIXI.Point( eX+half, eY+half );
+				eLeft = new PIXI.Point( eX-half, eY-half );
+			} else if ( sX === eX  &&
+					(sY > eY  ||  sY < eY) ) { // vertical
+				sLeft = new PIXI.Point( sX-half, sY );
+				sRight = new PIXI.Point( sX+half, sY);
+				eRight = new PIXI.Point( eX+half, eY );
+				eLeft = new PIXI.Point( eX-half, eY );
+				
+			} else if ( sY === eY  &&
+					(sX < eX  ||  sX > eX) ) { // horizontal
+				sLeft = new PIXI.Point( sX, sY+half );
+				sRight = new PIXI.Point( sX, sY-half );
+				eRight = new PIXI.Point( eX, eY-half );
+				eLeft = new PIXI.Point( eX, eY+half );
+			}
+			
+			results.sLeft = sLeft;
+			results.sRight = sRight;
+			results.eRight = eRight;
+			results.eLeft = eLeft;
+			
+			return results;
+		}
+		function changeColor(line, color) {
+			
+		}
+		function redraw(line, start, end) {
+			var dirty,
+				clearDirty;
+			
+			line.clear();
+			
+			var p = calcPoints(start, end, lineWidth);
+			
+			line.beginFill( color );
+			line.moveTo( p.sLeft.x, p.sLeft.y );
+			line.lineTo( p.sRight.x, p.sRight.y );
+			line.lineTo( p.eRight.x, p.eRight.y );
+			line.lineTo( p.eLeft.x, p.eLeft.y );
+			line.endFill();
+			
+			
+			dirty = ctx.dirty;
+			clearDirty = ctx.clearDirty;
+			
+			if ( dirty ) {
+				dirty = false
+			} else if ( !dirty ) {
+				dirty = true;
+			}
+			
+			if ( clearDirty ) {
+				clearDirty = false
+			} else if ( !clearDirty ) {
+				clearDirty = true;
+			}
+		}
+		function draw( line, start, end, lineWidth, color ) {
+			var p = calcPoints(start, end, lineWidth);
+			
+			line.beginFill( color );
+			line.moveTo( p.sLeft.x, p.sLeft.y );
+			line.lineTo( p.sRight.x, p.sRight.y );
+			line.lineTo( p.eRight.x, p.eRight.y );
+			line.lineTo( p.eLeft.x, p.eLeft.y );
+			line.endFill();
+		}
+		function createElement() {
+			var line;
+			
+			line = new PIXI.Graphics();
+			line.interactive = true;
+			line.buttonMode = true;
+			line.lineStyle(0);
+			
+			return line;
+		}
+		function create(conf) {
+			if ( !conf ) { var conf = {}; }
+			
+			var line,
+				start     =  conf.start     ||  {x: 0, y: 0},
+				end       =  conf.end       ||  {x: 1, y: 1},
+				lineWidth =  conf.lineWidth ||  2,
+				color     =  conf.color     ||  0x000000;
+			
+			line = createElement();
+			addEvent( line );
+			
+			draw( line, start, end, lineWidth, color );
+			
+			return line;
+		}
+		
+		function instantiate(conf) {
+			var line = create(conf);
+			line.redraw = redraw;
+			line.changeColor = changeColor;
+		}
+		
+		
+		//return instantiate;
+		
+		return {
+			create: create,
+			adjust: redraw
+			
+		}
+	}());
 	function createTwoPointLine(conf) {
 		if ( !conf ) { var conf = {}; }
 		
@@ -380,86 +537,6 @@ var pixi = (function () {
 		line.changeColor = changeColor;
 		
 		return line;
-	}
-	function createBoxSpriteText(conf) {
-		var sprite,
-			text,
-			box;
-		
-		function down() {
-			e.stopPropagation();
-			this.data = e.data;
-			this.alpha = 0.5;
-			this.dragging = true;
-			this.dragPoint = e.data.getLocalPosition(this.parent);
-			this.dragPoint.x -= this.position.x;
-			this.dragPoint.y -= this.position.y;
-			
-			bringToFront(this);
-		}
-		function up() {
-			this.alpha = 1;
-			this.dragging = false;
-			this.data = null;
-			
-			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
-				core.adjustLines(this);
-			}
-		}
-		function move() {
-			if ( this.dragging ) {
-				var newPosition = this.data.getLocalPosition(this.parent);
-				this.position.x = newPosition.x - this.dragPoint.x;
-				this.position.y = newPosition.y - this.dragPoint.y;
-			}
-		}
-		function addEvents(el) {
-			el
-				.on('mousedown', down) 
-				.on('touchstart', down)
-				.on('mouseup', up)
-				.on('mouseupoutside', up)
-				.on('touchend', up)
-				.on('touchendoutside', up)
-				.on('mousemove', move)
-				.on('touchmove', move);
-		}
-		function sprite() {
-			sprite = new PIXI.Sprite.fromImage( conf.spriteImg );
-			sprite.interactive = true;
-			sprite.buttonMode = true;
-			sprite.anchor.set(0, 0);
-			sprite.alpha = 1;
-			sprite.scale.set( conf.scale );
-			sprite.position.x = o.x;
-			sprite.position.y = o.y;
-		}
-		function text() {
-			var text = new PIXI.Text( conf.text || 'no_name', {
-				fontFamily: 'Arial',
-				fontSize: '20px',
-				fill: 'black'
-			});
-			text.interactive = true;
-			text.buttonMode = true;
-			text.y = sprite.y + sprite.height;
-		}
-		function box() {
-			box = new PIXI.Container();
-			box.interactive = true;
-			box.buttonMode = true;
-			box.scale.set(0); 
-			box.alpha = 1;
-			box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
-		}
-		
-		sprite();
-		text();
-		box();
-		box.addChild(sprite);
-		box.addChild(text);
-		
-		return box;
 	}
 	function bringToFront(el) {
 		// reorder children for z-index
@@ -637,6 +714,7 @@ var pixi = (function () {
 	inst.animate = animate;
 	inst.addDragDrop = addDragDrop;
 	inst.createSprite = createSprite;
+	inst.twoPointsLine = twoPointsLine;
 	inst.createTwoPointLine = createTwoPointLine;
 	inst.createLine = createLine;
 	inst.redrawLine = redrawLine;
@@ -647,94 +725,12 @@ var pixi = (function () {
 	inst.addStageChild = addStageChild;
 	inst.addMainChild = addMainChild;
 	return inst;
-}());
+	
+});
 
-
-var tpl = (function () {
-	var nodes,
-		idCounter = 0;
+define('core', ['util', 'pubsub'], function (core, util, pubsub) {
 	
-	function createNode(conf) {
-		if ( !conf ) { var conf = {}; }
-		var imgPath = 'images/',
-			hasLinks = false,
-			links = conf.links,
-			tplNode = {},
-			boxSpriteText,
-			line,
-			id;
-		
-		if ( links &&
-				util.isArr( links ) &&
-				links.length > 0 ) {
-			hasLinks = true;
-		}
-		
-		//---------------------------------------------------------------
-		imgPath += conf.type || 'computer';
-		imgPath += '.png';
-		
-		boxSpriteText = pixi.createBoxSpriteText({
-			spriteImg: imgPath,
-			spriteScale: 0.2,
-			text: conf.name || 'no_name'
-		});
-		//---------------------------------------------------------------
-		
-		id = conf.id || 'tpl_node_'+(idCounter+=1);
-		tplNode.name = conf.name || 'no_name';
-		tplNode.id = id;
-		tplNode.node = boxSpriteText;
-		if (hasLinks) {
-			tplNode.links = {};
-			tplNode.linkCount = links.length;
-			links.forEach(function (linkIdStr) {
-				var target = tplNodes[linkIdStr]; // tplNodes["device_14"]
-				// line = pixi.createLine();
-				line = pixi.createTwoPointLine();
-				if ( !target.links ) {
-					target.links = {};
-				}
-				target.links[ tplNode.id ] = {};
-				target.links[ tplNode.id ].line = line;
-				target.linkCount = util.objLength( target.links );
-				
-				
-				tplNode.links[linkIdStr] = {};
-				tplNode.links[linkIdStr].line = line;
-				/*
-				{
-					
-					
-					get x() { return target.node.x; },
-					get y() { return target.node.y; },
-					get width() { return target.node.width; },
-					get height() { return target.node.height; },
-					line: pixi.createLine()
-					
-				}
-				*/
-				pixi.addMainChild( line );
-			});
-		} else {
-			tplNode.links = false;
-		}
-		
-		tplNodes[ tplNode.id ] = tplNode;
-		box.TPL_Stuff = tplNode;
-		
-		pixi.addMainChild( tplNode.node );
-		
-		//adjustLines(tplNode.node);
-		animateNode(tplNode.node, {
-			done: adjustLines,
-			doneParams: [tplNode.node]
-		});
-		return id;
-	}
-	
-	
-}());
+});
 var core = (function () {
 	var inst = util.extend( coPubsub() ),
 	tplNodes = {},
@@ -1530,6 +1526,31 @@ var navigation = (function () {
 }());
 
 
+var tpl = (function () {
+	
+	function build(d) {
+		var devices = d.device,
+			links = d.circuits,
+			tplNodes = {};
+		
+		links.forEach(function () {
+			
+		});
+		devices.forEach(function (item) {
+			var id = 'node_'+item.id;
+			
+			tplNodes[id] = 'a';
+		});
+		
+		
+		return tplNodes;
+	}
+	
+	return {
+		build: build
+	}
+	
+}());
 
 
 var mediator = (function () {

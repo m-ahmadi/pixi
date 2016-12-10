@@ -76,8 +76,8 @@ $('#add_device').on('click', function (e) {
 			id: id,
 			name: name,
 			type: type,
-			x: (x) ? x : undefined,
-			y: (y) ? y : undefined,
+			x: x,
+			y: y,
 			links: links
 		});
 		$('#devices').append('<label><input type="checkbox" id="'+finished+'"> '+finished+'</label>');

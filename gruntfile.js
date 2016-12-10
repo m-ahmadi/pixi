@@ -51,6 +51,8 @@ module.exports = function(grunt) {
 			}
 		},
 		*/
+		
+		/*
 		browserify: {
 			all: {
 				files: {
@@ -61,6 +63,8 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		*/
+		
 		watch: {
 			scripts: {
 				files: [

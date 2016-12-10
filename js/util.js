@@ -18,7 +18,7 @@ if (typeof Object.keys !== 'function') {
 	};
 }
 var util = {
-	isObject: function (v) {
+	isObj: function (v) {
 		return (
 			v &&
 			typeof v === 'object' &&
@@ -26,7 +26,7 @@ var util = {
 			Object.prototype.toString.call(v) === '[object Object]'
 		) ? true : false;
 	},
-	isArray: function (v) {
+	isArr: function (v) {
 		if ( typeof Array.isArray === 'function' ) {
 			return Array.isArray(v);
 		}
@@ -47,7 +47,7 @@ var util = {
 		}
 		return args;
 	},
-	moveArrayItem: function (a, f, t) { // array, from, to
+	moveArrItem: function (a, f, t) { // array, from, to
 		a.splice( t, 0, a.splice(f, 1)[0] );
 	},
 	isInt: function (n) {
@@ -56,9 +56,9 @@ var util = {
 	makeNumberNegative: function (n) {
 		return Math.abs(n) * -1;
 	},
-	isEmptyObject: function (o) {
+	isEmptyObj: function (o) {
 		var k;
-		if ( this.isObject(o) ) {
+		if ( this.isObj(o) ) {
 			if ( typeof Object.getOwnPropertyNames === 'function' ) {
 				return Object.getOwnPropertyNames(o).length === 0; // ES5
 			} else {
@@ -71,14 +71,17 @@ var util = {
 			}
 		}
 	},
-	isString: function (v) {
+	isFunc: function (v) {
+		return ( typeof v === 'function' );
+	},
+	isStr: function (v) {
 		return ( typeof v === 'string' );
 	},
-	isEmptyString: function (v) {
+	isEmptyStr: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 );
 	},
-	objectLength: function (o) {
-		if ( this.isObject(o) ) {
+	objLength: function (o) {
+		if ( this.isObj(o) ) {
 			return Object.keys(o).length;
 		}
 	},
@@ -92,16 +95,16 @@ var util = {
 			
 		if (len === 1) {
 			first = args[0];
-			if ( this.isArray(first)  &&  first.length > 1 ) {
+			if ( this.isArr(first)  &&  first.length > 1 ) {
 				last = first.pop();
 				objects = first;
-			} else if ( this.isObject(first) ){
+			} else if ( this.isObj(first) ){
 				result = Object.create(first);
 			}
 		} else if (len === 2) {
 			first = args[0];
 			last = args[len-1];
-			if ( this.isObject(first) ) {
+			if ( this.isObj(first) ) {
 				result = Object.create(first);
 			}
 		} else if (len > 2) {
@@ -112,7 +115,7 @@ var util = {
 		if (objects.length !== 0) {
 			arr.push( {} );
 			objects.forEach(function (el, i) {
-				if ( this.isObject(el) ) {
+				if ( this.isObj(el) ) {
 					Object.keys(el).forEach(function (k) {
 						arr[i][k] = el[k];
 					});
@@ -122,7 +125,7 @@ var util = {
 			result = arr[arr.length-1];
 		}
 		
-		if ( last && this.isObject(last) ) {
+		if ( last && this.isObj(last) ) {
 			Object.keys(last).forEach(function(key) {
 				result[key] = last[key];
 			});
