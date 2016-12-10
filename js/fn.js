@@ -402,9 +402,13 @@ var pixi = (function () {
 			this.dragging = false;
 			this.data = null;
 			
+			/*
 			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
 				core.adjustLines(this);
 			}
+			*/
+			
+			this.adjustLines();
 		}
 		function move() {
 			if ( this.dragging ) {
@@ -649,59 +653,78 @@ var pixi = (function () {
 	return inst;
 }());
 
+var ani = (function () {
+	function simple(element, o) {
+		if ( !o ) { var o = {}; }
+		var box = element;
+		
+		TweenLite.to(box, 0.3, {
+			alpha: 1,
+			yoyo: true,
+			ease: Linear.easeInOut
+		});
 
+		TweenLite.to(box.scale, 0.3, {
+			x: 1,
+			y: 1,
+			yoyo: true,
+			ease: Linear.easeInOut,
+			onComplete: o.done,
+			onCompleteParams: o.doneParams,
+			onCompleteScope: o.doneCtx
+		});
+	}
+	
+	return simple;
+}());
 var tpl = (function () {
 	var nodes,
 		idCounter = 0;
 	
 	function createNode(conf) {
 		if ( !conf ) { var conf = {}; }
-		var imgPath = 'images/',
-			hasLinks = false,
-			links = conf.links,
-			tplNode = {},
-			boxSpriteText,
+		
+		var node,
+			links,
+			hasLinks,
+			img,
+			name,
+			id,
 			line,
-			id;
+			boxSpriteText;
 		
-		if ( links &&
-				util.isArr( links ) &&
-				links.length > 0 ) {
-			hasLinks = true;
+		function setThings() {
+			node = {};
+			links = conf.links;
+			hasLinks = false;
+			imgPath = 'images/';
+			imgPath += conf.type || 'computer';
+			imgPath += '.png';
+			id = conf.id || 'tpl_node_'+(idCounter+=1);
+			name = conf.name || 'no_name';
 		}
-		
-		//---------------------------------------------------------------
-		imgPath += conf.type || 'computer';
-		imgPath += '.png';
-		
-		boxSpriteText = pixi.createBoxSpriteText({
-			spriteImg: imgPath,
-			spriteScale: 0.2,
-			text: conf.name || 'no_name'
-		});
-		//---------------------------------------------------------------
-		
-		id = conf.id || 'tpl_node_'+(idCounter+=1);
-		tplNode.name = conf.name || 'no_name';
-		tplNode.id = id;
-		tplNode.node = boxSpriteText;
-		if (hasLinks) {
-			tplNode.links = {};
-			tplNode.linkCount = links.length;
+		function deterLinks() {
+			if ( links  &&  util.isArr( links )  &&  links.length ) {
+				hasLinks = true;
+			}
+		}
+		function createLink() {
+			node.links = {};
+			node.linkCount = links.length;
 			links.forEach(function (linkIdStr) {
-				var target = tplNodes[linkIdStr]; // tplNodes["device_14"]
+				var target = nodes[linkIdStr]; // nodes["device_14"]
 				// line = pixi.createLine();
 				line = pixi.createTwoPointLine();
 				if ( !target.links ) {
 					target.links = {};
 				}
-				target.links[ tplNode.id ] = {};
-				target.links[ tplNode.id ].line = line;
+				target.links[ node.id ] = {};
+				target.links[ node.id ].line = line;
 				target.linkCount = util.objLength( target.links );
 				
 				
-				tplNode.links[linkIdStr] = {};
-				tplNode.links[linkIdStr].line = line;
+				node.links[linkIdStr] = {};
+				node.links[linkIdStr].line = line;
 				/*
 				{
 					
@@ -716,19 +739,38 @@ var tpl = (function () {
 				*/
 				pixi.addMainChild( line );
 			});
+		}
+		function create() {
+			boxSpriteText = pixi.createBoxSpriteText({
+				spriteImg: imgPath,
+				spriteScale: 0.2,
+				text: name
+			});
+			node.name = name;
+			node.id = id;
+			node.pixiEl = boxSpriteText;
+		}
+		function addEvents() {
+			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
+				core.adjustLines(this);
+			}
+		}
+		if (hasLinks) {
+			createLink();
 		} else {
-			tplNode.links = false;
+			node.links = false;
 		}
 		
-		tplNodes[ tplNode.id ] = tplNode;
-		box.TPL_Stuff = tplNode;
 		
-		pixi.addMainChild( tplNode.node );
+		nodes[ node.id ] = node;
+		box.TPL_Stuff = node;
+		
+		pixi.addMainChild( node.pixiEl );
 		
 		//adjustLines(tplNode.node);
-		animateNode(tplNode.node, {
+		animateNode(node.pixiEl, {
 			done: adjustLines,
-			doneParams: [tplNode.node]
+			doneParams: [node.pixiEl]
 		});
 		return id;
 	}
