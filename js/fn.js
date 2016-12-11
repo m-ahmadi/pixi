@@ -10,6 +10,8 @@ var pixi = (function () {
 	p.renderer;
 	p.stage;
 	p.mainContainer;
+	p.nodeContainer;
+	p.lineContainer;
 	
 	function init(o) {
 		PIXI.utils.skipHello();
@@ -29,6 +31,8 @@ var pixi = (function () {
 		p.stage = new PIXI.Container();
 		
 		p.mainContainer = new PIXI.Container();
+		p.lineContainer = new PIXI.Container();
+		p.nodeContainer = new PIXI.Container();
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
@@ -41,6 +45,9 @@ var pixi = (function () {
 			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
+		
+		p.mainContainer.addChild( p.lineContainer );
+		p.mainContainer.addChild( p.nodeContainer );
 		p.stage.addChild( p.mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
@@ -384,8 +391,14 @@ var pixi = (function () {
 	function createBoxSpriteText(conf) {
 		var sprite,
 			text,
-			box;
+			box,
+			spriteImg, spriteScale, textContent, onmouseup;
 		
+		function setThings() {
+			spriteImg   = 'images/'+(conf.spriteImg || 'computer')+'.png';
+			spriteScale = conf.spriteScale || 0.2;
+			textContent = conf.textContent || 'no_name';
+		}
 		function down() {
 			e.stopPropagation();
 			this.data = e.data;
@@ -401,14 +414,9 @@ var pixi = (function () {
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
-			
-			/*
-			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
-				core.adjustLines(this);
+			if ( util.isFunc(onmouseup) ) {
+				onmouseup(this);
 			}
-			*/
-			
-			this.adjustLines();
 		}
 		function move() {
 			if ( this.dragging ) {
@@ -428,18 +436,18 @@ var pixi = (function () {
 				.on('mousemove', move)
 				.on('touchmove', move);
 		}
-		function sprite() {
-			sprite = new PIXI.Sprite.fromImage( conf.spriteImg );
+		function makeSprite() {
+			sprite = new PIXI.Sprite.fromImage( spriteImg );
 			sprite.interactive = true;
 			sprite.buttonMode = true;
 			sprite.anchor.set(0, 0);
 			sprite.alpha = 1;
-			sprite.scale.set( conf.scale );
+			sprite.scale.set( spriteScale );
 			sprite.position.x = o.x;
 			sprite.position.y = o.y;
 		}
-		function text() {
-			var text = new PIXI.Text( conf.text || 'no_name', {
+		function makeText() {
+			var text = new PIXI.Text( textContent, {
 				fontFamily: 'Arial',
 				fontSize: '20px',
 				fill: 'black'
@@ -448,7 +456,7 @@ var pixi = (function () {
 			text.buttonMode = true;
 			text.y = sprite.y + sprite.height;
 		}
-		function box() {
+		function makeBox() {
 			box = new PIXI.Container();
 			box.interactive = true;
 			box.buttonMode = true;
@@ -457,9 +465,10 @@ var pixi = (function () {
 			box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
 		}
 		
-		sprite();
-		text();
-		box();
+		setThings();
+		makeSprite();
+		makeText();
+		makeBox();
 		box.addChild(sprite);
 		box.addChild(text);
 		
@@ -618,11 +627,8 @@ var pixi = (function () {
 		
 		return text;
 	}
-	function addStageChild(el) {
-		p.stage.addChild(el);
-	}
-	function addMainChild(el) {
-		p.mainContainer.addChild(el);
+	function addChild(where, child) {
+		p[where].addChild(child);
 	}
 	
 	Object.defineProperties(inst, {
@@ -634,6 +640,12 @@ var pixi = (function () {
 		},
 		"mainContainer": {
 			get: function () { return p.mainContainer }
+		},
+		"nodeContainer": {
+			get: function () { return p.nodeContainer }
+		},
+		"lineContainer": {
+			get: function () { return p.lineContainer }
 		}
 		
 	});
@@ -648,15 +660,22 @@ var pixi = (function () {
 	inst.createText = createText;
 	inst.zoom = zoom;
 	inst.pan = pan;
-	inst.addStageChild = addStageChild;
-	inst.addMainChild = addMainChild;
+	inst.addChild = addChild;
+	inst.bringToFront = bringToFront;
+	
 	return inst;
 }());
 
-var ani = (function () {
-	function simple(element, o) {
+
+var tpl = (function () {
+	var nodes,
+		links,
+		idCounter = 0;
+	
+	
+	function animateNode(pixiEl, o) {
 		if ( !o ) { var o = {}; }
-		var box = element;
+		var box = pixiEl;
 		
 		TweenLite.to(box, 0.3, {
 			alpha: 1,
@@ -674,45 +693,39 @@ var ani = (function () {
 			onCompleteScope: o.doneCtx
 		});
 	}
-	
-	return simple;
-}());
-var tpl = (function () {
-	var nodes,
-		idCounter = 0;
-	
-	function createNode(conf) {
+	function PREV_STYLE_createNode(conf) {
 		if ( !conf ) { var conf = {}; }
 		
 		var node,
 			links,
 			hasLinks,
-			img,
+			nodeImg,
 			name,
 			id,
 			line,
 			boxSpriteText;
 		
 		function setThings() {
-			node = {};
-			links = conf.links;
+			node     = {};
 			hasLinks = false;
-			imgPath = 'images/';
-			imgPath += conf.type || 'computer';
-			imgPath += '.png';
-			id = conf.id || 'tpl_node_'+(idCounter+=1);
-			name = conf.name || 'no_name';
+			nodeImg  = conf.type; //image filename in './images/' (without extention)
+			name     = conf.name;
+			links    = conf.links;
+			id       = conf.id   || 'tpl_node_'+(idCounter+=1);
+			
 		}
-		function deterLinks() {
+		function handleLinks() {
 			if ( links  &&  util.isArr( links )  &&  links.length ) {
-				hasLinks = true;
+				createLink();
+			} else {
+				node.links = false;
 			}
 		}
 		function createLink() {
 			node.links = {};
 			node.linkCount = links.length;
-			links.forEach(function (linkIdStr) {
-				var target = nodes[linkIdStr]; // nodes["device_14"]
+			links.forEach(function (nodeIdStr) {
+				var target = nodes[nodeIdStr]; // nodes["device_14"]
 				// line = pixi.createLine();
 				line = pixi.createTwoPointLine();
 				if ( !target.links ) {
@@ -721,61 +734,161 @@ var tpl = (function () {
 				target.links[ node.id ] = {};
 				target.links[ node.id ].line = line;
 				target.linkCount = util.objLength( target.links );
-				
-				
-				node.links[linkIdStr] = {};
-				node.links[linkIdStr].line = line;
-				/*
-				{
-					
-					
-					get x() { return target.node.x; },
-					get y() { return target.node.y; },
-					get width() { return target.node.width; },
-					get height() { return target.node.height; },
-					line: pixi.createLine()
-					
-				}
-				*/
-				pixi.addMainChild( line );
+				node.links[nodeIdStr] = {};
+				node.links[nodeIdStr].line = line;
+				pixi.addChild('mainContainer', line);
 			});
 		}
 		function create() {
 			boxSpriteText = pixi.createBoxSpriteText({
-				spriteImg: imgPath,
+				spriteImg: nodeImg,
 				spriteScale: 0.2,
-				text: name
+				textContent: name,
+				onmouseup: function (pixiEl) {
+					adjustLines(pixiEl);
+				}
 			});
 			node.name = name;
 			node.id = id;
 			node.pixiEl = boxSpriteText;
 		}
-		function addEvents() {
-			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
-				core.adjustLines(this);
-			}
-		}
-		if (hasLinks) {
-			createLink();
-		} else {
-			node.links = false;
-		}
 		
+		setThings();
+		create();
+		handleLinks();
 		
-		nodes[ node.id ] = node;
-		box.TPL_Stuff = node;
-		
-		pixi.addMainChild( node.pixiEl );
-		
-		//adjustLines(tplNode.node);
+		nodes[ id ] = node;
+		pixi.addChild('mainContainer', node.pixiEl);
+		//adjustLines(node.pixiEl);
 		animateNode(node.pixiEl, {
 			done: adjustLines,
 			doneParams: [node.pixiEl]
 		});
-		return id;
+			
+		return node;
 	}
-	
-	
+	function createNode(conf) {
+		if ( !conf ) { var conf = {}; }
+		
+		var node,
+			links,
+			hasLinks,
+			nodeImg,
+			name,
+			id,
+			line,
+			boxSpriteText;
+		
+		function setThings() {
+			node     = {};
+			hasLinks = false;
+			nodeImg  = conf.type; //image filename in './images/' (without extention)
+			name     = conf.name;
+			links    = conf.links;
+			id       = conf.id   || 'tpl_node_'+(idCounter+=1);
+			
+		}
+		function handleLinks() {
+			if ( links  &&  util.isArr( links )  &&  links.length ) {
+				createLink();
+			} else {
+				node.links = false;
+			}
+		}
+		function createLink() {
+			node.links = {};
+			node.linkCount = links.length;
+			links.forEach(function (nodeIdStr) {
+				var target = nodes[nodeIdStr]; // nodes["device_14"]
+				// line = pixi.createLine();
+				line = pixi.createTwoPointLine();
+				if ( !target.links ) {
+					target.links = {};
+				}
+				target.links[ node.id ] = {};
+				target.links[ node.id ].line = line;
+				target.linkCount = util.objLength( target.links );
+				node.links[nodeIdStr] = {};
+				node.links[nodeIdStr].line = line;
+				pixi.addChild('mainContainer', line);
+			});
+		}
+		function create() {
+			boxSpriteText = pixi.createBoxSpriteText({
+				spriteImg: nodeImg,
+				spriteScale: 0.2,
+				textContent: name,
+				onmouseup: function (pixiEl) {
+					adjustLines(pixiEl);
+				}
+			});
+			node.name = name;
+			node.id = id;
+			node.pixiEl = boxSpriteText;
+		}
+		
+		setThings();
+		create();
+		handleLinks();
+		
+		nodes[ id ] = node;
+		pixi.addChild('mainContainer', node.pixiEl);
+		//adjustLines(node.pixiEl);
+		animateNode(node.pixiEl, {
+			done: adjustLines,
+			doneParams: [node.pixiEl]
+		});
+			
+		return node;
+	}
+	function drawNodes() {
+		
+	}
+	function drawLinks() {
+		
+	}
+	function generateJson(nodeCount) {
+		var o = {
+				nodes: {},
+				links: {}
+			},
+			nodeCounter = 0,
+			linkCounter = 0,
+			i;
+		
+		for (i=0; i<nodeCount; i+=1) {
+			var id = 'node_'+(nodeCounter+=1);
+			o.nodes[id] = {
+				id: id,
+				x: Math.random() * pixi.renderer.width,
+				y: Math.random() * pixi.renderer.height
+			};
+		}
+		
+		for (i=0; i<nodeCount; i+=1) {
+			var id = 'link_'+(linkCounter+=1),
+				srcNode = o.nodes['node_'+(i+1)],
+				destNode = o.nodes['node_'+(i+2)],
+				src = srcNode ? srcNode.id : undefined,
+				dest = destNode ? destNode.id : undefined;
+			
+			o.links[id] = {
+				id: id,
+				src: src,
+				dest: dest
+			};
+		}
+		
+		return o;
+	}
+	function test() {
+		var data = generateJson();
+		nodes = data.nodes;
+		links = data.links;
+	}
+	return {
+		generateJson : generateJson
+	};
 }());
 var core = (function () {
 	var inst = util.extend( coPubsub() ),
@@ -1266,7 +1379,7 @@ var core = (function () {
 					
 				}
 				*/
-				pixi.addMainChild( line );
+				pixi.addChild('lineContainer', line);
 			});
 		} else {
 			tplNode.links = false;
@@ -1275,8 +1388,9 @@ var core = (function () {
 		tplNodes[ tplNode.id ] = tplNode;
 		box.TPL_Stuff = tplNode;
 		
-		pixi.addMainChild( tplNode.node );
+		pixi.addChild('nodeContainer', tplNode.node);
 		
+		pixi.bringToFront(tplNode.node);
 		//adjustLines(tplNode.node);
 		animateNode(tplNode.node, {
 			done: adjustLines,
@@ -1415,7 +1529,7 @@ var navigation = (function () {
 		addDragDrop(panel, 'panel');
 		addDragDrop(rect, 'rect');
 		addDragDrop(dot, 'dot');
-		pixi.addStageChild(nav);
+		pixi.addChild('stage', nav);
 	}
 	function addDragDrop(el, name) {
 		if (name === 'rect') {
@@ -1600,6 +1714,7 @@ var mediator = (function () {
 return {
 	pixi: pixi,
 	core: core,
+	tpl: tpl,
 	mediator: mediator
 };
 	
