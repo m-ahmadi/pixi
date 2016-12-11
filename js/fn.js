@@ -389,17 +389,20 @@ var pixi = (function () {
 		return line;
 	}
 	function createBoxSpriteText(conf) {
+		if (!conf) { var conf = {}; }
 		var sprite,
 			text,
 			box,
-			spriteImg, spriteScale, textContent, onmouseup;
+			spriteImg, spriteScale, textContent, onmouseup, boxX, boxY;
 		
 		function setThings() {
 			spriteImg   = 'images/'+(conf.spriteImg || 'computer')+'.png';
-			spriteScale = conf.spriteScale || 0.2;
-			textContent = conf.textContent || 'no_name';
+			spriteScale = conf.spriteScale          || 0.2;
+			textContent = conf.textContent          || 'no_name';
+			boxX        = conf.x                    || 0;
+			boxY        = conf.y                    || 0;
 		}
-		function down() {
+		function down(e) {
 			e.stopPropagation();
 			this.data = e.data;
 			this.alpha = 0.5;
@@ -408,7 +411,7 @@ var pixi = (function () {
 			this.dragPoint.x -= this.position.x;
 			this.dragPoint.y -= this.position.y;
 			
-			bringToFront(this);
+			//bringToFront(this);
 		}
 		function up() {
 			this.alpha = 1;
@@ -443,11 +446,9 @@ var pixi = (function () {
 			sprite.anchor.set(0, 0);
 			sprite.alpha = 1;
 			sprite.scale.set( spriteScale );
-			sprite.position.x = o.x;
-			sprite.position.y = o.y;
 		}
 		function makeText() {
-			var text = new PIXI.Text( textContent, {
+			text = new PIXI.Text( textContent, {
 				fontFamily: 'Arial',
 				fontSize: '20px',
 				fill: 'black'
@@ -460,17 +461,21 @@ var pixi = (function () {
 			box = new PIXI.Container();
 			box.interactive = true;
 			box.buttonMode = true;
-			box.scale.set(0); 
+			//box.scale.set(0);
 			box.alpha = 1;
+			box.position.x = boxX;
+			box.position.y = boxY;
 			box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
+			addEvents(box);
+			box.addChild(sprite); 
+			box.addChild(text);
+			addChild('stage', box);
 		}
 		
 		setThings();
 		makeSprite();
 		makeText();
 		makeBox();
-		box.addChild(sprite);
-		box.addChild(text);
 		
 		return box;
 	}
@@ -654,6 +659,7 @@ var pixi = (function () {
 	inst.addDragDrop = addDragDrop;
 	inst.createSprite = createSprite;
 	inst.createTwoPointLine = createTwoPointLine;
+	inst.createBoxSpriteText = createBoxSpriteText;
 	inst.createLine = createLine;
 	inst.redrawLine = redrawLine;
 	inst.createRect = createRect;
@@ -668,7 +674,7 @@ var pixi = (function () {
 
 
 var tpl = (function () {
-	var nodes,
+	var nodes = {},
 		links,
 		idCounter = 0;
 	
@@ -696,13 +702,10 @@ var tpl = (function () {
 	function PREV_STYLE_createNode(conf) {
 		if ( !conf ) { var conf = {}; }
 		
-		var node,
-			links,
-			hasLinks,
-			nodeImg,
-			name,
-			id,
+		var node, links, hasLinks,
+			nodeImg, name, id,
 			line,
+			x, y,
 			boxSpriteText;
 		
 		function setThings() {
@@ -712,7 +715,8 @@ var tpl = (function () {
 			name     = conf.name;
 			links    = conf.links;
 			id       = conf.id   || 'tpl_node_'+(idCounter+=1);
-			
+			x        = conf.x;
+			y        = conf.y
 		}
 		function handleLinks() {
 			if ( links  &&  util.isArr( links )  &&  links.length ) {
@@ -744,6 +748,8 @@ var tpl = (function () {
 				spriteImg: nodeImg,
 				spriteScale: 0.2,
 				textContent: name,
+				x: x,
+				y: y,
 				onmouseup: function (pixiEl) {
 					adjustLines(pixiEl);
 				}
@@ -771,55 +777,28 @@ var tpl = (function () {
 		if ( !conf ) { var conf = {}; }
 		
 		var node,
-			links,
-			hasLinks,
-			nodeImg,
-			name,
-			id,
-			line,
+			nodeImg, name, id,
+			x, y,
 			boxSpriteText;
 		
 		function setThings() {
 			node     = {};
-			hasLinks = false;
 			nodeImg  = conf.type; //image filename in './images/' (without extention)
 			name     = conf.name;
-			links    = conf.links;
 			id       = conf.id   || 'tpl_node_'+(idCounter+=1);
+			x        = conf.x;
+			y        = conf.y;
 			
-		}
-		function handleLinks() {
-			if ( links  &&  util.isArr( links )  &&  links.length ) {
-				createLink();
-			} else {
-				node.links = false;
-			}
-		}
-		function createLink() {
-			node.links = {};
-			node.linkCount = links.length;
-			links.forEach(function (nodeIdStr) {
-				var target = nodes[nodeIdStr]; // nodes["device_14"]
-				// line = pixi.createLine();
-				line = pixi.createTwoPointLine();
-				if ( !target.links ) {
-					target.links = {};
-				}
-				target.links[ node.id ] = {};
-				target.links[ node.id ].line = line;
-				target.linkCount = util.objLength( target.links );
-				node.links[nodeIdStr] = {};
-				node.links[nodeIdStr].line = line;
-				pixi.addChild('mainContainer', line);
-			});
 		}
 		function create() {
 			boxSpriteText = pixi.createBoxSpriteText({
 				spriteImg: nodeImg,
 				spriteScale: 0.2,
 				textContent: name,
+				x: x,
+				y: y,
 				onmouseup: function (pixiEl) {
-					adjustLines(pixiEl);
+					
 				}
 			});
 			node.name = name;
@@ -829,20 +808,14 @@ var tpl = (function () {
 		
 		setThings();
 		create();
-		handleLinks();
 		
 		nodes[ id ] = node;
-		pixi.addChild('mainContainer', node.pixiEl);
-		//adjustLines(node.pixiEl);
-		animateNode(node.pixiEl, {
-			done: adjustLines,
-			doneParams: [node.pixiEl]
-		});
-			
-		return node;
+		pixi.addChild('nodeContainer', node.pixiEl);
 	}
-	function drawNodes() {
-		
+	function drawNodes(nodes) {
+		Object.keys(nodes).forEach(function (keyStr) {
+			createNode( nodes[keyStr] );
+		});
 	}
 	function drawLinks() {
 		
@@ -852,21 +825,21 @@ var tpl = (function () {
 				nodes: {},
 				links: {}
 			},
-			nodeCounter = 0,
-			linkCounter = 0,
+			counter = 0,
 			i;
 		
 		for (i=0; i<nodeCount; i+=1) {
-			var id = 'node_'+(nodeCounter+=1);
+			var id = 'node_'+(counter+=1);
 			o.nodes[id] = {
 				id: id,
-				x: Math.random() * pixi.renderer.width,
-				y: Math.random() * pixi.renderer.height
+				x: Math.random() * pixi.renderer.width *5,
+				y: Math.random() * pixi.renderer.height *5,
+				links: ['link_'+counter]
 			};
 		}
-		
+		counter = 0;
 		for (i=0; i<nodeCount; i+=1) {
-			var id = 'link_'+(linkCounter+=1),
+			var id = 'link_'+(counter+=1),
 				srcNode = o.nodes['node_'+(i+1)],
 				destNode = o.nodes['node_'+(i+2)],
 				src = srcNode ? srcNode.id : undefined,
@@ -887,7 +860,9 @@ var tpl = (function () {
 		links = data.links;
 	}
 	return {
-		generateJson : generateJson
+		generateJson : generateJson,
+		drawNodes: drawNodes,
+		drawLinks: drawLinks
 	};
 }());
 var core = (function () {
@@ -1338,9 +1313,11 @@ var core = (function () {
 		box = new PIXI.Container();
 		box.interactive = true;
 		box.buttonMode = true;
-		box.scale.set(0); 
+		box.scale.set(0);
 		box.alpha = 1;
 		box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
+		box.position.x = conf.x || 0;
+		box.position.y = conf.x || 0;
 		box.addChild(sprite);
 		box.addChild(text);
 		pixi.addDragDrop(box);
