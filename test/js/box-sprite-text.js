@@ -10,46 +10,44 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
 
-var main = new PIXI.Container();
-var box1 = new PIXI.Container();
-var box2 = new PIXI.Container();
+
+var sprite = new PIXI.Sprite.fromImage( '../images/computer.png' );
+sprite.interactive = true;
+sprite.buttonMode = true;
+sprite.anchor.set(0.5);
+sprite.alpha = 1;
+sprite.scale.set( 0.2 );
+sprite.position.set(0);
+
+var text = new PIXI.Text( "ghoromdang", {
+	fontFamily: 'Arial',
+	fontSize: '20px',
+	fill: 'black'
+});
+text.interactive = true;
+text.buttonMode = true;
 
 
-var yellow = 0xFFFF00;
-var red = 0xFF0000;
 
-var g = rect(yellow);
-var g2 = rect(yellow);
-var g3 = rect(red);
-var g4 = rect(red);
+var box = new PIXI.Container();
+box.interactive = true;
+box.buttonMode = true;
+//box.scale.set(0);
+box.alpha = 1;
+box.position.x = 400;
+box.position.y = 50;
+box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
 
-
-addDragDrop(g);
-addDragDrop(g2)
-addDragDrop(g3)
-addDragDrop(g4)
-
-
-box1.addChild(g);
-box1.addChild(g2);
-box2.addChild(g3);
-box2.addChild(g4);
+box.addChild(sprite); 
+box.addChild(text);
+addDragDrop(box)
+stage.addChild(box);
 
 
-main.addChild(box2, box1);
-stage.addChild(main);
 
 
-function rect(color) {
-	var r = new PIXI.Graphics();
-	r.interactive = true;
-	r.buttonMode = true;
-	r.beginFill(color, 1);
-	r.lineStyle(4, 0x0000FF, 1);
-	r.drawRect(0, 0, 100, 100);
-	r.endFill();
-	return r;
-}
+
+
 animate();
 function animate() {
     requestAnimationFrame(animate);
@@ -98,5 +96,5 @@ function bringToFront(el) {
 }
 
 $(function () {
-	
+	text.y = sprite.y + sprite.height;
 });
