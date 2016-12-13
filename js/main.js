@@ -85,3 +85,22 @@ $('#add_device').on('click', function (e) {
 	
 	
 });
+$('#generate').on('click', function (e) {
+	e.preventDefault();
+	var nodeCount = $('input[type="text"][name="nodecount"]').val(),
+		density = $('input[type="text"][name="density"]').val(),
+		linkColor = $('input[type="text"][name="linkcolor"]').val(),
+		each = $('input[type="text"][name="each"]').val(),
+		fill = $('input[type="checkbox"][name="fill"]').is(':checked');
+	
+	linkColor = parseInt(linkColor.substr(2), 16);
+	each = parseInt(each, 10);
+	
+	a.tpl.test(
+		nodeCount || 10,
+		density || 1,
+		linkColor,
+		each,
+		fill
+	);
+});

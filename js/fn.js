@@ -24,7 +24,12 @@ var pixi = (function () {
 			{
 				backgroundColor: p.defaults.background || 0xAB9999,
 				antialias: true,
+		//		resolution: false,
+		//		transparent: false,
+		//		preserveDrawingBuffer: false,
+		//		view: HTMLCanvasElement
 			}
+		//	noWebGL: false,                    // optional
 		);
 		// document.body.appendChild( p.renderer.view );
 		$('#contents').append( p.renderer.view );
@@ -53,6 +58,23 @@ var pixi = (function () {
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 		
+		
+		
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		var basePath = 'images/raw/edited/',
+		images = [
+			'computer', 'gamepad', 'hard-drive', 'imac-blue',
+			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
+			'macintosh', 'monitor', 'playstation', 'smartphone',
+			'smart-tv', 'smartwatch', 'tv-screen', 'video-card', 'xbox'
+		];
+		images.forEach(function (i) {
+			var imgTrans = basePath+i+'-trans.png',
+				imgFill = basePath+i+'-fill.png';
+			PIXI.loader.add( imgTrans );
+			PIXI.loader.add( imgFill );
+		});
+		PIXI.loader.load();
 		inst.publish('init');
 	}
 	
@@ -396,15 +418,20 @@ var pixi = (function () {
 		var sprite,
 			text,
 			box,
+			imgFill, imgBasePath, imgName, imgExt, img,
 			spriteImg, spriteScale, textContent, boxX, boxY,
 			onmouseup, onmouseupParam;
 		
 		function setThings() {
-			spriteImg   = 'images/'+(conf.spriteImg || 'computer')+'.png';
-			spriteScale = conf.spriteScale          || 0.2;
-			textContent = conf.textContent          || 'no_name';
-			boxX        = conf.x                    || 0;
-			boxY        = conf.y                    || 0;
+			imgFill     = conf.imgFill      || false;
+			imgBasePath = conf.imgBasePath  || 'images/raw/edited/'; // images/
+			imgName     = conf.imgName      || 'tv-screen'; // tv-screen computer
+			imgExt      = conf.imgExt       || '.png';
+			spriteScale = conf.spriteScale  || 0.2;
+			textContent = conf.textContent  || 'no_name';
+			boxX        = conf.x            || 0;
+			boxY        = conf.y            || 0;
+			spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? '-fill':'-trans') + imgExt;
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -465,7 +492,7 @@ var pixi = (function () {
 			box = new PIXI.Container();
 			box.interactive = true;
 			box.buttonMode = true;
-			//box.scale.set(0);
+			box.scale.set(1);
 			box.alpha = 1;
 			box.position.x = boxX;
 			box.position.y = boxY;
@@ -782,16 +809,16 @@ var tpl = (function () {
 			
 		return node;
 	}
-	function createNode(o) {
+	function createNode(o, fill) {
 		if ( !o ) { var o = {}; }
 		
 		var node,
-			nodeImg, name, id, thisLinks,
+			type, name, id, thisLinks,
 			x, y,
 			boxSpriteText;
 		
 		function setThings() {
-			nodeImg   = o.type; //image filename in './images/' (without extention)
+			type      = o.type  || 'xbox'; //image filename in './images/' (without extention)
 			id        = o.id    || 'tpl_node_'+(idCounter+=1);
 			name      = o.name  || 'Node '+(idCounter+=1);
 			x         = o.x;
@@ -803,7 +830,8 @@ var tpl = (function () {
 			boxSpriteText = pixi.createBoxSpriteText({
 				x: x,
 				y: y,
-				spriteImg: nodeImg,
+				imgName: type,
+				imgFill: fill,
 				spriteScale: 0.2,
 				textContent: name,
 				onmouseup: function () {
@@ -861,15 +889,9 @@ var tpl = (function () {
 					var link = tplLinks[linkId],
 						start, end;
 					
-					if (link.src === nodeId) {
-						start = node.center;
+					if (link.src === nodeId  ||  link.dest === nodeId) {
+						link.pixiEl.changePoints(node.center, end);
 					}
-					
-					if (link.dest === nodeId) {
-						
-					}
-					
-					link.pixiEl.changePoints(start, end);
 				});
 			});
 		}
@@ -882,7 +904,7 @@ var tpl = (function () {
 		nodes[ id ] = node;
 		pixi.addChild('nodeContainer', node.pixiEl);
 	}
-	function createLink(o) {
+	function createLink(o, tmpLinkColor) {
 		var link = {},
 			pixiEl,
 			src = nodes[o.src],
@@ -891,7 +913,8 @@ var tpl = (function () {
 			
 		pixiEl = pixi.createTwopointLine({
 			start: src.center,
-			end: dest.center
+			end: dest.center,
+			color: tmpLinkColor
 		});
 		
 		link.pixiEl = pixiEl;
@@ -920,32 +943,55 @@ var tpl = (function () {
 		links[ id ] = link;
 		pixi.addChild('lineContainer', link.pixiEl);
 	}
-	function drawNodes(data) {
+	function drawNodes(data, fill) {
 		Object.keys(data).forEach(function (keyStr) {
-			createNode( data[keyStr] );
+			createNode( data[keyStr], fill );
 		});
 	}
-	function drawLinks(data) {
+	function drawLinks(data, color) {
 		Object.keys(data).forEach(function (keyStr) {
-			createLink( data[keyStr] );
+			createLink( data[keyStr], color );
 		});
 	}
-	function generateJson(nodeCount) {
+	function generateJson(nodeCount, m, e) {
 		var o = {
 				nodes: {},
 				links: {}
 			},
 			counter = 0,
+			mul = m ? m : 1,
+			e = e ? e : 10,
 			i;
+			
+		var arr = [
+			'tv-screen', 'computer', 'gamepad', 'hard-drive', 'imac-blue',
+			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
+			'macintosh', 'monitor', 'playstation', 'smartphone',
+			'smart-tv', 'smartwatch', 'video-card', 'xbox'
+		];
 		
+		var typeIndex = 0;
 		for (i=0; i<nodeCount; i+=1) {
-			var id = 'node_'+(counter+=1);
-			o.nodes[id] = {
-				id: id,
-				x: Math.random() * pixi.renderer.width *10,
-				y: Math.random() * pixi.renderer.height *10,
-				links: ['link_'+counter]
-			};
+			var id = 'node_'+(counter+=1),
+				n = {};
+			
+			n.id = id;
+			n.x = Math.random() * pixi.renderer.width *mul;
+			n.y = Math.random() * pixi.renderer.height *mul;
+			n.links = ['link_'+counter];
+			
+			
+			var each = e;
+			
+			if ( i % each === 0 ) {
+				typeIndex += 1;
+			}
+			if (typeIndex === arr.length-1) {
+				typeIndex = 0;
+			}
+			
+			n.type = arr[typeIndex];
+			o.nodes[id] = n;
 		}
 		counter = 0;
 		for (i=0; i<nodeCount; i+=1) {
@@ -964,12 +1010,14 @@ var tpl = (function () {
 		
 		return o;
 	}
-	function test(o, str) {
+	function test(c, m, color, each, fill) {
+		
+		var data = generateJson(c, m, each);
+		drawNodes(data.nodes, fill);
+		drawLinks(data.links, color);
+		
+		
 		/*
-		var data = generateJson();
-		nodes = data.nodes;
-		links = data.links;
-		*/
 		var count = 0;
 		var arr = [];
 		Object.keys(o).forEach(function (key) {
@@ -982,6 +1030,7 @@ var tpl = (function () {
 		});
 		
 		return arr;
+		*/
 	}
 	
 	return {
