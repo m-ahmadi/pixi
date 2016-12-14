@@ -12,6 +12,7 @@ var pixi = (function () {
 	p.mainContainer;
 	p.nodeContainer;
 	p.lineContainer;
+	p.textures;
 	
 	function init(o) {
 		PIXI.utils.skipHello();
@@ -34,7 +35,6 @@ var pixi = (function () {
 		// document.body.appendChild( p.renderer.view );
 		$('#contents').append( p.renderer.view );
 		p.stage = new PIXI.Container();
-		
 		p.mainContainer = new PIXI.Container();
 		p.lineContainer = new PIXI.Container();
 		p.nodeContainer = new PIXI.Container();
@@ -61,7 +61,7 @@ var pixi = (function () {
 		
 		
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		var basePath = 'images/raw/edited/',
+		/* var basePath = 'images/raw/edited/',
 		images = [
 			'computer', 'gamepad', 'hard-drive', 'imac-blue',
 			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
@@ -74,7 +74,16 @@ var pixi = (function () {
 			PIXI.loader.add( imgTrans );
 			PIXI.loader.add( imgFill );
 		});
-		PIXI.loader.load();
+		PIXI.loader.load(); */
+		
+		PIXI.loader.add( 'images/computer.png' );
+		PIXI.loader.add( 'images/hard.png' );
+		PIXI.loader.add( 'images/atlas-0.json' );
+		PIXI.loader.load(function () {
+			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
+		});
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		
 		inst.publish('init');
 	}
 	
@@ -410,6 +419,9 @@ var pixi = (function () {
 		create();
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
+		Object.defineProperty(line, 'points', {
+			get: function () { return {start: start, end: end} }
+		});
 		
 		return line;
 	}
@@ -431,7 +443,8 @@ var pixi = (function () {
 			textContent = conf.textContent  || 'no_name';
 			boxX        = conf.x            || 0;
 			boxY        = conf.y            || 0;
-			spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? '-fill':'-trans') + imgExt;
+			// spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? '-fill':'-trans') + imgExt;
+			spriteImg   = conf.spriteImg    || imgName + (imgFill ? '-fill':'-trans') + imgExt;
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -471,7 +484,8 @@ var pixi = (function () {
 				.on('touchmove', move);
 		}
 		function makeSprite() {
-			sprite = new PIXI.Sprite.fromImage( spriteImg );
+			// sprite = new PIXI.Sprite.fromImage( spriteImg );
+			sprite = new PIXI.Sprite( p.textures[spriteImg] );
 			sprite.interactive = true;
 			sprite.buttonMode = true;
 			sprite.anchor.set(0, 0);
@@ -490,6 +504,7 @@ var pixi = (function () {
 		}
 		function makeBox() {
 			box = new PIXI.Container();
+			// box = new PIXI.particles.ParticleContainer();
 			box.interactive = true;
 			box.buttonMode = true;
 			box.scale.set(1);
@@ -521,7 +536,8 @@ var pixi = (function () {
 		arr.push(el);
 	}
 	function createSprite(o, noDrag) {
-		var sprite = new PIXI.Sprite.fromImage(o.image);
+		// var sprite = new PIXI.Sprite.fromImage(o.image);
+		var sprite = new PIXI.Sprite( PIXI.TextureCache[o.image] );
 		sprite.interactive = true;
 		sprite.buttonMode = true;
 		sprite.anchor.set(0, 0);
@@ -679,15 +695,17 @@ var pixi = (function () {
 			get: function () { return p.stage; }
 		},
 		"mainContainer": {
-			get: function () { return p.mainContainer }
+			get: function () { return p.mainContainer; }
 		},
 		"nodeContainer": {
-			get: function () { return p.nodeContainer }
+			get: function () { return p.nodeContainer; }
 		},
 		"lineContainer": {
-			get: function () { return p.lineContainer }
+			get: function () { return p.lineContainer; }
+		},
+		"textures": {
+			get: function () { return p.textures; }
 		}
-		
 	});
 	inst.init = init;
 	inst.animate = animate;
@@ -883,15 +901,29 @@ var tpl = (function () {
 			addTplnodeCustomPositionGetters(opt);
 		}
 		function addHandler() {
-			boxSpriteText.setOnmouseup([node, links], function (node, tplLinks) {
+			/*
+			boxSpriteText.setOnmousedown(function () {
+				// clear line
+			};
+			*/
+			
+			boxSpriteText.setOnmouseup([node, links, nodes], function (node, tplLinks, tplNodes) {
 				var nodeId = node.id;
+				
 				node.links.forEach(function (linkId) {
 					var link = tplLinks[linkId],
 						start, end;
 					
-					if (link.src === nodeId  ||  link.dest === nodeId) {
-						link.pixiEl.changePoints(node.center, end);
+					if (link.src === nodeId) {
+						start = node.center;
 					}
+					
+					if (link.dest === nodeId) {
+						end = node.center;
+					}
+					
+					link.pixiEl.changePoints(start, end);
+					
 				});
 			});
 		}
@@ -962,15 +994,15 @@ var tpl = (function () {
 			mul = m ? m : 1,
 			e = e ? e : 10,
 			i;
-			
+		
 		var arr = [
 			'tv-screen', 'computer', 'gamepad', 'hard-drive', 'imac-blue',
 			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
 			'macintosh', 'monitor', 'playstation', 'smartphone',
 			'smart-tv', 'smartwatch', 'video-card', 'xbox'
 		];
+		var typeIndex = -1;
 		
-		var typeIndex = 0;
 		for (i=0; i<nodeCount; i+=1) {
 			var id = 'node_'+(counter+=1),
 				n = {};
@@ -978,7 +1010,7 @@ var tpl = (function () {
 			n.id = id;
 			n.x = Math.random() * pixi.renderer.width *mul;
 			n.y = Math.random() * pixi.renderer.height *mul;
-			n.links = ['link_'+counter];
+			n.links = [];
 			
 			
 			var each = e;
@@ -1001,11 +1033,20 @@ var tpl = (function () {
 				src = srcNode ? srcNode.id : undefined,
 				dest = destNode ? destNode.id : 'node_1';
 			
-			o.links[id] = {
+			var link = {
 				id: id,
 				src: src,
 				dest: dest
 			};
+			
+			Object.keys(o.nodes).forEach(function (k) {
+				var node = o.nodes[k];
+				if (node.id === link.src ||
+						node.id === link.dest) {
+					node.links.push(link.id);
+				}
+			});
+			o.links[id] = link;
 		}
 		
 		return o;
@@ -1488,6 +1529,7 @@ var core = (function () {
 		text.y = sprite.y + sprite.height;
 		
 		box = new PIXI.Container();
+		// box = new PIXI.particles.ParticleContainer();
 		box.interactive = true;
 		box.buttonMode = true;
 		box.scale.set(0);
