@@ -1,3 +1,40 @@
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+makeTplNode = function (pixiElement, links, o) {
+	/*
+		links: [{
+			node: pixiElement,
+			line: pixiElement
+		}, {}, {}]
+		
+	*/
+	var hasLinks = false;
+	if ( !o ) { var o = {}; }
+	if ( links  &&  util.isArr(links) ) {
+		hasLinks = true;
+	}
+	
+	pixiElement.TPL_node = true;
+	pixiElement.TPL_nodeID = o.nodeId || 'no_id';
+	pixiElement.TP_nodeName = o.nodeName || 'no_name';
+	
+	if (hasLinks) {
+		pixiElement.TPL_links = [];
+		pixiElement.TPL_linkCount = links.length;
+		links.forEach(function (item) {
+			pixiElement.TPL_links.push({
+				get x() { return item.node.x; },
+				get y() { return item.node.y; },
+				get width() { return item.node.width; },
+				get height() { return item.node.height; },
+				get linkCount() { return item.node.TPL_linkCount; },
+				get line() { return item.line; }
+			});
+		});
+	} else {
+		pixiElement.TPL_links = false;
+	}
+}
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 var rectPos = getFullPositions(rect),
 	panelPos = getFullPositions(panel),
 	min = 0,

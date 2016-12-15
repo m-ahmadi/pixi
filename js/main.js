@@ -93,7 +93,7 @@ $('#generate').on('click', function (e) {
 		each = $('input[type="text"][name="each"]').val(),
 		fill = $('input[type="checkbox"][name="fill"]').is(':checked');
 	
-	linkColor = parseInt(linkColor.substr(2), 16);
+	linkColor = parseInt(linkColor, 16);
 	each = parseInt(each, 10);
 	
 	a.tpl.test(
@@ -103,4 +103,11 @@ $('#generate').on('click', function (e) {
 		each,
 		fill
 	);
+});
+
+$('#clear').on('click', function (e) {
+	e.preventDefault();
+	
+	a.pixi.clear('lineContainer', true);
+	a.pixi.clear('nodeContainer');
 });

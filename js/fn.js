@@ -87,6 +87,12 @@ var pixi = (function () {
 		inst.publish('init');
 	}
 	
+	function clear(k, opt) {
+		p[k].destroy(opt);
+		delete p[k];
+		p[k] = new PIXI.Container();
+		p.mainContainer.addChild( p[k] );
+	}
 	function animate() {
 		requestAnimationFrame(animate);
 		//tink.update();
@@ -708,6 +714,7 @@ var pixi = (function () {
 		}
 	});
 	inst.init = init;
+	inst.clear = clear;
 	inst.animate = animate;
 	inst.coPoint = coPoint;
 	inst.addDragDrop = addDragDrop;
@@ -1409,90 +1416,6 @@ var core = (function () {
 		}
 		
 	},
-	makeTplNode = function (pixiElement, links, o) {
-		/*
-			links: [{
-				node: pixiElement,
-				line: pixiElement
-			}, {}, {}]
-			
-		*/
-		var hasLinks = false;
-		if ( !o ) { var o = {}; }
-		if ( links  &&  util.isArr(links) ) {
-			hasLinks = true;
-		}
-		
-		pixiElement.TPL_node = true;
-		pixiElement.TPL_nodeID = o.nodeId || 'no_id';
-		pixiElement.TP_nodeName = o.nodeName || 'no_name';
-		
-		if (hasLinks) {
-			pixiElement.TPL_links = [];
-			pixiElement.TPL_linkCount = links.length;
-			links.forEach(function (item) {
-				pixiElement.TPL_links.push({
-					get x() { return item.node.x; },
-					get y() { return item.node.y; },
-					get width() { return item.node.width; },
-					get height() { return item.node.height; },
-					get linkCount() { return item.node.TPL_linkCount; },
-					get line() { return item.line; }
-				});
-			});
-		} else {
-			pixiElement.TPL_links = false;
-		}
-		
-	},
-	crapola = function () {
-		var kids = [];
-		
-		kids.push(pixi.createSprite({
-			image: 'images/computer.png',
-			scale: 0.2,
-			x: 900,
-			y: 20
-		}));
-		kids.push(pixi.createSprite({
-			image: 'images/hard.png',
-			scale: 0.1,
-			x: 900,
-			y: 250
-		}));
-		kids.push(pixi.createRect({
-			color: 0x0033CC,
-			lineWidth: 4,
-			lineColor: 0xFF0000,
-			alpha: 1,
-			x: 600,
-			y: 250,
-			width: 120,
-			height: 120
-		}));
-		kids.push(pixi.createText({
-			text: 'salam',
-			size: '24px',
-			color: 'red',
-		}));
-		kids.push(pixi.createRect({
-			color: 0x0033CC,
-			x: 50,
-			y: 250,
-			width: 100,
-			height: 100
-		}));
-		kids.push(pixi.createRect({
-			color: 0x0033CC,
-			x: 400,
-			y: 50,
-			width: 100,
-			height: 100
-		}));
-		kids.forEach(function (i) {
-			pixi.mainContainer.addChild(i);
-		});
-	},
 	addTplLink = function () {
 		
 	},
@@ -1595,54 +1518,6 @@ var core = (function () {
 		return id;
 	},
 	init = function () {
-		crapola();
-		var kids = [],
-			tplNode1,
-			tplNode2;
-		
-		var line = pixi.createLine({
-			color: 0xFFFFF,
-			thickness: 2,
-			points: [0, 0, 150, 150]
-		});
-		var n1 = pixi.createSprite({
-			image: 'images/computer.png',
-			scale: 0.2,
-			x: 200,
-			y: 200
-		});
-		var n2 = pixi.createSprite({
-			image: 'images/computer.png',
-			scale: 0.2,
-			x: 500,
-			y: 200
-		});
-		
-		s = n2;
-		/*
-		tplNode1 = {
-			node: n1,
-			line: line
-		};
-		tplNode2 = {
-			node: n2,
-			line: line
-		};
-		
-		makeTplNode(n1, [tplNode2], {
-			nodeName: 'device_1'
-		});
-		makeTplNode(n2, [tplNode1], {
-			nodeName: 'device_2'
-		});
-		
-		kids.push(n1, n2, line);
-		
-		
-		kids.forEach(function (i) {
-			pixi.mainContainer.addChild(i);
-		});
-		*/
 		
 	};
 	
