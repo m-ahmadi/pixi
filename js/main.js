@@ -1,34 +1,19 @@
 $(function () {
-	// http://192.168.10.13:2000/device/map/data?Token=1d729566c74d10037c4d&page=1&is_violated=false
-	/*
-	$.ajax({
-		url : 'http://192.168.10.13:2000/device/map/data',
-		type : 'GET',
-		dataType : 'json',
-		data: {
-			Token: '1d729566c74d10037c4d',
-			page: '1',
-			is_violated: 'false'
-		},
-		beforeSend : function () {
+	a.mediator.init(function () {
+		
+		ajax().done(function ( data ) {
 			
-		}
-	})
-	.done(function ( data, textStatus, jqXHR ) {
-		a.dataBuilder.build( data );
-		
-		
-		a.mediator.init();
-	})
-	.fail(function ( data, textStatus, jqXHR ) {
-		
-	})
-	.always(function ( data, textStatus, errorThrown ) {
-		
-	})
-	*/
+			console.log(data);
+			
+			a.tpl.drawNodes(data.nodes);
+			a.tpl.drawLinks(data.links);
+			
+		});
+	});
 	
-	a.mediator.init();
+	
+	
+	
 	
 });
 //var background = new PIXI.Container();

@@ -6,7 +6,6 @@ var pixi = (function () {
 	var inst = util.extend( coPubsub() ),
 		p = {};
 	
-	p.defaults = {};
 	p.renderer;
 	p.stage;
 	p.mainContainer;
@@ -14,16 +13,13 @@ var pixi = (function () {
 	p.lineContainer;
 	p.textures;
 	
-	function init(o) {
+	function init(callback, background) {
 		PIXI.utils.skipHello();
-		if (o) {
-			p.defaults = o;
-		}
 		p.renderer = PIXI.autoDetectRenderer(
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: p.defaults.background || 0xAB9999,
+				backgroundColor: background || 0xAB9999,
 				antialias: true,
 		//		resolution: false,
 		//		transparent: false,
@@ -81,6 +77,7 @@ var pixi = (function () {
 		PIXI.loader.add( 'images/atlas-0.json' );
 		PIXI.loader.load(function () {
 			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
+			callback();
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		
@@ -196,9 +193,10 @@ var pixi = (function () {
 			var pos = e.data.global,
 				dx = pos.x - prevX,
 				dy = pos.y - prevY;
-
+				
 			p.mainContainer.position.x += dx;
 			p.mainContainer.position.y += dy;
+			console.log(p.mainContainer.position.x, p.mainContainer.position.y);
 			prevX = pos.x;
 			prevY = pos.y;
 		}
@@ -737,7 +735,13 @@ var pixi = (function () {
 var tpl = (function () {
 	var nodes = {},
 		links = {},
-		idCounter = 0;
+		idCounter = 0,
+		types = [
+			'tv-screen', 'macintosh', 'gamepad', 'smartphone', 'imac-red',
+			'imac-grey', 'imac-blue', 'ipad', 'iphone', 'macbook',
+			'computer', 'monitor', 'playstation', 'hard-drive',
+			'smart-tv', 'smartwatch', 'video-card', 'xbox'
+		];
 	
 	
 	function animateNode(pixiEl, o) {
@@ -835,7 +839,7 @@ var tpl = (function () {
 		return node;
 	}
 	function createNode(o, fill) {
-		if ( !o ) { var o = {}; }
+		o = o ? o : {};
 		
 		var node,
 			type, name, id, thisLinks,
@@ -843,7 +847,7 @@ var tpl = (function () {
 			boxSpriteText;
 		
 		function setThings() {
-			type      = o.type  || 'xbox'; //image filename in './images/' (without extention)
+			type      = o.type  || 0;
 			id        = o.id    || 'tpl_node_'+(idCounter+=1);
 			name      = o.name  || 'Node '+(idCounter+=1);
 			x         = o.x;
@@ -855,9 +859,9 @@ var tpl = (function () {
 			boxSpriteText = pixi.createBoxSpriteText({
 				x: x,
 				y: y,
-				imgName: type,
+				imgName: types[type],
 				imgFill: fill,
-				spriteScale: 0.2,
+				spriteScale: 0.1,
 				textContent: name,
 				onmouseup: function () {
 					
@@ -920,7 +924,7 @@ var tpl = (function () {
 				node.links.forEach(function (linkId) {
 					var link = tplLinks[linkId],
 						start, end;
-					
+						
 					if (link.src === nodeId) {
 						start = node.center;
 					}
@@ -949,7 +953,8 @@ var tpl = (function () {
 			src = nodes[o.src],
 			dest = nodes[o.dest],
 			id = o.id;
-			
+		
+		debugger;
 		pixiEl = pixi.createTwopointLine({
 			start: src.center,
 			end: dest.center,
@@ -983,13 +988,13 @@ var tpl = (function () {
 		pixi.addChild('lineContainer', link.pixiEl);
 	}
 	function drawNodes(data, fill) {
-		Object.keys(data).forEach(function (keyStr) {
-			createNode( data[keyStr], fill );
+		Object.keys(data).forEach(function (k) {
+			createNode( data[k], fill );
 		});
 	}
 	function drawLinks(data, color) {
-		Object.keys(data).forEach(function (keyStr) {
-			createLink( data[keyStr], color );
+		Object.keys(data).forEach(function (k) {
+			createLink( data[k], color );
 		});
 	}
 	function generateJson(nodeCount, m, e) {
@@ -1029,7 +1034,7 @@ var tpl = (function () {
 				typeIndex = 0;
 			}
 			
-			n.type = arr[typeIndex];
+			n.type = typeIndex;
 			o.nodes[id] = n;
 		}
 		counter = 0;
@@ -1037,7 +1042,7 @@ var tpl = (function () {
 			var id = 'link_'+(counter+=1),
 				srcNode = o.nodes['node_'+(i+1)],
 				destNode = o.nodes['node_'+(i+2)],
-				src = srcNode ? srcNode.id : undefined,
+				src = srcNode ? srcNode.id : 'node_1',
 				dest = destNode ? destNode.id : 'node_1';
 			
 			var link = {
@@ -1762,10 +1767,10 @@ var navigation = (function () {
 var mediator = (function () {
 	var i = {};
 	
-	i.init = function () {
-		pixi.init();
+	i.init = function (cb) {
+		pixi.init(cb);
 		core.init();
-		navigation.init();
+		//navigation.init();
 		
 		navigation.on('zoom', function () {
 			console.log('zoom');

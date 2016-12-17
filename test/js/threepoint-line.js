@@ -9,92 +9,21 @@ var renderer = PIXI.autoDetectRenderer(
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
-var rect = new PIXI.Graphics();
-rect.interactive = true;
-rect.buttonMode = true;
-rect.beginFill(0xFFFF00, 1);
-rect.lineStyle(60, 0xFF0000, 1);
-rect.drawRect(0, 20, 400, 400);
-rect.endFill();
-addDragDrop(rect);
-stage.addChild(rect);
+var start = {x: 50, y: 50},
+	ctrl = {x: 100, y: 500}
+    end = {x: 300, y: 50};
 
-var pol = new PIXI.Graphics();
-pol.interactive = true;
-pol.buttonMode = true;
-pol.beginFill(0xFFFF00, 1);
-pol.lineStyle(10, 0xFF0000, 1);
-pol.drawPolygon([
-	200, 100,
-	210, 110,
-	110, 210,
-	100, 200
-]);
-/*
-150, 100,
-	170, 150,
-	230, 155,
-	185, 195,
-	200, 250,
-	150, 220,
-	100, 250,
-	115, 195,
-	070, 155,
-	130, 150
-*/
+var line = new PIXI.Graphics();
+line.interactive = true;
+line.buttonMode = true;
+line.lineStyle(10, 0xFF0000, 1);
+line.moveTo(start.x, start.y);
+line.quadraticCurveTo(ctrl.x, ctrl.y, end.x, end.y);
 
-pol.endFill();
-addDragDrop(pol);
-stage.addChild(pol);
+addDragDrop(line);
+stage.addChild(line);
 
 
-
-
-var box = new PIXI.Container();
-box.interactive = true;
-box.buttonMode = true;
-box.scale.set(0.5, 0.5);
-box.alpha = 0;
-
-var pc = new PIXI.Sprite.fromImage('images/pcb.png');
-pc.interactive = true;
-pc.buttonMode = true;
-pc.anchor.set(0, 0);
-pc.scale.set(0.5);
-pc.x = 0;
-pc.y = 0;
-
-
-var text = new PIXI.Text('Router 24S-Hi23');
-//text.interactive = true;
-//text.buttonMode = true;
-
-box.addChild(pc);
-box.addChild(text);
-
-
-addDragDrop(box);
-//stage.addChild(box);
-
-
-
-
-
-var tweenAlpha = TweenLite.to(box, 0.4, {
-	alpha: 1,
-	yoyo: true,
-	ease: Linear.easeInOut
-});
-
-var tweenScale = TweenLite.to(box.scale, 0.4, {
-	x: 1,
-	y: 1,
-	yoyo: true,
-	ease: Linear.easeInOut
-});
-
-
-var t;
 animate();
 function animate() {
     requestAnimationFrame(animate);
@@ -143,8 +72,5 @@ function bringToFront(el) {
 }
 
 $(function () {
-	box.hitArea = new PIXI.Rectangle( 0, 0, pc.width, pc.height);
 	
-	text.x += pc.width / 2;
-	text.y = pc.y + pc.height;
 });
