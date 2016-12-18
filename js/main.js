@@ -4,10 +4,10 @@ $(function () {
 		ajax().done(function ( data ) {
 			
 			console.log(data);
-			
-			a.tpl.drawNodes(data.nodes);
-			a.tpl.drawLinks(data.links);
-			
+			t = data
+			// a.tpl.drawNodes(data.nodes);
+			// a.tpl.drawLinks(data.links);
+			a.tpl.draw(data);
 		});
 	});
 	

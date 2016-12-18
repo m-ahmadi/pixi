@@ -42,15 +42,24 @@ function generateJson(nc) {
 	
 	counter = 0;
 	
+	function rand() {
+		return {
+			srcId: 'node_' + util.randInt(1, nodeCount),
+			destId: 'node_' + util.randInt(1, nodeCount)
+		};
+	}
 	for (i=0; i<linkCount; i+=1) {
-		var link = {},
-			id = 'link_'+(counter+=1),
-			srcId = 'node_' + util.randInt(1, nodeCount),
-			destId = 'node_' + util.randInt(1, nodeCount);
+		var link = {}, data,
+			id = 'link_'+(counter+=1);
+		
+		data = rand();
+		while ( data.srcId === data.destId ) {
+			data = rand();
+		}
 		
 		link.id = id,
-		link.src = srcId,
-		link.dest = destId;
+		link.src = data.srcId,
+		link.dest = data.destId;
 		link.status = util.randInt(0, 5);
 		
 		links[id] = link;

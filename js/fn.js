@@ -196,7 +196,7 @@ var pixi = (function () {
 				
 			p.mainContainer.position.x += dx;
 			p.mainContainer.position.y += dy;
-			console.log(p.mainContainer.position.x, p.mainContainer.position.y);
+			//console.log(p.mainContainer.position.x, p.mainContainer.position.y);
 			prevX = pos.x;
 			prevY = pos.y;
 		}
@@ -270,7 +270,7 @@ var pixi = (function () {
 		
 		return add;
 	}());
-	function createTwopointLine(conf) {
+	function create2pointLine(conf) {
 		if ( !conf ) { var conf = {}; }
 		
 		var line,
@@ -429,13 +429,156 @@ var pixi = (function () {
 		
 		return line;
 	}
+	function create3pointLine(conf) {
+		conf = conf ? conf : {};
+		var line,
+			start, end, ctrl,
+			color, width,
+			curveLevel, curveSide;
+		
+		function setThings() {
+			start      = conf.start      || {x: 50 , y: 50};
+			end        = conf.end        || {x: 600, y: 200};
+			color      = conf.color      || 0x000000;
+			width      = conf.width      || 2;
+			curveLevel = conf.curveLevel || 0;
+			curveSide  = conf.curveSide  || 0; // 1 top, 0 down
+			ctrl       = calcBetween(start, end);
+		}
+		function setStart(s) {
+			if (s) {
+				start = s;
+			}
+		}
+		function setEnd(e) {
+			if (e) {
+				end = e;
+			}
+		}
+		function setWidth(w) {
+			if (w) {
+				width = w;
+			}
+		}
+		function setColor(c) {
+			if (c) {
+				color = c;
+			}
+		}
+		function calcBetween(s, e) {
+			var sX = s.x,
+				sY = s.y,
+				eX = e.x,
+				eY = e.y,
+				diffX, diffY,
+				hX, hY;
+				
+			if (sX > eX) {
+				diffX = sX - eX;
+			} else if (eX > sX) {
+				diffX = eX - sX;
+			} else if (sX === eX) {
+				diffX = 0;
+			}
+			
+			if (sY > eY) {
+				diffY = sY - eY;
+			} else if (eY > sY) {
+				diffY = eY - sY;
+			} else if (sY === eY) {
+				diffY = 0;
+			}
+			
+			hX = sX + (diffX / 2);
+			hY = sY + (diffY / 2);
+			
+			return {
+				x: hX,
+				y: hY
+			};
+		}
+		function changeColor(c) {
+			setColor(c);
+			line.clear();
+			draw();
+			toggleDirties();
+		}
+		function toggleDirties() {
+			var dirty = line.dirty,
+				clearDirty = line.clearDirty;
+			
+			dirty = (dirty) ? false : true;
+			clearDirty = (clearDirty) ? false : true;
+		}
+		function incCurve() {
+			var sX = start.x,
+				sY = start.y,
+				eX = end.x,
+				eY = end.y,
+				incX = 0,
+				incY = 0;
+			
+			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
+					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
+				incX = curveSide ? 10 : -10;
+				incY = curveSide ? -10 : 10;
+			} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
+					(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
+				incX = curveSide ? -5 : 5;
+				incY = curveSide ? -5 : 5;
+			} else if ( sX === eX  &&
+					(sY > eY  ||  sY < eY) ) { // vertical
+				incX = curveSide ? -10 : 10;
+			} else if ( sY === eY  &&
+					(sX < eX  ||  sX > eX) ) { // horizontal
+				incY = curveSide ? -10 : 10;
+			}
+			
+			ctrl.x += incX * curveLevel;
+			ctrl.y += incY * curveLevel;
+		}
+		function changePoints(s, e) {
+			setStart(s);
+			setEnd(e);
+			line.clear();
+			draw();
+			toggleDirties();
+		}
+		function draw() {
+			line.lineStyle(width, color, 1);
+			line.moveTo(start.x, start.y);
+			line.quadraticCurveTo(ctrl.x, ctrl.y, end.x, end.y);
+		}
+		function create() {
+			line = new PIXI.Graphics();
+			line.interactive = true;
+			line.buttonMode = true;
+		}
+		
+		
+		setThings();
+		console.log(ctrl);
+		create();
+		if (curveLevel) {
+			incCurve();
+		}
+		draw();
+		
+		line.changeColor = changeColor;
+		line.changePoints = changePoints;
+		
+		p.stage.addChild(line);
+		return line;
+	}
 	function createBoxSpriteText(conf) {
 		if (!conf) { var conf = {}; }
 		var sprite,
 			text,
 			box,
 			imgFill, imgBasePath, imgName, imgExt, img,
-			spriteImg, spriteScale, textContent, boxX, boxY,
+			spriteImg, spriteScale,
+			textContent, textFont, textSize, textColor,
+			boxX, boxY,
 			onmouseup, onmouseupParam;
 		
 		function setThings() {
@@ -445,6 +588,9 @@ var pixi = (function () {
 			imgExt      = conf.imgExt       || '.png';
 			spriteScale = conf.spriteScale  || 0.2;
 			textContent = conf.textContent  || 'no_name';
+			textFont    = conf.textFont     || 'Arial';
+			textSize    = conf.textSize     || '16px';
+			textColor   = conf.textColor    || 'black';
 			boxX        = conf.x            || 0;
 			boxY        = conf.y            || 0;
 			// spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? '-fill':'-trans') + imgExt;
@@ -498,9 +644,9 @@ var pixi = (function () {
 		}
 		function makeText() {
 			text = new PIXI.Text( textContent, {
-				fontFamily: 'Arial',
-				fontSize: '20px',
-				fill: 'black'
+				fontFamily: textFont,
+				fontSize: textSize,
+				fill: textColor
 			});
 			text.interactive = true;
 			text.buttonMode = true;
@@ -717,7 +863,8 @@ var pixi = (function () {
 	inst.coPoint = coPoint;
 	inst.addDragDrop = addDragDrop;
 	inst.createSprite = createSprite;
-	inst.createTwopointLine = createTwopointLine;
+	inst.create2pointLine = create2pointLine;
+	inst.create3pointLine = create3pointLine;
 	inst.createBoxSpriteText = createBoxSpriteText;
 	inst.createLine = createLine;
 	inst.redrawLine = redrawLine;
@@ -733,15 +880,17 @@ var pixi = (function () {
 
 
 var tpl = (function () {
-	var nodes = {},
-		links = {},
-		idCounter = 0,
-		types = [
-			'tv-screen', 'macintosh', 'gamepad', 'smartphone', 'imac-red',
-			'imac-grey', 'imac-blue', 'ipad', 'iphone', 'macbook',
-			'computer', 'monitor', 'playstation', 'hard-drive',
-			'smart-tv', 'smartwatch', 'video-card', 'xbox'
-		];
+	var p = {};
+		
+	p.nodes = {};
+	p.links = {};
+	p.idCounter = 0;
+	p.types = [
+		'tv-screen', 'macintosh', 'gamepad', 'smartphone', 'imac-red',
+		'imac-grey', 'imac-blue', 'ipad', 'iphone', 'macbook',
+		'computer', 'monitor', 'playstation', 'hard-drive',
+		'smart-tv', 'smartwatch', 'video-card', 'xbox'
+	];
 	
 	
 	function animateNode(pixiEl, o) {
@@ -779,7 +928,7 @@ var tpl = (function () {
 			nodeImg  = conf.type; //image filename in './images/' (without extention)
 			name     = conf.name;
 			links    = conf.links;
-			id       = conf.id   || 'tpl_node_'+(idCounter+=1);
+			id       = conf.id   || 'tpl_node_'+(p.idCounter+=1);
 			x        = conf.x;
 			y        = conf.y
 		}
@@ -794,9 +943,9 @@ var tpl = (function () {
 			node.links = {};
 			node.linkCount = links.length;
 			links.forEach(function (nodeIdStr) {
-				var target = nodes[nodeIdStr]; // nodes["device_14"]
+				var target = p.nodes[nodeIdStr]; // nodes["device_14"]
 				// line = pixi.createLine();
-				line = pixi.createTwopointLine();
+				line = pixi.create2pointLine();
 				if ( !target.links ) {
 					target.links = {};
 				}
@@ -828,7 +977,7 @@ var tpl = (function () {
 		create();
 		handleLinks();
 		
-		nodes[ id ] = node;
+		p.nodes[ id ] = node;
 		pixi.addChild('mainContainer', node.pixiEl);
 		//adjustLines(node.pixiEl);
 		animateNode(node.pixiEl, {
@@ -848,8 +997,8 @@ var tpl = (function () {
 		
 		function setThings() {
 			type      = o.type  || 0;
-			id        = o.id    || 'tpl_node_'+(idCounter+=1);
-			name      = o.name  || 'Node '+(idCounter+=1);
+			id        = o.id    || 'tpl_node_'+(p.idCounter+=1);
+			name      = o.name  || 'Node '+(p.idCounter+=1);
 			x         = o.x;
 			y         = o.y;
 			thisLinks = o.links || false;
@@ -859,7 +1008,7 @@ var tpl = (function () {
 			boxSpriteText = pixi.createBoxSpriteText({
 				x: x,
 				y: y,
-				imgName: types[type],
+				imgName: p.types[type],
 				imgFill: fill,
 				spriteScale: 0.1,
 				textContent: name,
@@ -918,7 +1067,7 @@ var tpl = (function () {
 			};
 			*/
 			
-			boxSpriteText.setOnmouseup([node, links, nodes], function (node, tplLinks, tplNodes) {
+			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
 				var nodeId = node.id;
 				
 				node.links.forEach(function (linkId) {
@@ -944,21 +1093,34 @@ var tpl = (function () {
 		createTplNode();
 		addHandler();
 		
-		nodes[ id ] = node;
+		p.nodes[ id ] = node;
 		pixi.addChild('nodeContainer', node.pixiEl);
 	}
-	function createLink(o, tmpLinkColor) {
+	function twoNodesLinkCount(node1, node2, dataLinks) {
+		var id1 = node1.id,
+			id2 = node2.id,
+			count = 0;
+		
+		node1.links.forEach(function (i) {
+			var link = dataLinks[i];
+			
+			if (link.src === id2  ||  link.dest === id2) {
+				count += 1;
+			}
+		});
+		
+		return count;
+	}
+	function createLink(o) {
 		var link = {},
 			pixiEl,
-			src = nodes[o.src],
-			dest = nodes[o.dest],
+			srcNode = p.nodes[o.src],
+			destNode = p.nodes[o.dest],
 			id = o.id;
 		
-		debugger;
-		pixiEl = pixi.createTwopointLine({
-			start: src.center,
-			end: dest.center,
-			color: tmpLinkColor
+		pixiEl = pixi.create2pointLine({
+			start: srcNode.center,
+			end: destNode.center
 		});
 		
 		link.pixiEl = pixiEl;
@@ -966,7 +1128,7 @@ var tpl = (function () {
 		link.src = o.src;
 		link.dest = o.dest;
 		
-		links[ id ] = link;
+		p.links[ id ] = link;
 		pixi.addChild('lineContainer', link.pixiEl);
 	}
 	function createLink__TEST__FOR__CURVERD__LINES(o) {
@@ -977,7 +1139,7 @@ var tpl = (function () {
 			id = o.id;
 		
 		
-		pixiEl = pixi.createTwopointLine({
+		pixiEl = pixi.create2pointLine({
 			start: src.center,
 			end: dest.center
 		});
@@ -987,15 +1149,23 @@ var tpl = (function () {
 		links[ id ] = link;
 		pixi.addChild('lineContainer', link.pixiEl);
 	}
-	function drawNodes(data, fill) {
-		Object.keys(data).forEach(function (k) {
-			createNode( data[k], fill );
+	function drawNodes(nodes, fill) {
+		Object.keys(nodes).forEach(function (k) {
+			createNode( nodes[k], fill );
 		});
 	}
-	function drawLinks(data, color) {
-		Object.keys(data).forEach(function (k) {
-			createLink( data[k], color );
+	function drawLinks(links, nodes) {
+		Object.keys(links).forEach(function (k) {
+			var link = links[k],
+				srcNode = nodes[link.src],
+				destNode = nodes[link.dest],
+				sameNodesCount = twoNodesLinkCount(srcNode, destNode, links)
+			createLink( link, sameNodesCount );
 		});
+	}
+	function draw(data) {
+		drawNodes(data.nodes);
+		drawLinks(data.links, data.nodes);
 	}
 	function generateJson(nodeCount, m, e) {
 		var o = {
@@ -1087,12 +1257,14 @@ var tpl = (function () {
 	}
 	
 	return {
+		twoNodesLinkCount: twoNodesLinkCount,
 		test: test,
-		nodes: nodes,
-		links: links,
+		nodes: p.nodes,
+		links: p.links,
 		generateJson : generateJson,
 		drawNodes: drawNodes,
-		drawLinks: drawLinks
+		drawLinks: drawLinks,
+		draw: draw
 	};
 }());
 var core = (function () {
@@ -1480,7 +1652,7 @@ var core = (function () {
 			links.forEach(function (linkIdStr) {
 				var target = tplNodes[linkIdStr]; // tplNodes["device_14"]
 				// line = pixi.createLine();
-				line = pixi.createTwopointLine();
+				line = pixi.create2pointLine();
 				if ( !target.links ) {
 					target.links = {};
 				}
