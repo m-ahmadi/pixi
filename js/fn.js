@@ -516,31 +516,35 @@ var pixi = (function () {
 				eX = end.x,
 				eY = end.y,
 				incX = 0,
-				incY = 0;
+				incY = 0,
+				unit = 10;
 			
 			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
 					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
-				incX = curveSide ? 10 : -10;
-				incY = curveSide ? -10 : 10;
+				incX = curveSide ? unit : -unit;
+				incY = curveSide ? -unit : unit;
 			} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
 					(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
-				incX = curveSide ? -5 : 5;
-				incY = curveSide ? -5 : 5;
+				incX = curveSide ? -unit : unit;
+				incY = curveSide ? -unit : unit;
 			} else if ( sX === eX  &&
 					(sY > eY  ||  sY < eY) ) { // vertical
-				incX = curveSide ? -10 : 10;
+				incX = curveSide ? -unit : unit;
 			} else if ( sY === eY  &&
 					(sX < eX  ||  sX > eX) ) { // horizontal
-				incY = curveSide ? -10 : 10;
+				incY = curveSide ? -unit : unit;
 			}
 			
+			console.log(incX * curveLevel, incY * curveLevel);
 			ctrl.x += incX * curveLevel;
 			ctrl.y += incY * curveLevel;
 		}
 		function changePoints(s, e) {
 			setStart(s);
 			setEnd(e);
+			ctrl = calcBetween(start, end);
 			line.clear();
+			incCurve();
 			draw();
 			toggleDirties();
 		}
@@ -557,7 +561,6 @@ var pixi = (function () {
 		
 		
 		setThings();
-		console.log(ctrl);
 		create();
 		if (curveLevel) {
 			incCurve();
@@ -567,7 +570,7 @@ var pixi = (function () {
 		line.changeColor = changeColor;
 		line.changePoints = changePoints;
 		
-		p.stage.addChild(line);
+		p.mainContainer.addChild(line);
 		return line;
 	}
 	function createBoxSpriteText(conf) {
@@ -1111,17 +1114,26 @@ var tpl = (function () {
 		
 		return count;
 	}
-	function createLink(o) {
+	function createLink(o, count) {
 		var link = {},
 			pixiEl,
 			srcNode = p.nodes[o.src],
 			destNode = p.nodes[o.dest],
 			id = o.id;
 		
-		pixiEl = pixi.create2pointLine({
-			start: srcNode.center,
-			end: destNode.center
-		});
+		if (count === 1) {
+			pixiEl = pixi.create2pointLine({
+				start: srcNode.center,
+				end: destNode.center
+			});
+			
+		} else if (count > 1) {
+			pixiEl = pixi.create3pointLine({
+				start: srcNode.center,
+				end: destNode.center
+			});
+		}
+		
 		
 		link.pixiEl = pixiEl;
 		link.id = id;
@@ -1159,7 +1171,8 @@ var tpl = (function () {
 			var link = links[k],
 				srcNode = nodes[link.src],
 				destNode = nodes[link.dest],
-				sameNodesCount = twoNodesLinkCount(srcNode, destNode, links)
+				sameNodesCount = twoNodesLinkCount(srcNode, destNode, links);
+			console.log(sameNodesCount);
 			createLink( link, sameNodesCount );
 		});
 	}
