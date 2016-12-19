@@ -1,7 +1,7 @@
 $(function () {
 	a.mediator.init(function () {
 		
-		ajax().done(function ( data ) {
+		ajax({url: 'js/d.txt'}).done(function ( data ) {
 			
 			console.log(data);
 			t = data

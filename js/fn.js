@@ -1129,17 +1129,21 @@ var tpl = (function () {
 				destNode = p.nodes[o.dest],
 				id = o.id,
 				srcdest = o.src + o.dest,
+				destsrc = o.dest + o.src,
 				nth;
-			
-			if ( path[srcdest] ) {
-				path[srcdest] += 1;
-			} else if ( !path[srcdest] ) {
+			//console.log(o.src + o.dest, o.dest + o.src);
+			//debugger;
+			if ( !path[srcdest] && !path[destsrc] ) {
 				path[srcdest] = 1;
+			} else if ( path[srcdest] ) {
+				path[srcdest] += 1;
+			} else if ( path[destsrc] ) {
+				path[destsrc] += 1;
 			}
 			
-			nth = path[srcdest];
+			nth = path[srcdest] || path[destsrc];
 			
-			console.log(path);
+			
 			if (nth === 1) {
 				pixiEl = pixi.create2pointLine({
 					start: srcNode.center,
@@ -1153,7 +1157,6 @@ var tpl = (function () {
 				});
 			}
 			
-			
 			link.pixiEl = pixiEl;
 			link.id = id;
 			link.src = o.src;
@@ -1161,6 +1164,8 @@ var tpl = (function () {
 			
 			p.links[ id ] = link;
 			pixi.addChild('lineContainer', link.pixiEl);
+			
+			return path;
 		}
 		
 		return create;
@@ -1171,9 +1176,11 @@ var tpl = (function () {
 		});
 	}
 	function drawLinks(links) {
+		var t;
 		Object.keys(links).forEach(function (k) {
-			createLink( links[k], links );
+			t = createLink( links[k], links );
 		});
+		console.log(t);
 	}
 	/*
 	function createLink(o) {

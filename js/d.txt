@@ -1,0 +1,53 @@
+{
+	"nodes": {
+		"node_1": {
+			"id": "node_1",
+			"x": 233,
+			"y": 50,
+			"type": 4,
+			"status": 3,
+			"links": [
+				"link_1",
+				"link_2",
+				"link_3",
+				"link_4"
+			]
+		},
+		"node_2": {
+			"id": "node_2",
+			"x": 600,
+			"y": 110,
+			"type": 2,
+			"status": 2,
+			"links": [
+				"link_1",
+				"link_2",
+				"link_3",
+				"link_4"
+			]
+		}
+	},
+	"links": {
+		"link_1": {
+			"src": "node_1",
+			"dest": "node_2",
+			"id": "link_1"
+		},
+		"link_2": {
+			"src": "node_2",
+			"dest": "node_1",
+			"id": "link_2"
+		},
+		"link_3": {
+			"src": "node_1",
+			"dest": "node_2",
+			"id": "link_3"
+		},
+		"link_4": {
+			"src": "node_2",
+			"dest": "node_1",
+			"id": "link_4"
+		}
+	}
+	
+}
