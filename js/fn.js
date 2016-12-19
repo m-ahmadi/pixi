@@ -442,7 +442,7 @@ var pixi = (function () {
 			color      = conf.color      || 0x000000;
 			width      = conf.width      || 2;
 			curveLevel = conf.curveLevel || 0;
-			curveSide  = conf.curveSide  || 0; // 1 top, 0 down
+			curveSide  = conf.curveSide  || false; // true top, false down
 			ctrl       = calcBetween(start, end);
 		}
 		function setStart(s) {
@@ -535,16 +535,18 @@ var pixi = (function () {
 				incY = curveSide ? -unit : unit;
 			}
 			
-			console.log(incX * curveLevel, incY * curveLevel);
 			ctrl.x += incX * curveLevel;
 			ctrl.y += incY * curveLevel;
 		}
 		function changePoints(s, e) {
+			console.log(curveLevel);
 			setStart(s);
 			setEnd(e);
 			ctrl = calcBetween(start, end);
 			line.clear();
-			incCurve();
+			if (curveLevel) {
+				incCurve();
+			}
 			draw();
 			toggleDirties();
 		}
@@ -558,7 +560,6 @@ var pixi = (function () {
 			line.interactive = true;
 			line.buttonMode = true;
 		}
-		
 		
 		setThings();
 		create();
@@ -889,15 +890,15 @@ var tpl = (function () {
 	p.links = {};
 	p.idCounter = 0;
 	p.types = [
-		'tv-screen', 'macintosh', 'gamepad', 'smartphone', 'imac-red',
-		'imac-grey', 'imac-blue', 'ipad', 'iphone', 'macbook',
-		'computer', 'monitor', 'playstation', 'hard-drive',
-		'smart-tv', 'smartwatch', 'video-card', 'xbox'
+		'tv-screen', 'macintosh', 'imac-blue', 'smart-tv', 'imac-red',
+		'imac-grey', 'monitor', 'ipad', 'iphone', 'macbook',
+		'computer', 'gamepad', 'playstation', 'hard-drive',
+		'smartphone', 'smartwatch', 'video-card', 'xbox'
 	];
 	
 	
 	function animateNode(pixiEl, o) {
-		if ( !o ) { var o = {}; }
+		o = o ? o : {};
 		var box = pixiEl;
 		
 		TweenLite.to(box, 0.3, {
@@ -1099,42 +1100,151 @@ var tpl = (function () {
 		p.nodes[ id ] = node;
 		pixi.addChild('nodeContainer', node.pixiEl);
 	}
-	function twoNodesLinkCount(node1, node2, dataLinks) {
-		var id1 = node1.id,
-			id2 = node2.id,
-			count = 0;
+	function twoNodesLinkCount(firstNode, secondNode, dataLinks) {
+		var firstId = firstNode.id,
+			secondId = secondNode.id,
+			count = 0,
+			arr = [];
 		
-		node1.links.forEach(function (i) {
-			var link = dataLinks[i];
+		firstNode.links.forEach(function (i) {
+			var link = dataLinks[i],
+				linkId;
 			
-			if (link.src === id2  ||  link.dest === id2) {
+			if (link.src === secondId  ||  link.dest === secondId) {
 				count += 1;
+				arr.push(link.id);
 			}
 		});
 		
-		return count;
+		return arr;
 	}
-	function createLink(o, count) {
+	var createLink = (function () {
+		var path = {},
+			counter = 0;
+		
+		function create(o, datalinks) {
+			var link = {},
+				pixiEl,
+				srcNode = p.nodes[o.src],
+				destNode = p.nodes[o.dest],
+				id = o.id,
+				srcdest = o.src + o.dest,
+				nth;
+			
+			if ( path[srcdest] ) {
+				path[srcdest] += 1;
+			} else if ( !path[srcdest] ) {
+				path[srcdest] = 1;
+			}
+			
+			nth = path[srcdest];
+			
+			console.log(path);
+			if (nth === 1) {
+				pixiEl = pixi.create2pointLine({
+					start: srcNode.center,
+					end: destNode.center
+				});
+			} else if (nth > 1) {
+				pixiEl = pixi.create3pointLine({
+					start: srcNode.center,
+					end: destNode.center,
+					curveLevel: nth*2
+				});
+			}
+			
+			
+			link.pixiEl = pixiEl;
+			link.id = id;
+			link.src = o.src;
+			link.dest = o.dest;
+			
+			p.links[ id ] = link;
+			pixi.addChild('lineContainer', link.pixiEl);
+		}
+		
+		return create;
+	}());
+	function drawNodes(nodes, fill) {
+		Object.keys(nodes).forEach(function (k) {
+			createNode( nodes[k], fill );
+		});
+	}
+	function drawLinks(links) {
+		Object.keys(links).forEach(function (k) {
+			createLink( links[k], links );
+		});
+	}
+	/*
+	function createLink(o) {
+			var link = {},
+				pixiEl,
+				srcNode = p.nodes[o.src],
+				destNode = p.nodes[o.dest],
+				id = o.id;
+			
+			pixiEl = pixi.create2pointLine({
+				start: srcNode.center,
+				end: destNode.center
+			});
+			
+			link.pixiEl = pixiEl;
+			link.id = id;
+			link.src = o.src;
+			link.dest = o.dest;
+			
+			p.links[ id ] = link;
+			pixi.addChild('lineContainer', link.pixiEl);
+		}
+		
+		return create;
+	}
+	function createLinkSameHelper(sames) {
+		var toggle = false,
+			curveLevel = 0,
+			curveSide = false;
+		
+		
+		if ( util.isNumOdd(sames.length) ) { // odd
+			
+			
+			
+		} else { // even
+			
+		}
+		sames.forEach(function (idx, k) {
+			var link = links[k];
+			
+			if (idx === 0) {
+				curveLevel += 0;
+			} else if (idx > 0) {
+				curveLevel += 1;
+				if (toggle) {
+					curveSide = true;
+					toggle = false;
+				} else {
+					curveSide = false;
+					toggle = true;
+				}
+			}
+			createLinkSame(link, curveLevel, curveSide);
+			delete links[k];
+		});
+	}
+	function createLinkSame(o, curveLevel, curveSide) {
 		var link = {},
 			pixiEl,
 			srcNode = p.nodes[o.src],
 			destNode = p.nodes[o.dest],
 			id = o.id;
 		
-		if (count === 1) {
-			pixiEl = pixi.create2pointLine({
-				start: srcNode.center,
-				end: destNode.center
-			});
+		pixiEl = pixi.create3pointLine({
+			start: srcNode.center,
+			end: destNode.center,
+			curveLevel: curveLevel,
+			curveSide: curveSide
+		});	
 			
-		} else if (count > 1) {
-			pixiEl = pixi.create3pointLine({
-				start: srcNode.center,
-				end: destNode.center
-			});
-		}
-		
-		
 		link.pixiEl = pixiEl;
 		link.id = id;
 		link.src = o.src;
@@ -1143,39 +1253,61 @@ var tpl = (function () {
 		p.links[ id ] = link;
 		pixi.addChild('lineContainer', link.pixiEl);
 	}
-	function createLink__TEST__FOR__CURVERD__LINES(o) {
-		var link = {},
-			pixiEl,
-			src = nodes[o.src],
-			dest = nodes[o.dest],
-			id = o.id;
-		
-		
-		pixiEl = pixi.create2pointLine({
-			start: src.center,
-			end: dest.center
-		});
-		
-		link.pixiEl = pixiEl;
-		link.id = id;
-		links[ id ] = link;
-		pixi.addChild('lineContainer', link.pixiEl);
-	}
-	function drawNodes(nodes, fill) {
-		Object.keys(nodes).forEach(function (k) {
-			createNode( nodes[k], fill );
-		});
-	}
 	function drawLinks(links, nodes) {
+		
 		Object.keys(links).forEach(function (k) {
-			var link = links[k],
-				srcNode = nodes[link.src],
-				destNode = nodes[link.dest],
-				sameNodesCount = twoNodesLinkCount(srcNode, destNode, links);
-			console.log(sameNodesCount);
-			createLink( link, sameNodesCount );
+			var link,
+				srcNode, destNode,
+				sames, len,
+				curveLevel = 0,
+				curveSide = false;
+				
+			link = links[k];
+			if (!link) { return; }
+			srcNode = nodes[link.src];
+			destNode = nodes[link.dest];
+			if (!srcNode || !destNode) { return; }
+			
+			sames = twoNodesLinkCount(srcNode, destNode, links);
+			len = sames.length;
+			console.log(sames);
+			
+			if (len === 1) {
+				createLink( link );
+				
+			} else if (len > 1) {
+				
+				if ( util.isNumOdd(len) ) { // odd
+					
+					sames.forEach(function (k, idx) {
+						var link = links[k];
+						if (idx === 0) {
+							curveLevel += 0;
+						} else if (idx > 0) {
+							curveLevel += 2;
+							curveSide = curveSide ? false : true;
+						}
+						createLinkSame(link, curveLevel, curveSide);
+						delete links[k];
+					});
+					curveLevel = 0;
+				} else { // even
+					sames.forEach(function (k, idx) {
+						var link = links[k];
+						curveLevel += 2;
+						curveSide = curveSide ? false : true;
+						createLinkSame(link, curveLevel, curveSide);
+						delete links[k];
+					});
+					curveLevel = 0;
+				}
+				
+				
+				
+			}
 		});
 	}
+	*/
 	function draw(data) {
 		drawNodes(data.nodes);
 		drawLinks(data.links, data.nodes);
@@ -1270,7 +1402,9 @@ var tpl = (function () {
 	}
 	
 	return {
-		twoNodesLinkCount: twoNodesLinkCount,
+		//createLinkSame: createLinkSame,
+		//twoNodesLinkCount: twoNodesLinkCount,
+		createLink: createLink,
 		test: test,
 		nodes: p.nodes,
 		links: p.links,

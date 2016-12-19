@@ -53,8 +53,11 @@ var util = {
 	isInt: function (n) {
 		return n % 1 === 0;
 	},
-	makeNumberNegative: function (n) {
+	negateNum: function (n) {
 		return Math.abs(n) * -1;
+	},
+	isNumOdd: function (n) {
+		return (n % 2) ? true : false;
 	},
 	randInt: function (min, max) { // default between 0 and 1
 		min = min ? Math.ceil(min) : 0;
@@ -86,6 +89,9 @@ var util = {
 	},
 	isStr: function (v) {
 		return ( typeof v === 'string' );
+	},
+	isNum: function (v) {
+		return ( typeof v === 'number' );
 	},
 	isEmptyStr: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 );

@@ -23,7 +23,7 @@ function generateJson(nc) {
 		links = {},
 		counter = 0,
 		nodeCount = util.randInt(nc, nc*2),
-		linkCount = util.randInt(nc*2, nc*3),
+		linkCount = util.randInt(nc*3, nc*6),
 		i;
 	
 	for (i=0; i<nodeCount; i+=1) {
