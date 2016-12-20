@@ -102,7 +102,7 @@ var pixi = (function () {
 	var zoom = (function () {
 		var direction;
 		
-		var getGraphCoordinates = (function() {
+		var getGraphCoordinates = (function () {
 			var ctx = {
 				global: {
 					x: 0,
@@ -114,7 +114,7 @@ var pixi = (function () {
 				ctx.global.x = x;
 				ctx.global.y = y;
 				return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.mainContainer);
-			}
+			};
 		}());
 		function zoom(x, y, isZoomIn) {
 			var mainContainer = p.mainContainer;
@@ -226,7 +226,7 @@ var pixi = (function () {
 		return {
 			pan: pan,
 			add: add
-		}
+		};
 	}());
 	var addDragDrop = (function () {
 		function down(e) {
@@ -273,7 +273,7 @@ var pixi = (function () {
 		return add;
 	}());
 	function create2pointLine(conf) {
-		if ( !conf ) { var conf = {}; }
+		conf = conf ? conf : {};
 		
 		var line,
 			start,
@@ -426,7 +426,7 @@ var pixi = (function () {
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
 		Object.defineProperty(line, 'points', {
-			get: function () { return {start: start, end: end} }
+			get: function () { return {start: start, end: end}; }
 		});
 		
 		return line;
@@ -578,7 +578,7 @@ var pixi = (function () {
 		return line;
 	}
 	function createBoxSpriteText(conf) {
-		if (!conf) { var conf = {}; }
+		conf = conf ? conf : {};
 		var sprite,
 			text,
 			box,

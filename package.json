@@ -1,7 +1,7 @@
 {
   "name": "pixi",
   "title": "Argus Topology",
-  "description": "Topology network visualizer and tools",
+  "description": "Network topology visualizer and tools",
   "version": "1.0.0",
   "main": "index.htm",
   "scripts": {
