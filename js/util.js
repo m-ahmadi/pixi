@@ -56,6 +56,9 @@ var util = {
 	negateNum: function (n) {
 		return Math.abs(n) * -1;
 	},
+	positNum: function (n) {
+		return Math.abs(n);
+	},
 	isNumOdd: function (n) {
 		return (n % 2) ? true : false;
 	},

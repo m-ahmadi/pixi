@@ -30,7 +30,7 @@ function coPubsub() {
 					add(el);
 				});
 			}
-		} else if ( util.isObject(evt) ) {
+		} else if ( util.isObj(evt) ) {
 			Object.keys(evt).forEach(function (i) {
 				if (typeof subscribers[i] === 'undefined') {
 					subscribers[i] = [];
@@ -40,7 +40,7 @@ function coPubsub() {
 						fn: evt[i],
 						par: undefined
 					});
-				} else if ( util.isObject(evt[i]) ) {
+				} else if ( util.isObj(evt[i]) ) {
 					subscribers[i].push({
 						fn: evt[i].fn,
 						par: evt[i].par

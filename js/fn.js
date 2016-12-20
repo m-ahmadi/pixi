@@ -196,9 +196,11 @@ var pixi = (function () {
 				
 			p.mainContainer.position.x += dx;
 			p.mainContainer.position.y += dy;
-			//console.log(p.mainContainer.position.x, p.mainContainer.position.y);
+			
 			prevX = pos.x;
 			prevY = pos.y;
+			
+			inst.publish('pan', p.mainContainer.position);
 		}
 		function up() {
 			isDragging= false;
@@ -475,23 +477,25 @@ var pixi = (function () {
 				
 			if (sX > eX) {
 				diffX = sX - eX;
-			} else if (eX > sX) {
+				hX = sX - (diffX / 2);
+			} else if (sX < eX) {
 				diffX = eX - sX;
+				hX = sX + (diffX / 2);
 			} else if (sX === eX) {
-				diffX = 0;
+				hX = sX || eX;
 			}
 			
 			if (sY > eY) {
 				diffY = sY - eY;
-			} else if (eY > sY) {
-				diffY = eY - sY;
+				hY = sY - (diffY / 2);
+			} else if (sY < eY) {
+				diffY = eY + sY;
+				hY = sY + (diffY / 2);
 			} else if (sY === eY) {
-				diffY = 0;
+				hY = sY || eY;
 			}
-			
-			hX = sX + (diffX / 2);
-			hY = sY + (diffY / 2);
-			
+
+			//debugger;
 			return {
 				x: hX,
 				y: hY
@@ -517,7 +521,7 @@ var pixi = (function () {
 				eY = end.y,
 				incX = 0,
 				incY = 0,
-				unit = 10;
+				unit = 5;
 			
 			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
 					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
@@ -539,7 +543,6 @@ var pixi = (function () {
 			ctrl.y += incY * curveLevel;
 		}
 		function changePoints(s, e) {
-			console.log(curveLevel);
 			setStart(s);
 			setEnd(e);
 			ctrl = calcBetween(start, end);
@@ -1120,19 +1123,21 @@ var tpl = (function () {
 	}
 	var createLink = (function () {
 		var path = {},
-			counter = 0;
+			toggle = false;
 		
-		function create(o, datalinks) {
+		function create(o) {
 			var link = {},
 				pixiEl,
 				srcNode = p.nodes[o.src],
 				destNode = p.nodes[o.dest],
+				srcCenter = srcNode.center,
+				destCenter = destNode.center,
 				id = o.id,
 				srcdest = o.src + o.dest,
 				destsrc = o.dest + o.src,
-				nth;
+				nth, curveLevel;
 			//console.log(o.src + o.dest, o.dest + o.src);
-			//debugger;
+			
 			if ( !path[srcdest] && !path[destsrc] ) {
 				path[srcdest] = 1;
 			} else if ( path[srcdest] ) {
@@ -1142,18 +1147,21 @@ var tpl = (function () {
 			}
 			
 			nth = path[srcdest] || path[destsrc];
-			
-			
+			curveLevel = (nth-1)*2;
+			//debugger;
 			if (nth === 1) {
+				//debugger;
 				pixiEl = pixi.create2pointLine({
-					start: srcNode.center,
-					end: destNode.center
+					start: srcCenter,
+					end: destCenter
 				});
 			} else if (nth > 1) {
+				//debugger;
 				pixiEl = pixi.create3pointLine({
-					start: srcNode.center,
-					end: destNode.center,
-					curveLevel: nth*2
+					start: srcCenter,
+					end: destCenter,
+					curveLevel: curveLevel
+					//curveSide: toggle ? false : true
 				});
 			}
 			
@@ -1164,7 +1172,10 @@ var tpl = (function () {
 			
 			p.links[ id ] = link;
 			pixi.addChild('lineContainer', link.pixiEl);
-			
+			// if (nth > 1) {
+				// console.log(srcCenter, destCenter);
+				// throw new Error();
+			// }
 			return path;
 		}
 		
@@ -1178,7 +1189,7 @@ var tpl = (function () {
 	function drawLinks(links) {
 		var t;
 		Object.keys(links).forEach(function (k) {
-			t = createLink( links[k], links );
+			t = createLink( links[k] );
 		});
 		console.log(t);
 	}
@@ -1317,7 +1328,7 @@ var tpl = (function () {
 	*/
 	function draw(data) {
 		drawNodes(data.nodes);
-		drawLinks(data.links, data.nodes);
+		drawLinks(data.links);
 	}
 	function generateJson(nodeCount, m, e) {
 		var o = {
@@ -2093,10 +2104,44 @@ var navigation = (function () {
 var mediator = (function () {
 	var i = {};
 	
+	
+	function ajaxTime() {
+		pixi.clear('lineContainer', true);
+		pixi.clear('nodeContainer');
+		
+		
+	}
 	i.init = function (cb) {
 		pixi.init(cb);
 		core.init();
 		//navigation.init();
+		
+		pixi.on('pan', function (pos) {
+			var width = pixi.renderer.width,
+				height = pixi.renderer.height,
+				x = pos.x,
+				y = pos.y,
+				ajaxTime = false,
+				x1, x2, y1, y2;
+			if ( x < 0 &&
+					x < util.negateNum(width) ) { // going right
+				console.warn(2);
+				
+			} else if ( x > 0 &&
+					x > width ) { // going left
+				console.warn(3);
+			}
+			
+			if ( y < 0 &&
+					y < util.negateNum(height) ) { // going down
+				console.error(4);
+				
+			} else if ( y > 0  &&
+					y > height ) { // going up
+				console.error(5);
+			}
+			console.log(pos.x, pos.y);
+		});
 		
 		navigation.on('zoom', function () {
 			console.log('zoom');
