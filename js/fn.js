@@ -77,7 +77,7 @@ var pixi = (function () {
 		PIXI.loader.add( 'images/atlas-0.json' );
 		PIXI.loader.load(function () {
 			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
-			callback();
+			callback(p.renderer.width, p.renderer.height);
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		
@@ -2102,43 +2102,56 @@ var navigation = (function () {
 
 
 var mediator = (function () {
-	var i = {};
+	var inst = {},
+		p = {};
 	
+	p.data = {};
 	
-	function ajaxTime() {
+	function ajaxTime(data) {
 		pixi.clear('lineContainer', true);
 		pixi.clear('nodeContainer');
-		
-		
+		ajax({
+			data: data
+		}).done(function ( data ) {
+			
+			a.tpl.draw(data);
+		});
 	}
-	i.init = function (cb) {
-		pixi.init(cb);
-		core.init();
-		//navigation.init();
+	function addCustomEvents() {
 		
 		pixi.on('pan', function (pos) {
-			var width = pixi.renderer.width,
-				height = pixi.renderer.height,
-				x = pos.x,
+			var x = pos.x,
 				y = pos.y,
-				ajaxTime = false,
-				x1, x2, y1, y2;
+				width = p.data.w,
+				height = p.data.h,
+				d = {};// = p.data;
+			
 			if ( x < 0 &&
 					x < util.negateNum(width) ) { // going right
 				console.warn(2);
-				
+				d.x1 = x - (width / 2)
+				d.x2 = x + width + (width / 2);
+				d.y1 = p.data.y1;
+				d.y2 = p.data.y2
+				ajaxTime(d);
 			} else if ( x > 0 &&
 					x > width ) { // going left
 				console.warn(3);
+				
+				ajaxTime(d);
 			}
 			
 			if ( y < 0 &&
 					y < util.negateNum(height) ) { // going down
 				console.error(4);
 				
+				ajaxTime(d);
+				
 			} else if ( y > 0  &&
 					y > height ) { // going up
 				console.error(5);
+				
+				ajaxTime(d);
 			}
 			console.log(pos.x, pos.y);
 		});
@@ -2150,9 +2163,51 @@ var mediator = (function () {
 		navigation.on('pan', function () {
 			pixi.pan.pan(1, 1);
 		});
+	}
+	
+	
+	
+	inst.data = p.data;
+	inst.init = function () {
+		pixi.init(function (width, height) {
+			/*
+			data: {
+				x1: -1900,
+				x2: 4000,
+				y1: -90,
+				y2: 1800
+			}
+			*/
+			var d = {};
+			d.w = width;
+			d.h = height;
+			d.x1 = -(width / 2);
+			d.x2 = width + (width / 2);
+			d.y1 = -(height / 2);
+			d.y2 = height + (height / 2);
+			console.log(d);
+			p.data = d;
+			ajax({
+				data: d
+			})
+			.done(function ( data ) { // {url: 'js/d.txt'}
+				
+				console.log(data);
+				t = data
+				// a.tpl.drawNodes(data.nodes);
+				// a.tpl.drawLinks(data.links);
+				a.tpl.draw(data);
+			});
+		});
+		core.init();
+		//navigation.init();
+		addCustomEvents();
+		
+		
+		
 	};
 	
-	return i;
+	return inst;
 }());
 	
 

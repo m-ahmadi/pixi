@@ -1,22 +1,5 @@
 $(function () {
-	a.mediator.init(function () {
-		
-		ajax({
-			data: {
-				x1: -1900,
-				x2: 4000,
-				y1: -90,
-				y2: 1800
-			}
-		}).done(function ( data ) { // {url: 'js/d.txt'}
-			
-			console.log(data);
-			t = data
-			// a.tpl.drawNodes(data.nodes);
-			// a.tpl.drawLinks(data.links);
-			a.tpl.draw(data);
-		});
-	});
+	a.mediator.init();
 	
 	
 	
