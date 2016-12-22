@@ -50,17 +50,21 @@ function coPubsub() {
 		}
 	};
 	
-	inst.on = function (evt, fn, par) { // alias
-		this.subscribe(evt, fn, par);
-	};
-	
 	inst.publish = function (evtName, evtData) {
 		if (typeof subscribers[evtName] !== 'undefined') {
 			subscribers[evtName].forEach(function (i) {
 				i.fn(evtData, i.par);
 			});
 		}
-	}
+	};
+	
+	inst.on = function (evt, fn, par) { // alias
+		this.subscribe(evt, fn, par);
+	};
+	
+	inst.emit = function (evtName, evtData) { // alias
+		this.publish(evtName, evtData);
+	};
 	
 	return inst;
 };

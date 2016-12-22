@@ -13,7 +13,8 @@ var pixi = (function () {
 	p.lineContainer;
 	p.textures;
 	
-	function init(callback, background) {
+	function init(callback, panBounds, background) {
+		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
 		p.renderer = PIXI.autoDetectRenderer(
 			window.innerWidth,
@@ -176,7 +177,8 @@ var pixi = (function () {
 	var pan = (function () {
 		var isDragging = false,
 			prevX,
-			prevY;
+			prevY,
+			bounds = {};
 		
 		function down(e) {
 			isDragging = true;
@@ -192,10 +194,29 @@ var pixi = (function () {
 			if ( !isDragging ) { return; }
 			var pos = e.data.global,
 				dx = pos.x - prevX,
-				dy = pos.y - prevY;
-				
-			p.mainContainer.position.x += dx;
-			p.mainContainer.position.y += dy;
+				dy = pos.y - prevY,
+				mcX = p.mainContainer.position.x,
+				mcY = p.mainContainer.position.y,
+				bX1 = bounds.x1,
+				bX2 = bounds.x2,
+				bY1 = bounds.y1,
+				bY2 = bounds.y2,
+				negate = util.negateNum,
+				posit = util.positNum;
+			
+			if (mcX <= bX1    &&    mcX >= bX2) {
+				p.mainContainer.position.x += dx;
+			} else {
+				p.mainContainer.position.x = mcX > 0 ? bX1 : mcX < 0 ? bX2 : undefined;
+			}
+			
+			if (mcY <= bY1    &&    mcY >= bY2) {
+				p.mainContainer.position.y += dy;
+			} else {
+				p.mainContainer.position.y = mcY > 0 ? bY1 : mcY < 0 ? bY2 : undefined;
+			}
+			
+			
 			
 			prevX = pos.x;
 			prevY = pos.y;
@@ -222,8 +243,20 @@ var pixi = (function () {
 				.on('mousemove', move)
 				.on('touchmove', move);
 		}
+		function setBounds(o) {
+			var posit = util.positNum,
+				negate = util.negateNum;
+				
+			// changing bound signs for easier calculation later.
+			bounds.x1 = posit(o.X_1);
+			bounds.x2 = negate(o.X_2);
+			bounds.y1 = posit(o.Y_1);
+			bounds.y2 = negate(o.Y_2);
+		}
 		
 		return {
+			get: function () { return bounds; },
+			setBounds: setBounds,
 			pan: pan,
 			add: add
 		};
@@ -2105,56 +2138,130 @@ var mediator = (function () {
 	var inst = {},
 		p = {};
 	
-	p.data = {};
+	
+	p.GLOBAL_BOUNDS = {
+		X_1: -5000,
+		X_2: 5000,
+		Y_1: -2000,
+		Y_2: 2000
+	};
+	p.data = {};    // unreversed for ajax data
+	p.bounds = {};  // adjusted (reversed) to ease bound calculations
+	p.width = 0;
+	p.height = 0;
 	
 	function ajaxTime(data) {
 		pixi.clear('lineContainer', true);
 		pixi.clear('nodeContainer');
 		ajax({
-			data: data
+			data: p.data
 		}).done(function ( data ) {
 			
 			a.tpl.draw(data);
 		});
 	}
+	
+	function updateData() {
+		var w = p.width,
+			h = p.height,
+			hW = w / 2,
+			hH = h / 2,
+			d = {};
+		
+		d.x1 = -hW;
+		d.x2 = w + hW;
+		d.y1 = -hH;
+		d.y2 = h + hH;
+		
+		p.data = d;
+	}
+	function updateBounds(o) {
+		/*
+		var w = p.width,
+			h = p.height,
+			hW = w / 2,
+			hH = h / 2,
+			b = {};
+		
+		b.w = w;
+		b.h = h;
+		b.hW = hW;
+		b.hH = hH;
+		b.x1 = hW;  // hW;
+		b.x2 = -hW; // -(w + hW);
+		b.y1 = hH;  // hH;
+		b.y2 = -hH; // -(h + hH);
+		*/
+		
+		
+		var w = p.width,
+			h = p.height,
+			hW = w / 2,
+			hH = h / 2,
+			b = p.bounds;
+		
+		if (o.x1) { b.x1 = o.x1; }
+		if (o.x2) { b.x2 = o.x2; }
+		if (o.y1) { b.y1 = o.y1; }
+		if (o.y2) { b.y2 = o.y2; }
+		
+	}
+	function pixiCallback(width, height) {
+		p.width = width;
+		p.height = height;
+		
+		var hW = width / 2,
+			hH = height / 2;
+			
+		updateData();
+		updateBounds({x1: hW, x2: -hW, y1: hH, y2: -hH});
+		
+		ajax({
+			data: p.data
+		})
+		.done(function ( data ) { // {url: 'js/d.txt'}
+			
+			console.log(data);
+			t = data
+			// a.tpl.drawNodes(data.nodes);
+			// a.tpl.drawLinks(data.links);
+			a.tpl.draw(data);
+		});
+	}
+	function panCallback(pos) {
+		var x = pos.x,
+			y = pos.y,
+			b = p.bounds,
+			x1 = b.x1,
+			x2 = b.x2,
+			y1 = b.y1,
+			y2 = b.y2;
+		
+		if (x > 0  &&  x > x1 ) { // going left
+			
+			//ajaxTime(d);
+		} else if (x < 0  &&  x < x2) { // going right
+			
+			//debugger;
+			updateBounds({x1: x, x2: x+(p.width/2)});
+			
+			//ajaxTime(d);
+		}
+		
+		if (y > 0  &&  y > y1) { // going up
+			
+			//ajaxTime(d);
+			
+		} else if (y < 0  &&  y < y2) { // going down
+			
+			//ajaxTime(d);
+		}
+		//console.log();
+		console.log(Math.floor(pos.x), Math.floor(pos.y), x1, x2);
+	}
 	function addCustomEvents() {
 		
-		pixi.on('pan', function (pos) {
-			var x = pos.x,
-				y = pos.y,
-				width = p.data.w,
-				height = p.data.h,
-				d = {};// = p.data;
-			
-			if ( x < 0 &&
-					x < util.negateNum(width) ) { // going right
-				console.warn(2);
-				d.x1 = x - (width / 2)
-				d.x2 = x + width + (width / 2);
-				d.y1 = p.data.y1;
-				d.y2 = p.data.y2
-				ajaxTime(d);
-			} else if ( x > 0 &&
-					x > width ) { // going left
-				console.warn(3);
-				
-				ajaxTime(d);
-			}
-			
-			if ( y < 0 &&
-					y < util.negateNum(height) ) { // going down
-				console.error(4);
-				
-				ajaxTime(d);
-				
-			} else if ( y > 0  &&
-					y > height ) { // going up
-				console.error(5);
-				
-				ajaxTime(d);
-			}
-			console.log(pos.x, pos.y);
-		});
+		pixi.on('pan', panCallback);
 		
 		navigation.on('zoom', function () {
 			console.log('zoom');
@@ -2164,48 +2271,16 @@ var mediator = (function () {
 			pixi.pan.pan(1, 1);
 		});
 	}
-	
-	
-	
-	inst.data = p.data;
-	inst.init = function () {
-		pixi.init(function (width, height) {
-			/*
-			data: {
-				x1: -1900,
-				x2: 4000,
-				y1: -90,
-				y2: 1800
-			}
-			*/
-			var d = {};
-			d.w = width;
-			d.h = height;
-			d.x1 = -(width / 2);
-			d.x2 = width + (width / 2);
-			d.y1 = -(height / 2);
-			d.y2 = height + (height / 2);
-			console.log(d);
-			p.data = d;
-			ajax({
-				data: d
-			})
-			.done(function ( data ) { // {url: 'js/d.txt'}
-				
-				console.log(data);
-				t = data
-				// a.tpl.drawNodes(data.nodes);
-				// a.tpl.drawLinks(data.links);
-				a.tpl.draw(data);
-			});
-		});
+	function init() {
+		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
 		core.init();
 		//navigation.init();
 		addCustomEvents();
-		
-		
-		
 	};
+	
+	
+	inst.data = p.data;
+	inst.init = init;
 	
 	return inst;
 }());
