@@ -10,7 +10,7 @@ function toInt(v) {
 	return typeof v === 'string' ? parseInt(v, 10) : undefined;
 }
 function setThings(o) {
-	nCount =  o.count ?  toInt(o.count) :  100;
+	nCount =  o.count ?  toInt(o.count) :  20;
 	m      =  o.m     ?  toInt(o.m)     :  1;
 	e      =  o.e     ?  toInt(o.e)     :  5;
 	x1     =  o.x1    ?  toInt(o.x1)    :  0;

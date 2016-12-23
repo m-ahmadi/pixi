@@ -1220,11 +1220,9 @@ var tpl = (function () {
 		});
 	}
 	function drawLinks(links) {
-		var t;
 		Object.keys(links).forEach(function (k) {
-			t = createLink( links[k] );
+			createLink( links[k] );
 		});
-		console.log(t);
 	}
 	/*
 	function createLink(o) {
@@ -2161,61 +2159,27 @@ var mediator = (function () {
 		});
 	}
 	
-	function updateData() {
-		var w = p.width,
-			h = p.height,
-			hW = w / 2,
-			hH = h / 2,
-			d = {};
-		
-		d.x1 = -hW;
-		d.x2 = w + hW;
-		d.y1 = -hH;
-		d.y2 = h + hH;
-		
-		p.data = d;
-	}
-	function updateBounds(o) {
-		/*
-		var w = p.width,
-			h = p.height,
-			hW = w / 2,
-			hH = h / 2,
-			b = {};
-		
-		b.w = w;
-		b.h = h;
-		b.hW = hW;
-		b.hH = hH;
-		b.x1 = hW;  // hW;
-		b.x2 = -hW; // -(w + hW);
-		b.y1 = hH;  // hH;
-		b.y2 = -hH; // -(h + hH);
-		*/
-		
-		
-		var w = p.width,
-			h = p.height,
-			hW = w / 2,
-			hH = h / 2,
-			b = p.bounds;
-		
-		if (o.x1) { b.x1 = o.x1; }
-		if (o.x2) { b.x2 = o.x2; }
-		if (o.y1) { b.y1 = o.y1; }
-		if (o.y2) { b.y2 = o.y2; }
-		
-	}
 	function pixiCallback(width, height) {
-		p.width = width;
-		p.height = height;
+		var w = width,
+			h = height,
+			hW = w / 2,
+			hH = h / 2;
 		
-		var hW = width / 2,
-			hH = height / 2;
-			
-		updateData();
-		updateBounds({x1: hW, x2: -hW, y1: hH, y2: -hH});
+		p.width = w;
+		p.height = h;
 		
+		p.data.x1 = -hW;
+		p.data.x2 = w + hW;
+		p.data.y1 = -hH;
+		p.data.y2 = h + hH;
+		
+		p.bounds.x1 = hW;
+		p.bounds.x2 = -hW;
+		p.bounds.y1 = hH;
+		p.bounds.y2 = -hH
+		
+		console.log(p.bounds);
+		console.log(p.data);
 		ajax({
 			data: p.data
 		})
@@ -2229,36 +2193,55 @@ var mediator = (function () {
 		});
 	}
 	function panCallback(pos) {
-		var x = pos.x,
-			y = pos.y,
+		var x = Math.floor(pos.x),
+			y = Math.floor(pos.y),
 			b = p.bounds,
-			x1 = b.x1,
-			x2 = b.x2,
-			y1 = b.y1,
-			y2 = b.y2;
+			d = p.data,
+			w = p.width,
+			h = p.height,
+			hW = w / 2,
+			hH = h / 2;
 		
-		if (x > 0  &&  x > x1 ) { // going left
+		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
+			console.log('salam');
 			
-			//ajaxTime(d);
-		} else if (x < 0  &&  x < x2) { // going right
+			b.x1 += x;
+			b.x2 -= x;
 			
-			//debugger;
-			updateBounds({x1: x, x2: x+(p.width/2)});
+			d.x1 -= hW;
+			d.x2 -= hW;
+			console.log(b);
+			console.log(d);
 			
-			//ajaxTime(d);
+			ajaxTime();
 		}
 		
-		if (y > 0  &&  y > y1) { // going up
+		if (x < b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+			console.log('chetori');
 			
-			//ajaxTime(d);
+			b.x1 -= x;
+			b.x2 += x;
 			
-		} else if (y < 0  &&  y < y2) { // going down
+			d.x1 += hW;
+			d.x2 += hW;
 			
-			//ajaxTime(d);
+			
+			console.log(p.bounds);
+			console.log(p.data);
+			
+			ajaxTime();
 		}
-		//console.log();
-		console.log(Math.floor(pos.x), Math.floor(pos.y), x1, x2);
+		
+		console.log(Math.floor(pos.x));
 	}
+	/*
+	var t = new PIXI.Graphics();
+t.beginFill();
+t.drawRect(0, 0, 100, 100);
+t.endFill;
+t.x = 1500
+a.pixi.mainContainer.addChild(t);
+	*/
 	function addCustomEvents() {
 		
 		pixi.on('pan', panCallback);
@@ -2280,6 +2263,7 @@ var mediator = (function () {
 	
 	
 	inst.data = p.data;
+	inst.bounds = p.bounds;
 	inst.init = init;
 	
 	return inst;
