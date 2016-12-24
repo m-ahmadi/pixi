@@ -6,6 +6,101 @@ var nCount, m, e,
 	x1, x2,
 	y1, y2;
 
+var nodes = {},
+	links = {};
+function generateAll() {
+	var totalNodes = 20000,
+		totalLinks = 50000,
+		minX = -10000,
+		maxX = 10000,
+		minY = -6000,
+		maxY = 6000,
+		i,
+		link, data, id;
+	
+	for (i=0; i<totalNodes; i+=1) {
+		var node = {},
+			id = 'node_'+(i+=1);
+		
+		node.id = id;
+		node.x = util.randInt(minX, maxX);
+		node.y = util.randInt(minY, maxY);
+		node.type = util.randInt(0, 5);
+		node.status = util.randInt(0, 5);
+		node.links = [];
+		
+		nodes[id] = node;
+	}
+	
+	function rand() {
+		return {
+			srcId: 'node_' + util.randInt(1, totalNodes),
+			destId: 'node_' + util.randInt(1, totalNodes)
+		};
+	}
+	
+	for (i=0; i<totalLinks; i+=1) {
+		link = {};
+		id = 'link_'+(i+=1);
+		
+		data = rand();
+		while ( data.srcId === data.destId ) {
+			data = rand();
+		}
+		
+		link.id = id,
+		link.src = data.srcId,
+		link.dest = data.destId;
+		link.status = util.randInt(0, 5);
+		
+		links[id] = link;
+	}
+	
+	Object.keys(links).forEach(function (k) {
+		
+		var lnk = links[k],
+			srcNode = nodes[lnk.src],
+			destNode = nodes[lnk.dest];
+		// console.log(srcNode);
+		// srcNode.links.push(lnk.id);
+		// destNode.links.push(lnk.id);
+	});
+}
+
+generateAll();
+
+
+function getData(x1, x2, y1, y2) {
+	var d = {},
+		nodesFiltered = {},
+		linksFiltered = [];
+	
+	Object.keys(nodes).forEach(function (k) {
+		var n = nodes[k],
+			links = n.links;
+		
+		if (n.x > x1  &&  n.x < x2) {
+			nodesFiltered[n.id] = n;
+			
+			if (links.length) {
+				links.forEach(function (i) {
+					if ( linksFiltered.indexOf(i) !== -1 ) {
+						linksFiltered.push(links[i]);
+					}
+				});
+			}
+		}
+	});
+	
+	Object.keys(links).forEach(function (k) {
+		var l = links[k];
+		
+	});
+	
+	d.nodes = nodesFiltered;
+	d.links = linksFiltered;
+	return d;
+}
 function toInt(v) {
 	return typeof v === 'string' ? parseInt(v, 10) : undefined;
 }
@@ -90,9 +185,12 @@ function generateJson(nc) {
 }
 
 function get(req, res) {
+	var q = req.query;
 	setThings(req.query);
 	
 	var o = generateJson(nCount);
+	// var o = getData(q.x1, q.x2, q.y1, q.y2);
+	
 	
 	res.write( JSON.stringify(o) );
 	res.end();

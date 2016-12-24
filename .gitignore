@@ -1,3 +1,4 @@
 node_modules/*
 pixi.js-master/*
 .sass-cache/*
+compiler.jar

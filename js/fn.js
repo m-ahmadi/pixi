@@ -2148,15 +2148,14 @@ var mediator = (function () {
 	p.width = 0;
 	p.height = 0;
 	
-	function ajaxTime(data) {
+	function loadData() {
+		var cb = a.tpl.draw;
 		pixi.clear('lineContainer', true);
 		pixi.clear('nodeContainer');
 		ajax({
 			data: p.data
-		}).done(function ( data ) {
-			
-			a.tpl.draw(data);
-		});
+		})
+		.done(cb);
 	}
 	
 	function pixiCallback(width, height) {
@@ -2204,35 +2203,49 @@ var mediator = (function () {
 		
 		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
 			console.log('salam');
-			
 			b.x1 += x;
 			b.x2 -= x;
-			
 			d.x1 -= hW;
 			d.x2 -= hW;
 			console.log(b);
 			console.log(d);
-			
-			ajaxTime();
+			loadData();
 		}
 		
-		if (x < b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
 			console.log('chetori');
-			
 			b.x1 -= x;
 			b.x2 += x;
-			
 			d.x1 += hW;
 			d.x2 += hW;
-			
-			
-			console.log(p.bounds);
-			console.log(p.data);
-			
-			ajaxTime();
+			console.log(b);
+			console.log(d);
+			loadData();
 		}
 		
-		console.log(Math.floor(pos.x));
+		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
+			console.log('here');
+			b.y1 += hH;
+			b.y2 += hH;
+			d.y1 -= hH;
+			d.y2 += hH;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
+			console.log('kitty');
+			b.y1 -= hH;
+			b.y2 -= hH;
+			d.y1 += hH;
+			d.y2 += hH;		
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		// console.log(Math.floor(y));
 	}
 	/*
 	var t = new PIXI.Graphics();
