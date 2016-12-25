@@ -66,7 +66,7 @@ var ajax = (function () {
 		ajax.id = uid;
 		
 		$.ajax({
-			url: o.url || 'http://192.168.10.70:3000',
+			url: o.url || 'http://localhost:3000',
 			type: o.type || 'GET',
 			dataType: o.dataType || 'json',
 			data: o.data,

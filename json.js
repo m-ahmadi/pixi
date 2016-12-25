@@ -9,18 +9,18 @@ var nCount, m, e,
 var nodes = {},
 	links = {};
 function generateAll() {
-	var totalNodes = 20000,
-		totalLinks = 50000,
+	var totalNodes = 10,
+		totalLinks = 10,
 		minX = -10000,
 		maxX = 10000,
 		minY = -6000,
 		maxY = 6000,
-		i,
-		link, data, id;
+		i, counter = 0,
+		node, link, data, id;
 	
 	for (i=0; i<totalNodes; i+=1) {
-		var node = {},
-			id = 'node_'+(i+=1);
+		node = {},
+		id = 'node_'+(counter+=1);
 		
 		node.id = id;
 		node.x = util.randInt(minX, maxX);
@@ -32,19 +32,13 @@ function generateAll() {
 		nodes[id] = node;
 	}
 	
-	function rand() {
-		return {
-			srcId: 'node_' + util.randInt(1, totalNodes),
-			destId: 'node_' + util.randInt(1, totalNodes)
-		};
-	}
-	
+	counter = 0;
 	for (i=0; i<totalLinks; i+=1) {
 		link = {};
-		id = 'link_'+(i+=1);
+		id = 'link_'+(counter+=1);
 		
 		data = rand();
-		while ( data.srcId === data.destId ) {
+		while ( data.srcId === data.destId ) { 
 			data = rand();
 		}
 		
@@ -55,15 +49,19 @@ function generateAll() {
 		
 		links[id] = link;
 	}
+	function rand() {
+		return {
+			srcId: 'node_' + util.randInt(1, totalNodes),
+			destId: 'node_' + util.randInt(1, totalNodes)
+		};
+	}
 	
 	Object.keys(links).forEach(function (k) {
-		
 		var lnk = links[k],
 			srcNode = nodes[lnk.src],
 			destNode = nodes[lnk.dest];
-		// console.log(srcNode);
-		// srcNode.links.push(lnk.id);
-		// destNode.links.push(lnk.id);
+		srcNode.links.push(lnk.id);
+		destNode.links.push(lnk.id);
 	});
 }
 
@@ -72,33 +70,39 @@ generateAll();
 
 function getData(x1, x2, y1, y2) {
 	var d = {},
-		nodesFiltered = {},
-		linksFiltered = [];
+		filteredNodes = {},
+		filteredLinks = {},
+		arr = [];
 	
 	Object.keys(nodes).forEach(function (k) {
 		var n = nodes[k],
+			x = n.x,
+			y = n.y,
 			links = n.links;
 		
-		if (n.x > x1  &&  n.x < x2) {
-			nodesFiltered[n.id] = n;
+		if ( x >= x1 &&
+				x <= x2 &&
+				y >= y1 &&
+				y <= y2 ) {
 			
-			if (links.length) {
-				links.forEach(function (i) {
-					if ( linksFiltered.indexOf(i) !== -1 ) {
-						linksFiltered.push(links[i]);
-					}
-				});
-			}
+			filteredNodes[n.id] = n;
+			
+			if ( !links.length ) { return; }
+			links.forEach(function (item) {
+				if ( arr.indexOf(item) === -1 ) {
+					arr.push(item);
+				}
+			});
 		}
 	});
 	
-	Object.keys(links).forEach(function (k) {
-		var l = links[k];
-		
+	arr.forEach(function (i) {
+		filteredLinks[i] = links[i];
 	});
 	
-	d.nodes = nodesFiltered;
-	d.links = linksFiltered;
+	
+	d.nodes = filteredNodes;
+	d.links = filteredLinks;
 	return d;
 }
 function toInt(v) {
@@ -119,11 +123,11 @@ function generateJson(nc) {
 		counter = 0,
 		nodeCount = util.randInt(nc, nc*2),
 		linkCount = util.randInt(nc*3, nc*6),
-		i;
+		i, node, link, id, data;
 	
 	for (i=0; i<nodeCount; i+=1) {
-		var node = {},
-			id = 'node_'+(counter+=1);
+		node = {},
+		id = 'node_'+(counter+=1);
 		
 		node.id = id;
 		node.x = util.randInt(x1, x2);
@@ -144,8 +148,8 @@ function generateJson(nc) {
 		};
 	}
 	for (i=0; i<linkCount; i+=1) {
-		var link = {}, data,
-			id = 'link_'+(counter+=1);
+		link = {}, data,
+		id = 'link_'+(counter+=1);
 		
 		data = rand();
 		while ( data.srcId === data.destId ) {
@@ -162,7 +166,7 @@ function generateJson(nc) {
 	
 	
 	Object.keys(links).forEach(function (k) {
-		var link = links[k];
+		link = links[k];
 		nodes[link.src].links.push(link.id);
 		nodes[link.dest].links.push(link.id);
 	});
@@ -188,8 +192,8 @@ function get(req, res) {
 	var q = req.query;
 	setThings(req.query);
 	
-	var o = generateJson(nCount);
-	// var o = getData(q.x1, q.x2, q.y1, q.y2);
+	// var o = generateJson(nCount);
+	var o = getData(q.x1, q.x2, q.y1, q.y2);
 	
 	
 	res.write( JSON.stringify(o) );
