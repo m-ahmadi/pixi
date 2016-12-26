@@ -9,18 +9,21 @@ var nCount, m, e,
 var nodes = {},
 	links = {};
 function generateAll() {
-	var totalNodes = 10,
-		totalLinks = 10,
+	var totalNodes = 2000,
+		totalLinks = 2000,
 		minX = -10000,
 		maxX = 10000,
 		minY = -6000,
 		maxY = 6000,
 		i, counter = 0,
-		node, link, data, id;
+		node, link, data, id,
+		ids = [];
 	
 	for (i=0; i<totalNodes; i+=1) {
-		node = {},
+		node = {};
 		id = 'node_'+(counter+=1);
+		
+		ids.push(id);
 		
 		node.id = id;
 		node.x = util.randInt(minX, maxX);
@@ -49,10 +52,15 @@ function generateAll() {
 		
 		links[id] = link;
 	}
+	
 	function rand() {
-		return {
-			srcId: 'node_' + util.randInt(1, totalNodes),
-			destId: 'node_' + util.randInt(1, totalNodes)
+		// return {
+			// srcId: 'node_' + util.randInt(1, totalNodes),
+			// destId: 'node_' + util.randInt(1, totalNodes)
+		// };
+		return { 
+			srcId: ids[ util.randInt(0, ids.length-1) ],
+			destId: ids[ util.randInt(0, ids.length-1) ]
 		};
 	}
 	

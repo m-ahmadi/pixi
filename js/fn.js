@@ -1159,6 +1159,7 @@ var tpl = (function () {
 			toggle = false;
 		
 		function create(o) {
+			debugger;
 			var link = {},
 				pixiEl,
 				srcNode = p.nodes[o.src],
@@ -1169,6 +1170,7 @@ var tpl = (function () {
 				srcdest = o.src + o.dest,
 				destsrc = o.dest + o.src,
 				nth, curveLevel;
+			
 			//console.log(o.src + o.dest, o.dest + o.src);
 			
 			if ( !path[srcdest] && !path[destsrc] ) {
