@@ -9,12 +9,13 @@ var nCount, m, e,
 var nodes = {},
 	links = {};
 function generateAll() {
-	var totalNodes = 20000,
-		totalLinks = 50000,
+	var totalNodes = 2000,
+		totalLinks = 2000,
 		minX = -10000,
 		maxX = 10000,
 		minY = -6000,
 		maxY = 6000,
+		src, dest,
 		i, counter = 0,
 		node, link, data, id,
 		ids = [];
@@ -41,23 +42,21 @@ function generateAll() {
 		id = 'link_'+(counter+=1);
 		
 		data = rand();
-		while ( data.srcId === data.destId ) { 
+		while ( data.srcId === data.destId ||
+			(!nodes[data.srcId]  &&  !nodes[data.destId]) ) { 
 			data = rand();
 		}
-		
+		src = nodes[data.destId];
+		dest = nodes[data.srcId],
 		link.id = id,
-		link.src = data.srcId,
-		link.dest = data.destId;
+		link.src = { id: src.id, x: src.x, y: src.y };
+		link.dest = { id: dest.id, x: dest.x, y: dest.y };
 		link.status = util.randInt(0, 5);
 		
 		links[id] = link;
 	}
 	
 	function rand() {
-		// return {
-			// srcId: 'node_' + util.randInt(1, totalNodes),
-			// destId: 'node_' + util.randInt(1, totalNodes)
-		// };
 		return { 
 			srcId: ids[ util.randInt(0, ids.length-1) ],
 			destId: ids[ util.randInt(0, ids.length-1) ]
@@ -66,8 +65,8 @@ function generateAll() {
 	
 	Object.keys(links).forEach(function (k) {
 		var lnk = links[k],
-			srcNode = nodes[lnk.src],
-			destNode = nodes[lnk.dest];
+			srcNode = nodes[lnk.src.id],
+			destNode = nodes[lnk.dest.id];
 		srcNode.links.push(lnk.id);
 		destNode.links.push(lnk.id);
 	});
@@ -103,8 +102,8 @@ function getData(x1, x2, y1, y2) {
 		if ( !nLinks.length ) { return; }
 		nLinks.forEach(function (id) {
 			var lnk = links[id];
-			if ( filteredNodes[ lnk.src ] &&
-					filteredNodes[ lnk.dest ] &&
+			if ( (filteredNodes[ lnk.src.id ] &&
+					filteredNodes[ lnk.dest.id ] ) &&
 					arr.indexOf(id) === -1 ) {
 				arr.push(id);
 			}
@@ -186,20 +185,7 @@ function generateJson(nc) {
 		nodes[link.dest].links.push(link.id);
 	});
 	
-	/*
-	Object.keys(nodes).forEach(function (k) {
-		var node = nodes[k];
-		if ( !node.link ) {
-			var newone = {
-				id: 'link_'+(counter+=1),
-				src: node.id,
-				dest: 'node_' + util.randInt(1, nodeCount),
-				status: util.randInt(0, 5)
-			};
-			node.links.push(newone.id);
-		}
-	});
-	*/
+	
 	return { nodes: nodes, links: links };
 }
 

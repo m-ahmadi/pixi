@@ -1,4 +1,582 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var core = (function () {
+	var inst = util.extend( coPubsub() ),
+	tplNodes = {},
+	idCounter = 0; // createTplNode uses this
+	t = function () { return tplNodes; }; // testing purposes
+	
+	var
+	animateNode = function (element, o) {
+		if ( !o ) { var o = {}; }
+		var box = element;
+		
+		TweenLite.to(box, 0.3, {
+			alpha: 1,
+			yoyo: true,
+			ease: Linear.easeInOut
+		});
+
+		TweenLite.to(box.scale, 0.3, {
+			x: 1,
+			y: 1,
+			yoyo: true,
+			ease: Linear.easeInOut,
+			onComplete: o.done,
+			onCompleteParams: o.doneParams,
+			onCompleteScope: o.doneCtx
+		});
+	},
+	adjustLine = function (line, points) {
+		line.changePoints({
+			x: points[0],
+			y: points[1]
+		}, {
+			x: points[2],
+			y: points[3]
+		});
+		/*
+		pixi.redrawLine(line, {
+			points: points
+		});
+		*/
+	},
+	getNodeInfo = function (node) {
+		/*	node: A sprite or a graphics object, or a link object
+			return: An object containing only required information about the node. */
+		var x = node.x,
+			y = node.y,
+			width = node.width,
+			height = node.height,
+			pos = {},
+			result = {};
+		
+		result.linkCount = node.linkCount || node.TPL_linkCount;
+		
+		pos.left = x;
+		pos.right = x + width;
+		pos.top = y;
+		pos.bottom = y + height;
+		
+		pos.midLeft = {
+			x: x,
+			y: y + (height / 2)
+		}
+		pos.midRight = {
+			x: x + width,
+			y: y + (height / 2)
+		};
+		pos.midTop = {
+			x: x + (width / 2),
+			y: y
+		};
+		pos.midBott = {
+			x: x + (width / 2),
+			y: y + height
+		};
+		
+		pos.topLeft = {
+			x: x,
+			y: y
+		};
+		pos.topRight = {
+			x: x + width,
+			y: y
+		};
+		pos.bottomLeft = {
+			x: x,
+			y: y + height
+		};
+		pos.bottomRight = {
+			x: x + width,
+			y: y + height
+		};
+		
+		result.pos = pos;
+		
+		return result;
+	},
+	getOneLinkRelativePosition = function (source, target) {
+		// where is this link point in relation to the current node
+		// target: one of the links of the dragged node
+		var rel = {};
+		rel.farLeft = false;
+		rel.farRight = false;
+		rel.midLeft = false;
+		rel.midRight = false;
+		rel.farUp = false;
+		rel.farDown = false;
+		rel.midUp = false;
+		rel.midDown = false;
+		rel.sameX = false;
+		rel.sameY = false;
+		
+		if ( target.right < source.left ) { // farLeft
+			rel.farLeft = true;
+		} else if ( target.left > source.right ) { // farRight
+			rel.farRight = true;
+		} else if ( target.left < source.left &&
+				target.right > source.left ) { // midLeft
+			rel.midLeft = true;
+		} else if ( target.left < source.right &&
+				target.right > source.right ) { // midRight
+			rel.midRight = true;
+		} else if ( target.left === source.left ) {
+			rel.sameX = true;
+		}
+		
+		if ( target.bottom < source.top ) { // farUp
+			rel.farUp = true;
+		} else if ( target.top > source.bottom ) { // farDown
+			rel.farDown = true;
+		} else if ( target.bottom > source.top &&
+				target.top < source.top ) { // midUp
+			rel.midUp = true;
+		} else if ( target.bottom > source.top &&
+				target.top > source.top ) { // midDown
+			rel.midDown = true;
+		} else if ( target.top === source.top ) {
+			rel.sameY = true;
+		}
+		
+		target.rel = rel;
+		return target;
+	},
+	calcDistance = function (x, y) {
+		var distance = {},
+			distX,
+			distY;
+		
+		distX = x.bigX - x.smallX;
+		distY = y.bigY - y.smallY;
+		
+		if ( distX > distY ) {
+			
+			distance.largerX = true;
+			
+		} else if ( distY > distX ) {
+			
+			distance.largerY = true;
+			
+		} else if ( distX === distY ) {
+			
+			distance.equalXY = true;
+			
+		}
+		
+		distance.x = distX;
+		distance.y = distY;
+		
+		return distance;
+	},
+	calcLinkPoints = function (node) {
+		var points = [],
+			source = getNodeInfo(node),
+			links = node.TPL_Stuff.links,
+			srcTplNodeId = node.TPL_Stuff.id;
+			
+		Object.keys( links ).forEach(function (keyStr) {
+			var tplNode = tplNodes[keyStr],
+				link = tplNode.node,
+				target,
+				srcPos,
+				trgPos,
+				rel,
+				dist,
+				frm,
+				to;
+				
+			target = getNodeInfo(link);
+			srcPos = source.pos;
+			trgPos = target.pos
+			target = getOneLinkRelativePosition(srcPos, trgPos);
+			rel = target.rel;
+			
+			if ( rel.farUp  &&  rel.farLeft ) {
+				dist = calcDistance({
+					bigX: srcPos.left,
+					smallX: trgPos.right
+				}, {
+					bigY: srcPos.top,
+					smallY: trgPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.topLeft;
+					to = trgPos.bottomRight;
+				}
+			} else if ( rel.farUp  &&  rel.farRight ) {
+				dist = calcDistance({
+					bigX: trgPos.left,
+					smallX: srcPos.right
+				}, {
+					bigY: srcPos.bottom,
+					smallY: trgPos.top
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.topRight;
+					to = trgPos.bottomLeft;
+				}
+			} else if ( rel.farDown  &&  rel.farLeft ) {
+				dist = calcDistance({
+					bigX: srcPos.left,
+					smallX: trgPos.right
+				}, {
+					bigY: trgPos.top,
+					smallY: srcPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.bottomLeft;
+					to = trgPos.topRight;
+				}
+			} else if ( rel.farDown  &&  rel.farRight ) {
+				dist = calcDistance({
+					bigX: trgPos.left,
+					smallX: srcPos.right
+				}, {
+					bigY: trgPos.top,
+					smallY: srcPos.bottom
+				});
+				
+				if ( dist.largerX ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				} else if ( dist.largerY ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				} else if ( dist.equalXY ) {
+					frm = srcPos.bottomRight;
+					to = trgPos.topLeft;
+				}
+			}
+			
+			if ( rel.midLeft  ||  rel.midRight ) {
+				if ( rel.farUp ) {
+					frm = srcPos.midTop;
+					to = trgPos.midBott;
+					
+				} else if ( rel.farDown ) {
+					frm = srcPos.midBott;
+					to = trgPos.midTop;
+				}
+			}
+			
+			if ( rel.midUp  ||  rel.midDown ) {
+				if ( rel.farLeft ) {
+					frm = srcPos.midLeft;
+					to = trgPos.midRight;
+				} else if ( rel.farRight ) {
+					frm = srcPos.midRight;
+					to = trgPos.midLeft;
+				}
+			}
+			
+			if (  !( (rel.midLeft || rel.midRight) &&
+					(rel.midUp || rel.midDown) )  ) {
+				
+				points.push({
+					line: tplNode.links[srcTplNodeId].line,
+					ferom: frm,
+					to: to
+				});
+			
+			}
+			
+			
+			
+		});
+		
+		
+		return points;
+	},
+	adjustLines = function (node) {
+		var points = calcLinkPoints(node);
+		
+		if (points) {
+			points.forEach(function (item) {
+				if (!item.ferom  ||  !item.to) { console.warn("adjustLine(): Bad points olaghe sag"); return; }
+				var points = [
+					item.ferom.x,
+					item.ferom.y,
+					item.to.x,
+					item.to.y
+				];
+				adjustLine(item.line, points);
+			});
+		}
+		
+	},
+	addTplLink = function () {
+		
+	},
+	createTplNode = function (conf) {
+		if ( !conf ) { var conf = {}; }
+		var imgPath = 'images/',
+			hasLinks = false,
+			links = conf.links,
+			tplNode = {},
+			sprite,
+			text,
+			box,
+			line,
+			id;
+		
+		if ( links &&
+				util.isArr( links ) &&
+				links.length > 0 ) {
+			hasLinks = true;
+		}
+		
+		//---------------------------------------------------------------
+		//	Creating Pixi Elements
+		imgPath += conf.type || 'computer';
+		imgPath += '.png';
+		sprite = pixi.createSprite({
+			image: imgPath,
+			scale: 0.2,
+			alpha: 1,
+			x: conf.x || 0,
+			y: conf.x || 0
+		}, true);
+		text = pixi.createText( conf.name || 'no_name', true );
+		text.y = sprite.y + sprite.height;
+		
+		box = new PIXI.Container();
+		// box = new PIXI.particles.ParticleContainer();
+		box.interactive = true;
+		box.buttonMode = true;
+		box.scale.set(0);
+		box.alpha = 1;
+		box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
+		box.position.x = conf.x || 0;
+		box.position.y = conf.x || 0;
+		box.addChild(sprite);
+		box.addChild(text);
+		pixi.addDragDrop(box);
+		//---------------------------------------------------------------
+		
+		id = conf.id || 'tpl_node_'+(idCounter+=1);
+		tplNode.name = conf.name || 'no_name';
+		tplNode.id = id;
+		tplNode.node = box;
+		if (hasLinks) {
+			tplNode.links = {};
+			tplNode.linkCount = links.length;
+			links.forEach(function (linkIdStr) {
+				var target = tplNodes[linkIdStr]; // tplNodes["device_14"]
+				// line = pixi.createLine();
+				line = pixi.create2pointLine();
+				if ( !target.links ) {
+					target.links = {};
+				}
+				target.links[ tplNode.id ] = {};
+				target.links[ tplNode.id ].line = line;
+				target.linkCount = util.objLength( target.links );
+				
+				
+				tplNode.links[linkIdStr] = {};
+				tplNode.links[linkIdStr].line = line;
+				/*
+				{
+					
+					
+					get x() { return target.node.x; },
+					get y() { return target.node.y; },
+					get width() { return target.node.width; },
+					get height() { return target.node.height; },
+					line: pixi.createLine()
+					
+				}
+				*/
+				pixi.addChild('lineContainer', line);
+			});
+		} else {
+			tplNode.links = false;
+		}
+		
+		tplNodes[ tplNode.id ] = tplNode;
+		box.TPL_Stuff = tplNode;
+		
+		pixi.addChild('nodeContainer', tplNode.node);
+		
+		pixi.bringToFront(tplNode.node);
+		//adjustLines(tplNode.node);
+		animateNode(tplNode.node, {
+			done: adjustLines,
+			doneParams: [tplNode.node]
+		});
+		return id;
+	},
+	init = function () {
+		
+	};
+	
+	Object.defineProperties(inst, {
+		"some": {
+			get: function () { return "some"; }
+		}
+	});
+	inst.adjustLines = adjustLines;
+	inst.createTplNode = createTplNode;
+	inst.tplNodes = tplNodes;
+	inst.init = init;
+	
+	return inst;
+}());
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+/*
+	function createLink(o) {
+			var link = {},
+				pixiEl,
+				srcNode = p.nodes[o.src],
+				destNode = p.nodes[o.dest],
+				id = o.id;
+			
+			pixiEl = pixi.create2pointLine({
+				start: srcNode.center,
+				end: destNode.center
+			});
+			
+			link.pixiEl = pixiEl;
+			link.id = id;
+			link.src = o.src;
+			link.dest = o.dest;
+			
+			p.links[ id ] = link;
+			pixi.addChild('lineContainer', link.pixiEl);
+		}
+		
+		return create;
+	}
+	function createLinkSameHelper(sames) {
+		var toggle = false,
+			curveLevel = 0,
+			curveSide = false;
+		
+		
+		if ( util.isNumOdd(sames.length) ) { // odd
+			
+			
+			
+		} else { // even
+			
+		}
+		sames.forEach(function (idx, k) {
+			var link = links[k];
+			
+			if (idx === 0) {
+				curveLevel += 0;
+			} else if (idx > 0) {
+				curveLevel += 1;
+				if (toggle) {
+					curveSide = true;
+					toggle = false;
+				} else {
+					curveSide = false;
+					toggle = true;
+				}
+			}
+			createLinkSame(link, curveLevel, curveSide);
+			delete links[k];
+		});
+	}
+	function createLinkSame(o, curveLevel, curveSide) {
+		var link = {},
+			pixiEl,
+			srcNode = p.nodes[o.src],
+			destNode = p.nodes[o.dest],
+			id = o.id;
+		
+		pixiEl = pixi.create3pointLine({
+			start: srcNode.center,
+			end: destNode.center,
+			curveLevel: curveLevel,
+			curveSide: curveSide
+		});	
+			
+		link.pixiEl = pixiEl;
+		link.id = id;
+		link.src = o.src;
+		link.dest = o.dest;
+		
+		p.links[ id ] = link;
+		pixi.addChild('lineContainer', link.pixiEl);
+	}
+	function drawLinks(links, nodes) {
+		
+		Object.keys(links).forEach(function (k) {
+			var link,
+				srcNode, destNode,
+				sames, len,
+				curveLevel = 0,
+				curveSide = false;
+				
+			link = links[k];
+			if (!link) { return; }
+			srcNode = nodes[link.src];
+			destNode = nodes[link.dest];
+			if (!srcNode || !destNode) { return; }
+			
+			sames = twoNodesLinkCount(srcNode, destNode, links);
+			len = sames.length;
+			console.log(sames);
+			
+			if (len === 1) {
+				createLink( link );
+				
+			} else if (len > 1) {
+				
+				if ( util.isNumOdd(len) ) { // odd
+					
+					sames.forEach(function (k, idx) {
+						var link = links[k];
+						if (idx === 0) {
+							curveLevel += 0;
+						} else if (idx > 0) {
+							curveLevel += 2;
+							curveSide = curveSide ? false : true;
+						}
+						createLinkSame(link, curveLevel, curveSide);
+						delete links[k];
+					});
+					curveLevel = 0;
+				} else { // even
+					sames.forEach(function (k, idx) {
+						var link = links[k];
+						curveLevel += 2;
+						curveSide = curveSide ? false : true;
+						createLinkSame(link, curveLevel, curveSide);
+						delete links[k];
+					});
+					curveLevel = 0;
+				}
+				
+				
+				
+			}
+		});
+	}
+	*/
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 function PREV_STYLE_createNode(conf) {
 	if ( !conf ) { var conf = {}; }
 	
