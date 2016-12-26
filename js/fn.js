@@ -13,6 +13,16 @@ var pixi = (function () {
 	p.lineContainer;
 	p.textures;
 	
+	p.xGrid_1;
+	p.xGrid_2;
+	p.xGrid_3;
+	p.xGrid_4;
+	
+	p.yGrid_1;
+	p.yGrid_2;
+	p.yGrid_3;
+	p.yGrid_4;
+	
 	function init(callback, panBounds, background) {
 		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
@@ -36,6 +46,16 @@ var pixi = (function () {
 		p.lineContainer = new PIXI.Container();
 		p.nodeContainer = new PIXI.Container();
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		p.xGrid_1 = new PIXI.Container();
+		p.xGrid_2 = new PIXI.Container();
+		p.xGrid_3 = new PIXI.Container();
+		p.xGrid_4 = new PIXI.Container();
+		
+		p.yGrid_1 = new PIXI.Container();
+		p.yGrid_2 = new PIXI.Container();
+		p.yGrid_3 = new PIXI.Container();
+		p.yGrid_4 = new PIXI.Container();
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
 		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
@@ -50,6 +70,16 @@ var pixi = (function () {
 		
 		p.mainContainer.addChild( p.lineContainer );
 		p.mainContainer.addChild( p.nodeContainer );
+		
+		p.mainContainer.addChild( p.xGrid_1 );
+		p.mainContainer.addChild( p.xGrid_2 );
+		p.mainContainer.addChild( p.xGrid_3 );
+		p.mainContainer.addChild( p.xGrid_4 );
+		p.mainContainer.addChild( p.yGrid_1 );
+		p.mainContainer.addChild( p.yGrid_2 );
+		p.mainContainer.addChild( p.yGrid_3 );
+		p.mainContainer.addChild( p.yGrid_4 );
+		
 		p.stage.addChild( p.mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
@@ -953,80 +983,6 @@ var tpl = (function () {
 			onCompleteScope: o.doneCtx
 		});
 	}
-	function PREV_STYLE_createNode(conf) {
-		if ( !conf ) { var conf = {}; }
-		
-		var node, links, hasLinks,
-			nodeImg, name, id,
-			line,
-			x, y,
-			boxSpriteText;
-		
-		function setThings() {
-			node     = {};
-			hasLinks = false;
-			nodeImg  = conf.type; //image filename in './images/' (without extention)
-			name     = conf.name;
-			links    = conf.links;
-			id       = conf.id   || 'tpl_node_'+(p.idCounter+=1);
-			x        = conf.x;
-			y        = conf.y
-		}
-		function handleLinks() {
-			if ( links  &&  util.isArr( links )  &&  links.length ) {
-				createLink();
-			} else {
-				node.links = false;
-			}
-		}
-		function createLink() {
-			node.links = {};
-			node.linkCount = links.length;
-			links.forEach(function (nodeIdStr) {
-				var target = p.nodes[nodeIdStr]; // nodes["device_14"]
-				// line = pixi.createLine();
-				line = pixi.create2pointLine();
-				if ( !target.links ) {
-					target.links = {};
-				}
-				target.links[ node.id ] = {};
-				target.links[ node.id ].line = line;
-				target.linkCount = util.objLength( target.links );
-				node.links[nodeIdStr] = {};
-				node.links[nodeIdStr].line = line;
-				pixi.addChild('mainContainer', line);
-			});
-		}
-		function create() {
-			boxSpriteText = pixi.createBoxSpriteText({
-				spriteImg: nodeImg,
-				spriteScale: 0.2,
-				textContent: name,
-				x: x,
-				y: y,
-				onmouseup: function (pixiEl) {
-					adjustLines(pixiEl);
-				}
-			});
-			node.name = name;
-			node.id = id;
-			node.pixiEl = boxSpriteText;
-		}
-		
-		setThings();
-		create();
-		handleLinks();
-		
-		p.nodes[ id ] = node;
-		pixi.addChild('mainContainer', node.pixiEl);
-		//adjustLines(node.pixiEl);
-		animateNode(node.pixiEl, {
-			done: adjustLines,
-			doneParams: [node.pixiEl]
-		});
-			
-		return node;
-	}
 	function createNode(o, fill) {
 		o = o ? o : {};
 		
@@ -1159,7 +1115,7 @@ var tpl = (function () {
 			toggle = false;
 		
 		function create(o) {
-			debugger;
+			
 			var link = {},
 				pixiEl,
 				srcNode = p.nodes[o.src],
@@ -2140,10 +2096,10 @@ var mediator = (function () {
 	
 	
 	p.GLOBAL_BOUNDS = {
-		X_1: -5000,
-		X_2: 5000,
-		Y_1: -2000,
-		Y_2: 2000
+		X_1: -10000,
+		X_2: 10000,
+		Y_1: -6000,
+		Y_2: 6000
 	};
 	p.data = {};    // unreversed for ajax data
 	p.bounds = {};  // adjusted (reversed) to ease bound calculations

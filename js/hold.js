@@ -1,4 +1,79 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+function PREV_STYLE_createNode(conf) {
+	if ( !conf ) { var conf = {}; }
+	
+	var node, links, hasLinks,
+		nodeImg, name, id,
+		line,
+		x, y,
+		boxSpriteText;
+	
+	function setThings() {
+		node     = {};
+		hasLinks = false;
+		nodeImg  = conf.type; //image filename in './images/' (without extention)
+		name     = conf.name;
+		links    = conf.links;
+		id       = conf.id   || 'tpl_node_'+(p.idCounter+=1);
+		x        = conf.x;
+		y        = conf.y
+	}
+	function handleLinks() {
+		if ( links  &&  util.isArr( links )  &&  links.length ) {
+			createLink();
+		} else {
+			node.links = false;
+		}
+	}
+	function createLink() {
+		node.links = {};
+		node.linkCount = links.length;
+		links.forEach(function (nodeIdStr) {
+			var target = p.nodes[nodeIdStr]; // nodes["device_14"]
+			// line = pixi.createLine();
+			line = pixi.create2pointLine();
+			if ( !target.links ) {
+				target.links = {};
+			}
+			target.links[ node.id ] = {};
+			target.links[ node.id ].line = line;
+			target.linkCount = util.objLength( target.links );
+			node.links[nodeIdStr] = {};
+			node.links[nodeIdStr].line = line;
+			pixi.addChild('mainContainer', line);
+		});
+	}
+	function create() {
+		boxSpriteText = pixi.createBoxSpriteText({
+			spriteImg: nodeImg,
+			spriteScale: 0.2,
+			textContent: name,
+			x: x,
+			y: y,
+			onmouseup: function (pixiEl) {
+				adjustLines(pixiEl);
+			}
+		});
+		node.name = name;
+		node.id = id;
+		node.pixiEl = boxSpriteText;
+	}
+	
+	setThings();
+	create();
+	handleLinks();
+	
+	p.nodes[ id ] = node;
+	pixi.addChild('mainContainer', node.pixiEl);
+	//adjustLines(node.pixiEl);
+	animateNode(node.pixiEl, {
+		done: adjustLines,
+		doneParams: [node.pixiEl]
+	});
+		
+	return node;
+}
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 makeTplNode = function (pixiElement, links, o) {
 	/*
 		links: [{
