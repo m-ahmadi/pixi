@@ -30,7 +30,7 @@ var pixi = (function () {
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: background || 0xAB9999,
+				backgroundColor: background || 0xAB9988, // 0xAB9999,
 				antialias: true,
 		//		resolution: false,
 		//		transparent: false,
@@ -948,7 +948,6 @@ var pixi = (function () {
 	return inst;
 }());
 
-
 var tpl = (function () {
 	var p = {};
 		
@@ -983,7 +982,7 @@ var tpl = (function () {
 			onCompleteScope: o.doneCtx
 		});
 	}
-	function createNode(o, fill) {
+	function createNode(o) {
 		o = o ? o : {};
 		
 		var node,
@@ -1005,7 +1004,6 @@ var tpl = (function () {
 				x: x,
 				y: y,
 				imgName: p.types[type],
-				imgFill: fill,
 				spriteScale: 0.1,
 				textContent: name,
 				onmouseup: function () {
@@ -1092,42 +1090,28 @@ var tpl = (function () {
 		p.nodes[ id ] = node;
 		pixi.addChild('nodeContainer', node.pixiEl);
 	}
-	function twoNodesLinkCount(firstNode, secondNode, dataLinks) {
-		var firstId = firstNode.id,
-			secondId = secondNode.id,
-			count = 0,
-			arr = [];
-		
-		firstNode.links.forEach(function (i) {
-			var link = dataLinks[i],
-				linkId;
-			
-			if (link.src === secondId  ||  link.dest === secondId) {
-				count += 1;
-				arr.push(link.id);
-			}
-		});
-		
-		return arr;
-	}
 	var createLink = (function () {
 		var path = {},
 			toggle = false;
 		
-		function create(o) {
+		function create(conf) {
+			var container, start, end,
+				link, id, pixiEl, nth, curveLevel,
+				srcId, destId, srcdest, destsrc;
 			
-			var link = {},
-				pixiEl,
-				srcNode = p.nodes[o.src],
-				destNode = p.nodes[o.dest],
-				srcCenter = srcNode.center,
-				destCenter = destNode.center,
-				id = o.id,
-				srcdest = o.src + o.dest,
-				destsrc = o.dest + o.src,
-				nth, curveLevel;
+			function setThings() {
+				container = conf.container;
+				start     = conf.start;
+				end       = conf.end;
+				srcId     = conf.srcId;
+				destId    = conf.destId;
+				id        = conf.linkId;
+				srcdest   = srcId + destId;
+				destsrc   = destId + srcId;
+				link      = {};
+			}
 			
-			//console.log(o.src + o.dest, o.dest + o.src);
+			setThings();
 			
 			if ( !path[srcdest] && !path[destsrc] ) {
 				path[srcdest] = 1;
@@ -1139,20 +1123,18 @@ var tpl = (function () {
 			
 			nth = path[srcdest] || path[destsrc];
 			curveLevel = (nth-1)*2;
-			//debugger;
+			
 			if (nth === 1) {
-				//debugger;
 				pixiEl = pixi.create2pointLine({
-					start: srcCenter,
-					end: destCenter
+					start: start,
+					end: end
 				});
 			} else if (nth > 1) {
-				//debugger;
 				pixiEl = pixi.create3pointLine({
-					start: srcCenter,
-					end: destCenter,
-					curveLevel: curveLevel
-					//curveSide: toggle ? false : true
+					start: start,
+					end: end,
+					curveLevel: curveLevel,
+					curveSide: toggle ? false : true
 				});
 			}
 			
@@ -1162,134 +1144,244 @@ var tpl = (function () {
 			link.dest = o.dest;
 			
 			p.links[ id ] = link;
-			pixi.addChild('lineContainer', link.pixiEl);
-			// if (nth > 1) {
-				// console.log(srcCenter, destCenter);
-				// throw new Error();
-			// }
+			pixi.addChild(container, link.pixiEl);
+			
 			return path;
 		}
 		
 		return create;
 	}());
-	function drawNodes(nodes, fill) {
+	
+	function checkLink(link, container) {
+		var src = link.src,
+			dest = link.dest,
+			cName = container,
+			cBounds = container.bounds,
+			x1 = cBounds.x1,
+			x2 = cBounds.x2,
+			y1 = cBounds.y1,
+			y2 = cBounds.y2,
+			start, end,
+			srcOut = false,
+			destOut = false;
+		
+		if ( src.x > x1 &&
+				src.x < x2 &&
+				src.y > y1 &&
+				src.y < y2 ) {
+			start = p.nodes[src.id].center;
+		} else {
+			srcOut = true;
+		}
+		
+		if ( dest.x > x1 &&
+				dest.x < x2 &&
+				dest.y > y1 &&
+				dest.y < y2 ) {
+			end = p.nodes[dest.id].center;
+		} else {
+			destOut = true;
+		}
+		
+		if (srcOut) {
+			start = calc();
+		} else if (destOut) {
+			end = calc();
+		}
+		
+		createLink({
+			container: cName,
+			start: start,
+			end: end,
+			srcId: src.id,
+			destId: dest.id,
+			linkId: link.id
+		});
+	}
+	function drawNodes(nodes) {
 		Object.keys(nodes).forEach(function (k) {
-			createNode( nodes[k], fill );
+			createNode( nodes[k] );
 		});
 	}
-	function drawLinks(links) {
+	function drawLinks(links, c) {
 		Object.keys(links).forEach(function (k) {
-			createLink( links[k] );
+			checkLink( links[k], c );
 		});
 	}
-	function draw(data) {
+	function draw(data, c) {
 		drawNodes(data.nodes);
-		drawLinks(data.links);
-	}
-	function generateJson(nodeCount, m, e) {
-		var o = {
-				nodes: {},
-				links: {}
-			},
-			counter = 0,
-			mul = m ? m : 1,
-			e = e ? e : 10,
-			i;
-		
-		var arr = [
-			'tv-screen', 'computer', 'gamepad', 'hard-drive', 'imac-blue',
-			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
-			'macintosh', 'monitor', 'playstation', 'smartphone',
-			'smart-tv', 'smartwatch', 'video-card', 'xbox'
-		];
-		var typeIndex = -1;
-		
-		for (i=0; i<nodeCount; i+=1) {
-			var id = 'node_'+(counter+=1),
-				n = {};
-			
-			n.id = id;
-			n.x = Math.random() * pixi.renderer.width *mul;
-			n.y = Math.random() * pixi.renderer.height *mul;
-			n.links = [];
-			
-			
-			var each = e;
-			
-			if ( i % each === 0 ) {
-				typeIndex += 1;
-			}
-			if (typeIndex === arr.length-1) {
-				typeIndex = 0;
-			}
-			
-			n.type = typeIndex;
-			o.nodes[id] = n;
-		}
-		counter = 0;
-		for (i=0; i<nodeCount; i+=1) {
-			var id = 'link_'+(counter+=1),
-				srcNode = o.nodes['node_'+(i+1)],
-				destNode = o.nodes['node_'+(i+2)],
-				src = srcNode ? srcNode.id : 'node_1',
-				dest = destNode ? destNode.id : 'node_1';
-			
-			var link = {
-				id: id,
-				src: src,
-				dest: dest
-			};
-			
-			Object.keys(o.nodes).forEach(function (k) {
-				var node = o.nodes[k];
-				if (node.id === link.src ||
-						node.id === link.dest) {
-					node.links.push(link.id);
-				}
-			});
-			o.links[id] = link;
-		}
-		
-		return o;
-	}
-	function test(c, m, color, each, fill) {
-		
-		var data = generateJson(c, m, each);
-		drawNodes(data.nodes, fill);
-		drawLinks(data.links, color);
-		
-		
-		/*
-		var count = 0;
-		var arr = [];
-		Object.keys(o).forEach(function (key) {
-			var t = o[key];
-			if ( t.src === str || t.dest === str ) {
-				count += 1;
-				arr.push(t.id);
-			}
-			
-		});
-		
-		return arr;
-		*/
+		drawLinks(data.links, c);
 	}
 	
 	return {
-		//createLinkSame: createLinkSame,
-		//twoNodesLinkCount: twoNodesLinkCount,
-		createLink: createLink,
-		test: test,
 		nodes: p.nodes,
 		links: p.links,
-		generateJson : generateJson,
-		drawNodes: drawNodes,
-		drawLinks: drawLinks,
 		draw: draw
 	};
 }());
 
-
+var mediator = (function () {
+	var inst = {},
+		p = {};
+	
+	p.GLOBAL_BOUNDS = {
+		X_1: -10000,
+		X_2: 10000,
+		Y_1: -6000,
+		Y_2: 6000
+	};
+	p.data = {};    // unreversed for ajax data
+	p.bounds = {};  // adjusted (reversed) to ease bound calculations
+	p.width = 0;
+	p.height = 0;
+	p.gridBounds = {};
+	
+	function loadData() {
+		ajax({
+			data: p.data
+		})
+		.done( a.tpl.draw );
+	}
+	function pixiCallback(width, height) {
+		var w = width,
+			h = height,
+			qW = w / 4,
+			qH = h / 4;
+		
+		p.width = w;
+		p.height = h;
+		
+		p.data.x1 = 0;
+		p.data.x2 = w;
+		p.data.y1 = 0;
+		p.data.y2 = h;
+		
+		p.bounds.x1 = qW;
+		p.bounds.x2 = -qW;
+		p.bounds.y1 = qH;
+		p.bounds.y2 = -qH
+		
+		console.log(p.bounds);
+		console.log(p.data);
+		ajax({
+			data: p.data
+		})
+		.done(function ( data ) { // {url: 'js/d.txt'}
+			console.log(data);
+			t = data
+			a.tpl.draw(data);
+		});
+	}
+	updateGridBounds(v) {
+		var gB = p.gridBounds;
+		
+		xGridBounds_1.x1 += v;
+		xGridBounds_1.x2 += v;
+		
+		xGridBounds_2.x1 += v;
+		xGridBounds_2.x2 += v;
+		
+		xGridBounds_3.x1 += v;
+		xGridBounds_3.x2 += v;
+		
+		xGridBounds_4.x1 += v;
+		xGridBounds_4.x2 += v;
+		
+		
+		yGridBounds_1.y1 += v;
+		yGridBounds_1.y2 += v;
+		
+		yGridBounds_2.y1 += v;
+		yGridBounds_2.y2 += v;
+		
+		yGridBounds_3.y1 += v;
+		yGridBounds_3.y2 += v;
+		
+		yGridBounds_4.y1 += v;
+		yGridBounds_4.y2 += v;
+	}
+	function panCallback(pos) {
+		var x = Math.floor(pos.x),
+			y = Math.floor(pos.y),
+			b = p.bounds,
+			d = p.data,
+			w = p.width,
+			h = p.height,
+			qW = w / 4,
+			qH = h / 4;
+		
+		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
+			console.log('salam');
+			b.x1 += x;
+			b.x2 -= x;
+			d.x1 -= qW;
+			d.x2 -= qW;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+			console.log('chetori');
+			b.x1 -= x;
+			b.x2 += x;
+			d.x1 += qW;
+			d.x2 += qW;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
+			console.log('here');
+			b.y1 += qH;
+			b.y2 += qH;
+			d.y1 -= qH;
+			d.y2 += qH;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
+			console.log('kitty');
+			b.y1 -= qH;
+			b.y2 -= qH;
+			d.y1 += qH;
+			d.y2 += qH;		
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		// console.log(Math.floor(y));
+	}
+	function addCustomEvents() {
+		
+		pixi.on('pan', panCallback);
+		
+		navigation.on('zoom', function () {
+			console.log('zoom');
+			pixi.zoom();
+		});
+		navigation.on('pan', function () {
+			pixi.pan.pan(1, 1);
+		});
+	}
+	function init() {
+		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
+		//core.init();
+		//navigation.init();
+		addCustomEvents();
+	};
+	
+	
+	inst.data = p.data;
+	inst.bounds = p.bounds;
+	inst.init = init;
+	
+	return inst;
+}());
 
 var navigation = (function () {
 	var inst = util.extend( coPubsub() ),
@@ -1511,160 +1603,6 @@ var navigation = (function () {
 	inst.init = init;
 	return inst;
 }());
-
-
-
-
-var mediator = (function () {
-	var inst = {},
-		p = {};
-	
-	
-	p.GLOBAL_BOUNDS = {
-		X_1: -10000,
-		X_2: 10000,
-		Y_1: -6000,
-		Y_2: 6000
-	};
-	p.data = {};    // unreversed for ajax data
-	p.bounds = {};  // adjusted (reversed) to ease bound calculations
-	p.width = 0;
-	p.height = 0;
-	
-	function loadData() {
-		var cb = a.tpl.draw;
-		pixi.clear('lineContainer', true);
-		pixi.clear('nodeContainer');
-		ajax({
-			data: p.data
-		})
-		.done(cb);
-	}
-	
-	function pixiCallback(width, height) {
-		var w = width,
-			h = height,
-			hW = w / 2,
-			hH = h / 2;
-		
-		p.width = w;
-		p.height = h;
-		
-		p.data.x1 = -hW;
-		p.data.x2 = w + hW;
-		p.data.y1 = -hH;
-		p.data.y2 = h + hH;
-		
-		p.bounds.x1 = hW;
-		p.bounds.x2 = -hW;
-		p.bounds.y1 = hH;
-		p.bounds.y2 = -hH
-		
-		console.log(p.bounds);
-		console.log(p.data);
-		ajax({
-			data: p.data
-		})
-		.done(function ( data ) { // {url: 'js/d.txt'}
-			
-			console.log(data);
-			t = data
-			// a.tpl.drawNodes(data.nodes);
-			// a.tpl.drawLinks(data.links);
-			a.tpl.draw(data);
-		});
-	}
-	function panCallback(pos) {
-		var x = Math.floor(pos.x),
-			y = Math.floor(pos.y),
-			b = p.bounds,
-			d = p.data,
-			w = p.width,
-			h = p.height,
-			hW = w / 2,
-			hH = h / 2;
-		
-		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
-			console.log('salam');
-			b.x1 += x;
-			b.x2 -= x;
-			d.x1 -= hW;
-			d.x2 -= hW;
-			console.log(b);
-			console.log(d);
-			loadData();
-		}
-		
-		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
-			console.log('chetori');
-			b.x1 -= x;
-			b.x2 += x;
-			d.x1 += hW;
-			d.x2 += hW;
-			console.log(b);
-			console.log(d);
-			loadData();
-		}
-		
-		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
-			console.log('here');
-			b.y1 += hH;
-			b.y2 += hH;
-			d.y1 -= hH;
-			d.y2 += hH;
-			console.log(b);
-			console.log(d);
-			loadData();
-		}
-		
-		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
-			console.log('kitty');
-			b.y1 -= hH;
-			b.y2 -= hH;
-			d.y1 += hH;
-			d.y2 += hH;		
-			console.log(b);
-			console.log(d);
-			loadData();
-		}
-		
-		// console.log(Math.floor(y));
-	}
-	/*
-	var t = new PIXI.Graphics();
-t.beginFill();
-t.drawRect(0, 0, 100, 100);
-t.endFill;
-t.x = 1500
-a.pixi.mainContainer.addChild(t);
-	*/
-	function addCustomEvents() {
-		
-		pixi.on('pan', panCallback);
-		
-		navigation.on('zoom', function () {
-			console.log('zoom');
-			pixi.zoom();
-		});
-		navigation.on('pan', function () {
-			pixi.pan.pan(1, 1);
-		});
-	}
-	function init() {
-		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
-		//core.init();
-		//navigation.init();
-		addCustomEvents();
-	};
-	
-	
-	inst.data = p.data;
-	inst.bounds = p.bounds;
-	inst.init = init;
-	
-	return inst;
-}());
-	
 
 
 

@@ -8,6 +8,7 @@ var renderer = PIXI.autoDetectRenderer(
 );
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
+var textures;
 
 var r = renderer;
 
@@ -17,6 +18,17 @@ g.drawRect(0, 0, r.width / 4, r.height / 4);
 g.endFill();
 
 
+var s;
+
+function cb() {
+	s = new PIXI.Sprite(textures['computer-trans.png']);
+	s.interactive = true;
+	s.buttonMode = true;
+	s.scale.set(0.2);
+	
+	addDragDrop(s);
+	stage.addChild(s);
+}
 
 
 stage.addChild(g);
@@ -69,5 +81,11 @@ function bringToFront(el) {
 }
 
 $(function () {
+	PIXI.loader.add( '../images/atlas-0.json' );
+	PIXI.loader.load(function () {
+		textures = PIXI.loader.resources["../images/atlas-0.json"].textures;
+		cb();
+	});
+	
 	
 });

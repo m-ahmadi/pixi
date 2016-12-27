@@ -1,4 +1,482 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var mediator = (function () {
+	var inst = {},
+		p = {};
+	
+	
+	p.GLOBAL_BOUNDS = {
+		X_1: -10000,
+		X_2: 10000,
+		Y_1: -6000,
+		Y_2: 6000
+	};
+	p.data = {};    // unreversed for ajax data
+	p.bounds = {};  // adjusted (reversed) to ease bound calculations
+	p.width = 0;
+	p.height = 0;
+	
+	function loadData() {
+		var cb = a.tpl.draw;
+		pixi.clear('lineContainer', true);
+		pixi.clear('nodeContainer');
+		ajax({
+			data: p.data
+		})
+		.done(cb);
+	}
+	function pixiCallback(width, height) {
+		var w = width,
+			h = height,
+			hW = w / 2,
+			hH = h / 2;
+		
+		p.width = w;
+		p.height = h;
+		
+		p.data.x1 = -hW;
+		p.data.x2 = w + hW;
+		p.data.y1 = -hH;
+		p.data.y2 = h + hH;
+		
+		p.bounds.x1 = hW;
+		p.bounds.x2 = -hW;
+		p.bounds.y1 = hH;
+		p.bounds.y2 = -hH
+		
+		console.log(p.bounds);
+		console.log(p.data);
+		ajax({
+			data: p.data
+		})
+		.done(function ( data ) { // {url: 'js/d.txt'}
+			console.log(data);
+			t = data
+			a.tpl.draw(data);
+		});
+	}
+	function panCallback(pos) {
+		var x = Math.floor(pos.x),
+			y = Math.floor(pos.y),
+			b = p.bounds,
+			d = p.data,
+			w = p.width,
+			h = p.height,
+			hW = w / 2,
+			hH = h / 2;
+		
+		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
+			console.log('salam');
+			b.x1 += x;
+			b.x2 -= x;
+			d.x1 -= hW;
+			d.x2 -= hW;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+			console.log('chetori');
+			b.x1 -= x;
+			b.x2 += x;
+			d.x1 += hW;
+			d.x2 += hW;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
+			console.log('here');
+			b.y1 += hH;
+			b.y2 += hH;
+			d.y1 -= hH;
+			d.y2 += hH;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
+			console.log('kitty');
+			b.y1 -= hH;
+			b.y2 -= hH;
+			d.y1 += hH;
+			d.y2 += hH;		
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		// console.log(Math.floor(y));
+	}
+	function addCustomEvents() {
+		
+		pixi.on('pan', panCallback);
+		
+		navigation.on('zoom', function () {
+			console.log('zoom');
+			pixi.zoom();
+		});
+		navigation.on('pan', function () {
+			pixi.pan.pan(1, 1);
+		});
+	}
+	function init() {
+		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
+		//core.init();
+		//navigation.init();
+		addCustomEvents();
+	};
+	
+	
+	inst.data = p.data;
+	inst.bounds = p.bounds;
+	inst.init = init;
+	
+	return inst;
+}());
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var tpl = (function () {
+	var p = {};
+		
+	p.nodes = {};
+	p.links = {};
+	p.idCounter = 0;
+	p.types = [
+		'tv-screen', 'macintosh', 'imac-blue', 'smart-tv', 'imac-red',
+		'imac-grey', 'monitor', 'ipad', 'iphone', 'macbook',
+		'computer', 'gamepad', 'playstation', 'hard-drive',
+		'smartphone', 'smartwatch', 'video-card', 'xbox'
+	];
+	
+	
+	function animateNode(pixiEl, o) {
+		o = o ? o : {};
+		var box = pixiEl;
+		
+		TweenLite.to(box, 0.3, {
+			alpha: 1,
+			yoyo: true,
+			ease: Linear.easeInOut
+		});
+
+		TweenLite.to(box.scale, 0.3, {
+			x: 1,
+			y: 1,
+			yoyo: true,
+			ease: Linear.easeInOut,
+			onComplete: o.done,
+			onCompleteParams: o.doneParams,
+			onCompleteScope: o.doneCtx
+		});
+	}
+	function createNode(o, fill) {
+		o = o ? o : {};
+		
+		var node,
+			type, name, id, thisLinks,
+			x, y,
+			boxSpriteText;
+		
+		function setThings() {
+			type      = o.type  || 0;
+			id        = o.id    || 'tpl_node_'+(p.idCounter+=1);
+			name      = o.name  || 'Node '+(p.idCounter+=1);
+			x         = o.x;
+			y         = o.y;
+			thisLinks = o.links || false;
+			
+		}
+		function createBox() {
+			boxSpriteText = pixi.createBoxSpriteText({
+				x: x,
+				y: y,
+				imgName: p.types[type],
+				imgFill: fill,
+				spriteScale: 0.1,
+				textContent: name,
+				onmouseup: function () {
+					
+				},
+				onmouseupParam: undefined
+			});
+		}
+		function addTplnodeCustomPositionGetters(o) {
+			var b = boxSpriteText;
+			
+			function midX() {
+				return b.x + (b.width / 2);
+			}
+			function midY() {
+				return b.y + (b.height / 2);
+			}
+			Object.defineProperties(node, {
+				"top": {
+					get: function () { return b.y; }
+				},
+				"bott": {
+					get: function () { return b.y + b.height; }
+				},
+				"left": {
+					get: function () { return b.x; }
+				},
+				"right": {
+					get: function () { return b.x + b.width; }
+				},
+				//--------------------------------------------------------
+				"topLeft"  : {  get: function () { return pixi.coPoint( this.left  , this.top  ); }  },
+				"topRight" : {  get: function () { return pixi.coPoint( this.right , this.top  ); }  },
+				"bottLeft" : {  get: function () { return pixi.coPoint( this.left  , this.bott ); }  },
+				"bottRight": {  get: function () { return pixi.coPoint( this.right , this.bott ); }  },
+				"topMid"   : {  get: function () { return pixi.coPoint( midX()     , this.top  ); }  },
+				"bottMid"  : {  get: function () { return pixi.coPoint( midX()     , this.bott ); }  },
+				"leftMid"  : {  get: function () { return pixi.coPoint( this.left  , midY()    ); }  },
+				"rightMid" : {  get: function () { return pixi.coPoint( this.right , midY()    ); }  },
+				"center"   : {  get: function () { return pixi.coPoint( midX()     , midY()    ); }  }
+			});
+		}
+		function createTplNode() {
+			node = {};
+			node.id = id;
+			node.name = name;
+			node.links = thisLinks;
+			node.pixiEl = boxSpriteText;
+			addTplnodeCustomPositionGetters(opt);
+		}
+		function addHandler() {
+			/*
+			boxSpriteText.setOnmousedown(function () {
+				// clear line
+			};
+			*/
+			
+			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
+				var nodeId = node.id;
+				
+				node.links.forEach(function (linkId) {
+					var link = tplLinks[linkId],
+						start, end;
+						
+					if (link.src === nodeId) {
+						start = node.center;
+					}
+					
+					if (link.dest === nodeId) {
+						end = node.center;
+					}
+					
+					link.pixiEl.changePoints(start, end);
+					
+				});
+			});
+		}
+		
+		setThings();
+		createBox();
+		createTplNode();
+		addHandler();
+		
+		p.nodes[ id ] = node;
+		pixi.addChild('nodeContainer', node.pixiEl);
+	}
+	function twoNodesLinkCount(firstNode, secondNode, dataLinks) {
+		var firstId = firstNode.id,
+			secondId = secondNode.id,
+			count = 0,
+			arr = [];
+		
+		firstNode.links.forEach(function (i) {
+			var link = dataLinks[i],
+				linkId;
+			
+			if (link.src === secondId  ||  link.dest === secondId) {
+				count += 1;
+				arr.push(link.id);
+			}
+		});
+		
+		return arr;
+	}
+	var createLink = (function () {
+		var path = {},
+			toggle = false;
+		
+		function create(o) {
+			
+			var link = {},
+				pixiEl,
+				srcNode = p.nodes[o.src],
+				destNode = p.nodes[o.dest],
+				srcCenter = srcNode.center,
+				destCenter = destNode.center,
+				id = o.id,
+				srcdest = o.src + o.dest,
+				destsrc = o.dest + o.src,
+				nth, curveLevel;
+			
+			//console.log(o.src + o.dest, o.dest + o.src);
+			
+			if ( !path[srcdest] && !path[destsrc] ) {
+				path[srcdest] = 1;
+			} else if ( path[srcdest] ) {
+				path[srcdest] += 1;
+			} else if ( path[destsrc] ) {
+				path[destsrc] += 1;
+			}
+			
+			nth = path[srcdest] || path[destsrc];
+			curveLevel = (nth-1)*2;
+			//debugger;
+			if (nth === 1) {
+				//debugger;
+				pixiEl = pixi.create2pointLine({
+					start: srcCenter,
+					end: destCenter
+				});
+			} else if (nth > 1) {
+				//debugger;
+				pixiEl = pixi.create3pointLine({
+					start: srcCenter,
+					end: destCenter,
+					curveLevel: curveLevel
+					//curveSide: toggle ? false : true
+				});
+			}
+			
+			link.pixiEl = pixiEl;
+			link.id = id;
+			link.src = o.src;
+			link.dest = o.dest;
+			
+			p.links[ id ] = link;
+			pixi.addChild('lineContainer', link.pixiEl);
+			// if (nth > 1) {
+				// console.log(srcCenter, destCenter);
+				// throw new Error();
+			// }
+			return path;
+		}
+		
+		return create;
+	}());
+	function drawNodes(nodes, fill) {
+		Object.keys(nodes).forEach(function (k) {
+			createNode( nodes[k], fill );
+		});
+	}
+	function drawLinks(links) {
+		Object.keys(links).forEach(function (k) {
+			createLink( links[k] );
+		});
+	}
+	function draw(data) {
+		drawNodes(data.nodes);
+		drawLinks(data.links);
+	}
+	function generateJson(nodeCount, m, e) {
+		var o = {
+				nodes: {},
+				links: {}
+			},
+			counter = 0,
+			mul = m ? m : 1,
+			e = e ? e : 10,
+			i;
+		
+		var arr = [
+			'tv-screen', 'computer', 'gamepad', 'hard-drive', 'imac-blue',
+			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
+			'macintosh', 'monitor', 'playstation', 'smartphone',
+			'smart-tv', 'smartwatch', 'video-card', 'xbox'
+		];
+		var typeIndex = -1;
+		
+		for (i=0; i<nodeCount; i+=1) {
+			var id = 'node_'+(counter+=1),
+				n = {};
+			
+			n.id = id;
+			n.x = Math.random() * pixi.renderer.width *mul;
+			n.y = Math.random() * pixi.renderer.height *mul;
+			n.links = [];
+			
+			
+			var each = e;
+			
+			if ( i % each === 0 ) {
+				typeIndex += 1;
+			}
+			if (typeIndex === arr.length-1) {
+				typeIndex = 0;
+			}
+			
+			n.type = typeIndex;
+			o.nodes[id] = n;
+		}
+		counter = 0;
+		for (i=0; i<nodeCount; i+=1) {
+			var id = 'link_'+(counter+=1),
+				srcNode = o.nodes['node_'+(i+1)],
+				destNode = o.nodes['node_'+(i+2)],
+				src = srcNode ? srcNode.id : 'node_1',
+				dest = destNode ? destNode.id : 'node_1';
+			
+			var link = {
+				id: id,
+				src: src,
+				dest: dest
+			};
+			
+			Object.keys(o.nodes).forEach(function (k) {
+				var node = o.nodes[k];
+				if (node.id === link.src ||
+						node.id === link.dest) {
+					node.links.push(link.id);
+				}
+			});
+			o.links[id] = link;
+		}
+		
+		return o;
+	}
+	function test(c, m, color, each, fill) {
+		
+		var data = generateJson(c, m, each);
+		drawNodes(data.nodes, fill);
+		drawLinks(data.links, color);
+		
+		
+		/*
+		var count = 0;
+		var arr = [];
+		Object.keys(o).forEach(function (key) {
+			var t = o[key];
+			if ( t.src === str || t.dest === str ) {
+				count += 1;
+				arr.push(t.id);
+			}
+			
+		});
+		
+		return arr;
+		*/
+	}
+	
+	return {
+		//createLinkSame: createLinkSame,
+		//twoNodesLinkCount: twoNodesLinkCount,
+		createLink: createLink,
+		test: test,
+		nodes: p.nodes,
+		links: p.links,
+		generateJson : generateJson,
+		drawNodes: drawNodes,
+		drawLinks: drawLinks,
+		draw: draw
+	};
+}());
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 var core = (function () {
 	var inst = util.extend( coPubsub() ),
 	tplNodes = {},
