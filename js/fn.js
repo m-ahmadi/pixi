@@ -13,16 +13,6 @@ var pixi = (function () {
 	p.lineContainer;
 	p.textures;
 	
-	p.xGrid_1;
-	p.xGrid_2;
-	p.xGrid_3;
-	p.xGrid_4;
-	
-	p.yGrid_1;
-	p.yGrid_2;
-	p.yGrid_3;
-	p.yGrid_4;
-	
 	function init(callback, panBounds, background) {
 		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
@@ -46,15 +36,43 @@ var pixi = (function () {
 		p.lineContainer = new PIXI.Container();
 		p.nodeContainer = new PIXI.Container();
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		p.xGrid_1 = new PIXI.Container();
-		p.xGrid_2 = new PIXI.Container();
-		p.xGrid_3 = new PIXI.Container();
-		p.xGrid_4 = new PIXI.Container();
+		function createContainers() {
+			function add(el) {
+				var nodeContainer = new PIXI.Container(),
+					lineContainer = new PIXI.Container();
+				el.addChild(nodeContainer);
+				el.addChild(lineContainer);
+			};
+			
+			p.xGrid_1 = new PIXI.Container();
+			p.xGrid_2 = new PIXI.Container();
+			p.xGrid_3 = new PIXI.Container();
+			p.xGrid_4 = new PIXI.Container();
+			
+			p.yGrid_1 = new PIXI.Container();
+			p.yGrid_2 = new PIXI.Container();
+			p.yGrid_3 = new PIXI.Container();
+			p.yGrid_4 = new PIXI.Container();
+			
+			add(p.xGrid_1);
+			add(p.xGrid_2);
+			add(p.xGrid_3);
+			add(p.xGrid_4);
+			add(p.yGrid_1);
+			add(p.yGrid_2);
+			add(p.yGrid_3);
+			add(p.yGrid_4);
+			
+			p.mainContainer.addChild( p.xGrid_1 );
+			p.mainContainer.addChild( p.xGrid_2 );
+			p.mainContainer.addChild( p.xGrid_3 );
+			p.mainContainer.addChild( p.xGrid_4 );
+			p.mainContainer.addChild( p.yGrid_1 );
+			p.mainContainer.addChild( p.yGrid_2 );
+			p.mainContainer.addChild( p.yGrid_3 );
+			p.mainContainer.addChild( p.yGrid_4 );
+		}
 		
-		p.yGrid_1 = new PIXI.Container();
-		p.yGrid_2 = new PIXI.Container();
-		p.yGrid_3 = new PIXI.Container();
-		p.yGrid_4 = new PIXI.Container();
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
@@ -67,19 +85,9 @@ var pixi = (function () {
 			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
-		
 		p.mainContainer.addChild( p.lineContainer );
 		p.mainContainer.addChild( p.nodeContainer );
-		
-		p.mainContainer.addChild( p.xGrid_1 );
-		p.mainContainer.addChild( p.xGrid_2 );
-		p.mainContainer.addChild( p.xGrid_3 );
-		p.mainContainer.addChild( p.xGrid_4 );
-		p.mainContainer.addChild( p.yGrid_1 );
-		p.mainContainer.addChild( p.yGrid_2 );
-		p.mainContainer.addChild( p.yGrid_3 );
-		p.mainContainer.addChild( p.yGrid_4 );
-		
+		createContainers();
 		p.stage.addChild( p.mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
@@ -115,11 +123,18 @@ var pixi = (function () {
 		inst.publish('init');
 	}
 	
-	function clear(k, opt) {
-		p[k].destroy(opt);
-		delete p[k];
-		p[k] = new PIXI.Container();
-		p.mainContainer.addChild( p[k] );
+	function clear(k, k2, opt) {
+		if ( util.isBool(k2) ) {
+			p[k].destroy(opt);
+			delete p[k];
+			p[k] = new PIXI.Container();
+			p.mainContainer.addChild( p[k] );
+		} else if ( util.isStr(k2) ) {
+			p[k][k2].destroy(opt);
+			delete p[k][k2];
+			p[k][k2] = new PIXI.Container();
+			p.mainContainer.addChild( p[k][k2] );
+		}
 	}
 	function animate() {
 		requestAnimationFrame(animate);
@@ -903,8 +918,12 @@ var pixi = (function () {
 		
 		return text;
 	}
-	function addChild(where, child) {
-		p[where].addChild(child);
+	function addChild(where, w, child) {
+		if ( util.isObj(w) ) {
+			p[where].addChild(child);
+		} else if ( util.isStr(w) ) {
+			p[where][w].addChild(child);
+		}
 	}
 	
 	Object.defineProperties(inst, {
@@ -982,7 +1001,7 @@ var tpl = (function () {
 			onCompleteScope: o.doneCtx
 		});
 	}
-	function createNode(o) {
+	function createNode(o, container) {
 		o = o ? o : {};
 		
 		var node,
@@ -1088,7 +1107,7 @@ var tpl = (function () {
 		addHandler();
 		
 		p.nodes[ id ] = node;
-		pixi.addChild('nodeContainer', node.pixiEl);
+		pixi.addChild(container, node.pixiEl);
 	}
 	var createLink = (function () {
 		var path = {},
@@ -1151,7 +1170,9 @@ var tpl = (function () {
 		
 		return create;
 	}());
-	
+	function checkNode(node, container) {
+		createNode( node );
+	}
 	function checkLink(link, container) {
 		var src = link.src,
 			dest = link.dest,
@@ -1198,9 +1219,9 @@ var tpl = (function () {
 			linkId: link.id
 		});
 	}
-	function drawNodes(nodes) {
+	function drawNodes(nodes, c) {
 		Object.keys(nodes).forEach(function (k) {
-			createNode( nodes[k] );
+			checkNode( nodes[k], c );
 		});
 	}
 	function drawLinks(links, c) {
@@ -1209,7 +1230,7 @@ var tpl = (function () {
 		});
 	}
 	function draw(data, c) {
-		drawNodes(data.nodes);
+		drawNodes(data.nodes, c);
 		drawLinks(data.links, c);
 	}
 	
@@ -1234,7 +1255,56 @@ var mediator = (function () {
 	p.bounds = {};  // adjusted (reversed) to ease bound calculations
 	p.width = 0;
 	p.height = 0;
-	p.gridBounds = {};
+	
+	var grid = (function () {
+		p.gridBounds = {};
+		
+		function updateBounds(n, y) {
+			var gB = p.gridBounds;
+			if (!y) {
+				gB.xG1.x1 += n;
+				gB.xG1.x2 += n;
+				
+				gB.xG2.x1 += n;
+				gB.xG2.x2 += n;
+				
+				gB.xG3.x1 += n;
+				gB.xG3.x2 += n;
+				
+				gB.xG4.x1 += n;
+				gB.xG4.x2 += n;
+			} else {
+				gB.yG1.y1 += n;
+				gB.yG1.y2 += n;
+				
+				gB.yG2.y1 += n;
+				gB.yG2.y2 += n;
+				
+				gB.yG3.y1 += n;
+				gB.yG3.y2 += n;
+				
+				gB.yG4.y1 += n;
+				gB.yG4.y2 += n;
+			}
+		}
+		function init() {
+			var gB = p.gridBounds;
+			gB.xG1 = { x1: 0, x2: 0 };
+			gB.xG2 = { x1: 0, x2: 0 };
+			gB.xG3 = { x1: 0, x2: 0 };
+			gB.xG4 = { x1: 0, x2: 0 };
+			gB.yG1 = { y1: 0, y2: 0 };
+			gB.yG2 = { y1: 0, y2: 0 };
+			gB.yG3 = { y1: 0, y2: 0 };
+			gB.yG4 = { y1: 0, y2: 0 };
+		}
+		
+		init();
+		
+		return {
+			updateBounds: updateBounds
+		};
+	}());
 	
 	function loadData() {
 		ajax({
@@ -1242,6 +1312,7 @@ var mediator = (function () {
 		})
 		.done( a.tpl.draw );
 	}
+	
 	function pixiCallback(width, height) {
 		var w = width,
 			h = height,
@@ -1272,34 +1343,7 @@ var mediator = (function () {
 			a.tpl.draw(data);
 		});
 	}
-	updateGridBounds(v) {
-		var gB = p.gridBounds;
-		
-		xGridBounds_1.x1 += v;
-		xGridBounds_1.x2 += v;
-		
-		xGridBounds_2.x1 += v;
-		xGridBounds_2.x2 += v;
-		
-		xGridBounds_3.x1 += v;
-		xGridBounds_3.x2 += v;
-		
-		xGridBounds_4.x1 += v;
-		xGridBounds_4.x2 += v;
-		
-		
-		yGridBounds_1.y1 += v;
-		yGridBounds_1.y2 += v;
-		
-		yGridBounds_2.y1 += v;
-		yGridBounds_2.y2 += v;
-		
-		yGridBounds_3.y1 += v;
-		yGridBounds_3.y2 += v;
-		
-		yGridBounds_4.y1 += v;
-		yGridBounds_4.y2 += v;
-	}
+	
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
 			y = Math.floor(pos.y),
@@ -1354,7 +1398,7 @@ var mediator = (function () {
 			loadData();
 		}
 		
-		// console.log(Math.floor(y));
+		console.log(Math.floor(x));
 	}
 	function addCustomEvents() {
 		

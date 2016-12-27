@@ -96,6 +96,9 @@ var util = {
 	isNum: function (v) {
 		return ( typeof v === 'number' );
 	},
+	isBool: function (v) {
+		return ( typeof v === 'boolean' );
+	},
 	isEmptyStr: function (v) {
 		return ( typeof v === 'string'  &&  v.length === 0 );
 	},
