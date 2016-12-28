@@ -83,6 +83,8 @@ $('#generate').on('click', function (e) {
 $('#clear').on('click', function (e) {
 	e.preventDefault();
 	
-	a.pixi.clear('lineContainer', true);
-	a.pixi.clear('nodeContainer');
+	//a.pixi.clear('lineContainer', true);
+	//a.pixi.clear('nodeContainer');
+	
+	a.pixi.clearContainer('viewport');
 });

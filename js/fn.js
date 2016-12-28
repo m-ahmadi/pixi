@@ -9,8 +9,13 @@ var pixi = (function () {
 	p.renderer;
 	p.stage;
 	p.mainContainer;
-	p.nodeContainer;
-	p.lineContainer;
+	
+	p.viewport;
+	p.xLeft;
+	p.xRight;
+	p.yTop;
+	p.yBott;
+	
 	p.textures;
 	
 	function init(callback, panBounds, background) {
@@ -33,45 +38,6 @@ var pixi = (function () {
 		$('#contents').append( p.renderer.view );
 		p.stage = new PIXI.Container();
 		p.mainContainer = new PIXI.Container();
-		p.lineContainer = new PIXI.Container();
-		p.nodeContainer = new PIXI.Container();
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		function createContainers() {
-			function add(el) {
-				var nodeContainer = new PIXI.Container(),
-					lineContainer = new PIXI.Container();
-				el.addChild(nodeContainer);
-				el.addChild(lineContainer);
-			};
-			
-			p.xGrid_1 = new PIXI.Container();
-			p.xGrid_2 = new PIXI.Container();
-			p.xGrid_3 = new PIXI.Container();
-			p.xGrid_4 = new PIXI.Container();
-			
-			p.yGrid_1 = new PIXI.Container();
-			p.yGrid_2 = new PIXI.Container();
-			p.yGrid_3 = new PIXI.Container();
-			p.yGrid_4 = new PIXI.Container();
-			
-			add(p.xGrid_1);
-			add(p.xGrid_2);
-			add(p.xGrid_3);
-			add(p.xGrid_4);
-			add(p.yGrid_1);
-			add(p.yGrid_2);
-			add(p.yGrid_3);
-			add(p.yGrid_4);
-			
-			p.mainContainer.addChild( p.xGrid_1 );
-			p.mainContainer.addChild( p.xGrid_2 );
-			p.mainContainer.addChild( p.xGrid_3 );
-			p.mainContainer.addChild( p.xGrid_4 );
-			p.mainContainer.addChild( p.yGrid_1 );
-			p.mainContainer.addChild( p.yGrid_2 );
-			p.mainContainer.addChild( p.yGrid_3 );
-			p.mainContainer.addChild( p.yGrid_4 );
-		}
 		
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
@@ -85,16 +51,11 @@ var pixi = (function () {
 			// zoom(e);
 			zoom(e.pageX, e.pageY, e.deltaY > 0);
 		});
-		p.mainContainer.addChild( p.lineContainer );
-		p.mainContainer.addChild( p.nodeContainer );
 		createContainers();
 		p.stage.addChild( p.mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
-		
-		
-		
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		/* var basePath = 'images/raw/edited/',
 		images = [
@@ -119,22 +80,58 @@ var pixi = (function () {
 			callback(p.renderer.width, p.renderer.height);
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		
 		inst.publish('init');
+		
+		
 	}
-	
-	function clear(k, k2, opt) {
-		if ( util.isBool(k2) ) {
-			p[k].destroy(opt);
-			delete p[k];
-			p[k] = new PIXI.Container();
-			p.mainContainer.addChild( p[k] );
-		} else if ( util.isStr(k2) ) {
-			p[k][k2].destroy(opt);
-			delete p[k][k2];
-			p[k][k2] = new PIXI.Container();
-			p.mainContainer.addChild( p[k][k2] );
+	function createContainers() {
+		var viewport, xLeft, xRight, yTop, yBott,
+			main = p.mainContainer;
+		
+		viewport = new PIXI.Container();
+		xLeft    = new PIXI.Container();
+		xRight   = new PIXI.Container();
+		yTop     = new PIXI.Container();
+		yBott    = new PIXI.Container();
+		
+		add( viewport );
+		add( xLeft    );
+		add( xRight   );
+		add( yTop     );
+		add( yBott    );
+		
+		main.addChild( viewport );
+		main.addChild( xLeft    );
+		main.addChild( xRight   );
+		main.addChild( yTop     );
+		main.addChild( yBott    );
+		
+		p.viewport = viewport;
+		p.xLeft    = xLeft;
+		p.xRight   = xRight;
+		p.yTop     = yTop;
+		p.yBott    = yBott;
+	}
+	function add(el) {
+		var lineContainer = new PIXI.Container(),
+			nodeContainer = new PIXI.Container();
+		el.addChild(lineContainer);
+		el.addChild(nodeContainer);
+	}
+	function clearContainer(k) {
+		var r = p[k];
+		r.children[0].destroy(true); // lineContainer
+		r.children[0].destroy();     // nodeContainer
+		add(r);
+	}
+	function addChild(k, str, child) {
+		var i;
+		if (str === 'lineContainer') {
+			i = 0;
+		} else if (str === 'nodeContainer') {
+			i = 1;
 		}
+		p[k].children[i].addChild(child);
 	}
 	function animate() {
 		requestAnimationFrame(animate);
@@ -652,7 +649,7 @@ var pixi = (function () {
 		line.changeColor = changeColor;
 		line.changePoints = changePoints;
 		
-		p.mainContainer.addChild(line);
+		//p.mainContainer.addChild(line);
 		return line;
 	}
 	function createBoxSpriteText(conf) {
@@ -750,7 +747,6 @@ var pixi = (function () {
 			addEvents(box);
 			box.addChild(sprite); 
 			box.addChild(text);
-			addChild('stage', box);
 		}
 		
 		setThings();
@@ -918,13 +914,7 @@ var pixi = (function () {
 		
 		return text;
 	}
-	function addChild(where, w, child) {
-		if ( util.isObj(w) ) {
-			p[where].addChild(child);
-		} else if ( util.isStr(w) ) {
-			p[where][w].addChild(child);
-		}
-	}
+	
 	
 	Object.defineProperties(inst, {
 		"renderer": {
@@ -936,18 +926,11 @@ var pixi = (function () {
 		"mainContainer": {
 			get: function () { return p.mainContainer; }
 		},
-		"nodeContainer": {
-			get: function () { return p.nodeContainer; }
-		},
-		"lineContainer": {
-			get: function () { return p.lineContainer; }
-		},
 		"textures": {
 			get: function () { return p.textures; }
 		}
 	});
 	inst.init = init;
-	inst.clear = clear;
 	inst.animate = animate;
 	inst.coPoint = coPoint;
 	inst.addDragDrop = addDragDrop;
@@ -961,6 +944,7 @@ var pixi = (function () {
 	inst.createText = createText;
 	inst.zoom = zoom;
 	inst.pan = pan;
+	inst.clearContainer = clearContainer;
 	inst.addChild = addChild;
 	inst.bringToFront = bringToFront;
 	
@@ -1023,7 +1007,7 @@ var tpl = (function () {
 				x: x,
 				y: y,
 				imgName: p.types[type],
-				spriteScale: 0.1,
+				spriteScale: 0.08,
 				textContent: name,
 				onmouseup: function () {
 					
@@ -1107,30 +1091,20 @@ var tpl = (function () {
 		addHandler();
 		
 		p.nodes[ id ] = node;
-		pixi.addChild(container, node.pixiEl);
+		
+		pixi.addChild(container, 'nodeContainer', node.pixiEl);
 	}
 	var createLink = (function () {
 		var path = {},
 			toggle = false;
 		
-		function create(conf) {
-			var container, start, end,
-				link, id, pixiEl, nth, curveLevel,
-				srcId, destId, srcdest, destsrc;
+		function create(start, end, srcId, destId, linkId, container) {
+			var link, pixiEl, nth, curveLevel,
+				srcdest, destsrc;
 			
-			function setThings() {
-				container = conf.container;
-				start     = conf.start;
-				end       = conf.end;
-				srcId     = conf.srcId;
-				destId    = conf.destId;
-				id        = conf.linkId;
-				srcdest   = srcId + destId;
-				destsrc   = destId + srcId;
-				link      = {};
-			}
-			
-			setThings();
+			srcdest = srcId + destId;
+			destsrc = destId + srcId;
+			link    = {};
 			
 			if ( !path[srcdest] && !path[destsrc] ) {
 				path[srcdest] = 1;
@@ -1158,12 +1132,14 @@ var tpl = (function () {
 			}
 			
 			link.pixiEl = pixiEl;
-			link.id = id;
-			link.src = o.src;
-			link.dest = o.dest;
+			link.id = linkId;
+			link.src = srcId;
+			link.dest = destId;
 			
-			p.links[ id ] = link;
-			pixi.addChild(container, link.pixiEl);
+			p.links[ linkId ] = link;
+			
+			
+			pixi.addChild(container, 'lineContainer', link.pixiEl);
 			
 			return path;
 		}
@@ -1171,26 +1147,28 @@ var tpl = (function () {
 		return create;
 	}());
 	function checkNode(node, container) {
-		createNode( node );
+		createNode( node, container );
 	}
-	function checkLink(link, container) {
+	function checkLink(link, container, bounds) {
+		//debugger;
+		/*
 		var src = link.src,
 			dest = link.dest,
-			cName = container,
-			cBounds = container.bounds,
-			x1 = cBounds.x1,
-			x2 = cBounds.x2,
-			y1 = cBounds.y1,
-			y2 = cBounds.y2,
+			b = bounds ? bounds : {},
+			x1 = b.x1,
+			x2 = b.x2,
+			y1 = b.y1,
+			y2 = b.y2,
 			start, end,
 			srcOut = false,
-			destOut = false;
+			destOut = false,
+			nodes = p.nodes;
 		
 		if ( src.x > x1 &&
 				src.x < x2 &&
 				src.y > y1 &&
 				src.y < y2 ) {
-			start = p.nodes[src.id].center;
+			start = nodes[src.id].center;
 		} else {
 			srcOut = true;
 		}
@@ -1199,7 +1177,7 @@ var tpl = (function () {
 				dest.x < x2 &&
 				dest.y > y1 &&
 				dest.y < y2 ) {
-			end = p.nodes[dest.id].center;
+			end = nodes[dest.id].center;
 		} else {
 			destOut = true;
 		}
@@ -1209,29 +1187,33 @@ var tpl = (function () {
 		} else if (destOut) {
 			end = calc();
 		}
-		
-		createLink({
-			container: cName,
-			start: start,
-			end: end,
-			srcId: src.id,
-			destId: dest.id,
-			linkId: link.id
-		});
+		*/
+		// createLink(start, end, src.id, dest.id, link.id, container);
+		createLink(
+			p.nodes[link.src.id].center,
+			p.nodes[link.dest.id].center,
+			link.src.id,
+			link.dest.id,
+			link.id,
+			container
+		);
 	}
 	function drawNodes(nodes, c) {
 		Object.keys(nodes).forEach(function (k) {
 			checkNode( nodes[k], c );
 		});
 	}
-	function drawLinks(links, c) {
+	function drawLinks(links, c, b) {
 		Object.keys(links).forEach(function (k) {
-			checkLink( links[k], c );
+			checkLink( links[k], c, b );
 		});
 	}
-	function draw(data, c) {
-		drawNodes(data.nodes, c);
-		drawLinks(data.links, c);
+	function draw(data, c, b) {
+		var container = c ? c : 'viewport',
+			bounds = b ? b : {};
+		
+		drawNodes(data.nodes, container);
+		drawLinks(data.links, container, bounds);
 	}
 	
 	return {
@@ -1256,81 +1238,39 @@ var mediator = (function () {
 	p.width = 0;
 	p.height = 0;
 	
-	var grid = (function () {
-		p.gridBounds = {};
+	function loadData(container) {
 		
-		function updateBounds(n, y) {
-			var gB = p.gridBounds;
-			if (!y) {
-				gB.xG1.x1 += n;
-				gB.xG1.x2 += n;
-				
-				gB.xG2.x1 += n;
-				gB.xG2.x2 += n;
-				
-				gB.xG3.x1 += n;
-				gB.xG3.x2 += n;
-				
-				gB.xG4.x1 += n;
-				gB.xG4.x2 += n;
-			} else {
-				gB.yG1.y1 += n;
-				gB.yG1.y2 += n;
-				
-				gB.yG2.y1 += n;
-				gB.yG2.y2 += n;
-				
-				gB.yG3.y1 += n;
-				gB.yG3.y2 += n;
-				
-				gB.yG4.y1 += n;
-				gB.yG4.y2 += n;
-			}
-		}
-		function init() {
-			var gB = p.gridBounds;
-			gB.xG1 = { x1: 0, x2: 0 };
-			gB.xG2 = { x1: 0, x2: 0 };
-			gB.xG3 = { x1: 0, x2: 0 };
-			gB.xG4 = { x1: 0, x2: 0 };
-			gB.yG1 = { y1: 0, y2: 0 };
-			gB.yG2 = { y1: 0, y2: 0 };
-			gB.yG3 = { y1: 0, y2: 0 };
-			gB.yG4 = { y1: 0, y2: 0 };
-		}
-		
-		init();
-		
-		return {
-			updateBounds: updateBounds
-		};
-	}());
-	
-	function loadData() {
 		ajax({
 			data: p.data
 		})
-		.done( a.tpl.draw );
+		.done(function (data) {
+			pixi.clearContainer(container || 'viewport');
+			tpl.draw(data, container, p.bounds);
+		});
 	}
-	
 	function pixiCallback(width, height) {
 		var w = width,
 			h = height,
-			qW = w / 4,
-			qH = h / 4;
+			hW = w / 2,
+			hH = h / 2;
 		
 		p.width = w;
 		p.height = h;
+		
+		// p.data.x1 = -hW;
+		// p.data.x2 = w + hW;
+		// p.data.y1 = -hH;
+		// p.data.y2 = h + hH;
 		
 		p.data.x1 = 0;
 		p.data.x2 = w;
 		p.data.y1 = 0;
 		p.data.y2 = h;
 		
-		p.bounds.x1 = qW;
-		p.bounds.x2 = -qW;
-		p.bounds.y1 = qH;
-		p.bounds.y2 = -qH
+		p.bounds.x1 = hW;
+		p.bounds.x2 = -hW;
+		p.bounds.y1 = hH;
+		p.bounds.y2 = -hH;
 		
 		console.log(p.bounds);
 		console.log(p.data);
@@ -1340,10 +1280,9 @@ var mediator = (function () {
 		.done(function ( data ) { // {url: 'js/d.txt'}
 			console.log(data);
 			t = data
-			a.tpl.draw(data);
+			a.tpl.draw(data, 'viewport');
 		});
 	}
-	
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
 			y = Math.floor(pos.y),
@@ -1351,37 +1290,64 @@ var mediator = (function () {
 			d = p.data,
 			w = p.width,
 			h = p.height,
-			qW = w / 4,
-			qH = h / 4;
+			hW = w / 2,
+			hH = h / 2;
 		
 		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
 			console.log('salam');
-			b.x1 += x;
-			b.x2 -= x;
-			d.x1 -= qW;
-			d.x2 -= qW;
+			b.x1 += hW;
+			b.x2 -= hW;
+			d.x1 -= hW;
+			d.x2 -= hW;
 			console.log(b);
 			console.log(d);
-			loadData();
+			loadData('xLeft');
 		}
 		
 		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
 			console.log('chetori');
-			b.x1 -= x;
-			b.x2 += x;
-			d.x1 += qW;
-			d.x2 += qW;
+			b.x1 -= hW;
+			b.x2 += hW;
+			d.x1 += hW;
+			d.x2 += hW;
 			console.log(b);
 			console.log(d);
 			loadData();
 		}
+		/*
+		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
+			console.log('salam');
+			b.x1 += hW;
+			b.x2 -= hW;
+			
+			d.x1 -= hW;
+			d.x2 -= hW*2;
+			
+			console.log(b);
+			console.log(d);
+			loadData('xLeft');
+		}
+		
+		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+			console.log('chetori');
+			b.x1 -= hW;
+			b.x2 += hW;
+			
+			d.x1 += hW*2;
+			d.x2 += hW;
+			
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		*/
 		
 		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
 			console.log('here');
-			b.y1 += qH;
-			b.y2 += qH;
-			d.y1 -= qH;
-			d.y2 += qH;
+			b.y1 += hH;
+			b.y2 += hH;
+			d.y1 -= hH;
+			d.y2 += hH;
 			console.log(b);
 			console.log(d);
 			loadData();
@@ -1389,16 +1355,16 @@ var mediator = (function () {
 		
 		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
 			console.log('kitty');
-			b.y1 -= qH;
-			b.y2 -= qH;
-			d.y1 += qH;
-			d.y2 += qH;		
+			b.y1 -= hH;
+			b.y2 -= hH;
+			d.y1 += hH;
+			d.y2 += hH;		
 			console.log(b);
 			console.log(d);
 			loadData();
 		}
 		
-		console.log(Math.floor(x));
+		//console.log(Math.floor(x));
 	}
 	function addCustomEvents() {
 		
