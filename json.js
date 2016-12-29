@@ -10,7 +10,7 @@ var nodes = {},
 	links = {};
 function generateAll() {
 	var totalNodes = 20000,
-		totalLinks = 50000,
+		totalLinks = 200000,
 		minX = -10000,
 		maxX = 10000,
 		minY = -6000,
@@ -27,9 +27,10 @@ function generateAll() {
 		ids.push(id);
 		
 		node.id = id;
+		node.name = id;
 		node.x = util.randInt(minX, maxX);
 		node.y = util.randInt(minY, maxY);
-		node.type = util.randInt(0, 5);
+		node.type = util.randInt(0, 17);
 		node.status = util.randInt(0, 5);
 		node.links = [];
 		

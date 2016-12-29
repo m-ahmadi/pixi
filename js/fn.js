@@ -11,10 +11,10 @@ var pixi = (function () {
 	p.mainContainer;
 	
 	p.viewport;
-	p.xLeft;
-	p.xRight;
-	p.yTop;
-	p.yBott;
+	p.xSec1;
+	p.xSec2;
+	p.ySec1;
+	p.ySec2;
 	
 	p.textures;
 	
@@ -35,7 +35,7 @@ var pixi = (function () {
 		//	noWebGL: false,                    // optional
 		);
 		// document.body.appendChild( p.renderer.view );
-		$('#contents').append( p.renderer.view );
+		$("#contents").append( p.renderer.view );
 		p.stage = new PIXI.Container();
 		p.mainContainer = new PIXI.Container();
 		
@@ -45,11 +45,18 @@ var pixi = (function () {
 		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
 		pan.add( p.mainContainer );
 			
-		$(document).on('mousewheel', function (e) {
+		$(document).on("mousewheel", function (e) {
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
 			// zoom(e);
-			zoom(e.pageX, e.pageY, e.deltaY > 0);
+			var zoomIn = e.deltaY > 0;
+			
+			inst.publish("zoom", {
+				zoomIn: zoomIn,
+				pos: p.mainContainer.position
+			});
+			
+			zoom(e.pageX, e.pageY, zoomIn);
 		});
 		createContainers();
 		p.stage.addChild( p.mainContainer );
@@ -57,60 +64,61 @@ var pixi = (function () {
 		requestAnimationFrame( animate );
 		p.renderer.render( p.stage );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		/* var basePath = 'images/raw/edited/',
+		/* var basePath = "images/raw/edited/",
 		images = [
-			'computer', 'gamepad', 'hard-drive', 'imac-blue',
-			'imac-grey', 'imac-red', 'ipad', 'iphone', 'macbook',
-			'macintosh', 'monitor', 'playstation', 'smartphone',
-			'smart-tv', 'smartwatch', 'tv-screen', 'video-card', 'xbox'
+			"computer", "gamepad", "hard-drive", "imac-blue",
+			"imac-grey", "imac-red", "ipad", "iphone", "macbook",
+			"macintosh", "monitor", "playstation", "smartphone",
+			"smart-tv", "smartwatch", "tv-screen", "video-card", "xbox"
 		];
 		images.forEach(function (i) {
-			var imgTrans = basePath+i+'-trans.png',
-				imgFill = basePath+i+'-fill.png';
+			var imgTrans = basePath+i+"-trans.png",
+				imgFill = basePath+i+"-fill.png";
 			PIXI.loader.add( imgTrans );
 			PIXI.loader.add( imgFill );
 		});
 		PIXI.loader.load(); */
 		
-		PIXI.loader.add( 'images/computer.png' );
-		PIXI.loader.add( 'images/hard.png' );
-		PIXI.loader.add( 'images/atlas-0.json' );
+		PIXI.loader.add( "images/computer.png" );
+		PIXI.loader.add( "images/hard.png" );
+		PIXI.loader.add( "images/atlas-0.json" );
 		PIXI.loader.load(function () {
 			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
 			callback(p.renderer.width, p.renderer.height);
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		inst.publish('init');
+		inst.publish("init");
 		
 		
 	}
+	
 	function createContainers() {
-		var viewport, xLeft, xRight, yTop, yBott,
+		var viewport, xSec1, xSec2, ySec1, ySec2,
 			main = p.mainContainer;
 		
 		viewport = new PIXI.Container();
-		xLeft    = new PIXI.Container();
-		xRight   = new PIXI.Container();
-		yTop     = new PIXI.Container();
-		yBott    = new PIXI.Container();
+		xSec1    = new PIXI.Container();
+		xSec2    = new PIXI.Container();
+		ySec1    = new PIXI.Container();
+		ySec2    = new PIXI.Container();
 		
 		add( viewport );
-		add( xLeft    );
-		add( xRight   );
-		add( yTop     );
-		add( yBott    );
+		add( xSec1    );
+		add( xSec2   );
+		add( ySec1     );
+		add( ySec2    );
 		
 		main.addChild( viewport );
-		main.addChild( xLeft    );
-		main.addChild( xRight   );
-		main.addChild( yTop     );
-		main.addChild( yBott    );
+		main.addChild( xSec1    );
+		main.addChild( xSec2   );
+		main.addChild( ySec1     );
+		main.addChild( ySec2    );
 		
 		p.viewport = viewport;
-		p.xLeft    = xLeft;
-		p.xRight   = xRight;
-		p.yTop     = yTop;
-		p.yBott    = yBott;
+		p.xSec1    = xSec1;
+		p.xSec2    = xSec2;
+		p.ySec1    = ySec1;
+		p.ySec2    = ySec2;
 	}
 	function add(el) {
 		var lineContainer = new PIXI.Container(),
@@ -126,9 +134,9 @@ var pixi = (function () {
 	}
 	function addChild(k, str, child) {
 		var i;
-		if (str === 'lineContainer') {
+		if (str === "lineContainer") {
 			i = 0;
-		} else if (str === 'nodeContainer') {
+		} else if (str === "nodeContainer") {
 			i = 1;
 		}
 		p[k].children[i].addChild(child);
@@ -205,7 +213,7 @@ var pixi = (function () {
 				local_pt = new PIXI.Point(),
 				point = new PIXI.Point(x, y),
 				mainContainer = p.mainContainer;
-				
+			
 			PIXI.interaction.InteractionData.prototype.getLocalPosition(mainContainer, local_pt, point);
 			
 			mainContainer.scale.x *= factor;
@@ -263,7 +271,7 @@ var pixi = (function () {
 			prevX = pos.x;
 			prevY = pos.y;
 			
-			inst.publish('pan', p.mainContainer.position);
+			inst.publish("pan", p.mainContainer.position);
 		}
 		function up() {
 			isDragging= false;
@@ -276,14 +284,14 @@ var pixi = (function () {
 		}
 		function add(el) {
 			el
-				.on('mousedown', down)
-				.on('touchstart', down)
-				.on('mouseup', up)
-				.on('mouseupoutside', up)
-				.on('touchend', up)
-				.on('touchendoutside', up)
-				.on('mousemove', move)
-				.on('touchmove', move);
+				.on("mousedown", down)
+				.on("touchstart", down)
+				.on("mouseup", up)
+				.on("mouseupoutside", up)
+				.on("touchend", up)
+				.on("touchendoutside", up)
+				.on("mousemove", move)
+				.on("touchmove", move);
 		}
 		function setBounds(o) {
 			var posit = util.positNum,
@@ -334,14 +342,14 @@ var pixi = (function () {
 		
 		function add(el) {
 			el
-				.on('mousedown', down) 
-				.on('touchstart', down)
-				.on('mouseup', up)
-				.on('mouseupoutside', up)
-				.on('touchend', up)
-				.on('touchendoutside', up)
-				.on('mousemove', move)
-				.on('touchmove', move);
+				.on("mousedown", down) 
+				.on("touchstart", down)
+				.on("mouseup", up)
+				.on("mouseupoutside", up)
+				.on("touchend", up)
+				.on("touchendoutside", up)
+				.on("mousemove", move)
+				.on("touchmove", move);
 		}
 		
 		
@@ -358,9 +366,9 @@ var pixi = (function () {
 			p;
 		
 		function setThings() {
-			start     =  conf.start     ||  {x: 0, y: 0},
-			end       =  conf.end       ||  {x: 0, y: 0},
-			lineWidth =  conf.lineWidth ||  2,
+			start     =  conf.start     ||  {x: 0, y: 0};
+			end       =  conf.end       ||  {x: 0, y: 0};
+			lineWidth =  conf.lineWidth ||  2;
 			color     =  conf.color     ||  0x000000;
 			p = calcPoints(start, end, lineWidth);
 		}
@@ -392,18 +400,18 @@ var pixi = (function () {
 			this.alpha = 1;
 		}
 		function move() {
-			//console.log('move');
+			//console.log("move");
 		}
 		function addEvents() {
 			line
-				.on('mousedown', down) 
-				.on('touchstart', down)
-				.on('mouseup', up)
-				.on('mouseupoutside', up)
-				.on('touchend', up)
-				.on('touchendoutside', up)
-				.on('mousemove', move)
-				.on('touchmove', move);
+				.on("mousedown", down) 
+				.on("touchstart", down)
+				.on("mouseup", up)
+				.on("mouseupoutside", up)
+				.on("touchend", up)
+				.on("touchendoutside", up)
+				.on("mousemove", move)
+				.on("touchmove", move);
 		}
 		function toggleDirties() {
 			var dirty = line.dirty,
@@ -500,7 +508,7 @@ var pixi = (function () {
 		create();
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
-		Object.defineProperty(line, 'points', {
+		Object.defineProperty(line, "points", {
 			get: function () { return {start: start, end: end}; }
 		});
 		
@@ -665,18 +673,18 @@ var pixi = (function () {
 		
 		function setThings() {
 			imgFill     = conf.imgFill      || false;
-			imgBasePath = conf.imgBasePath  || 'images/raw/edited/'; // images/
-			imgName     = conf.imgName      || 'tv-screen'; // tv-screen computer
-			imgExt      = conf.imgExt       || '.png';
+			imgBasePath = conf.imgBasePath  || "images/raw/edited/"; // images/
+			imgName     = conf.imgName      || "tv-screen"; // tv-screen computer
+			imgExt      = conf.imgExt       || ".png";
 			spriteScale = conf.spriteScale  || 0.2;
-			textContent = conf.textContent  || 'no_name';
-			textFont    = conf.textFont     || 'Arial';
-			textSize    = conf.textSize     || '16px';
-			textColor   = conf.textColor    || 'black';
+			textContent = conf.textContent  || "no_name";
+			textFont    = conf.textFont     || "Arial";
+			textSize    = conf.textSize     || "16px";
+			textColor   = conf.textColor    || "black";
 			boxX        = conf.x            || 0;
 			boxY        = conf.y            || 0;
-			// spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? '-fill':'-trans') + imgExt;
-			spriteImg   = conf.spriteImg    || imgName + (imgFill ? '-fill':'-trans') + imgExt;
+			// spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
+			spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill":"-trans") + imgExt;
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -706,14 +714,14 @@ var pixi = (function () {
 		}
 		function addEvents(el) {
 			el
-				.on('mousedown', down) 
-				.on('touchstart', down)
-				.on('mouseup', up)
-				.on('mouseupoutside', up)
-				.on('touchend', up)
-				.on('touchendoutside', up)
-				.on('mousemove', move)
-				.on('touchmove', move);
+				.on("mousedown", down) 
+				.on("touchstart", down)
+				.on("mouseup", up)
+				.on("mouseupoutside", up)
+				.on("touchend", up)
+				.on("touchendoutside", up)
+				.on("mousemove", move)
+				.on("touchmove", move);
 		}
 		function makeSprite() {
 			// sprite = new PIXI.Sprite.fromImage( spriteImg );
@@ -789,7 +797,8 @@ var pixi = (function () {
 			points,
 			i;
 		
-		if (!conf) { var conf = {}; }
+		conf = conf ? conf : {};
+		
 		if ( util.isObj(conf) ) {
 			points = conf.points || [];
 		} else if ( util.isArr(conf) ) {
@@ -859,13 +868,13 @@ var pixi = (function () {
 		clearDirty = ctx.clearDirty;
 		
 		if ( dirty ) {
-			dirty = false
+			dirty = false;
 		} else if ( !dirty ) {
 			dirty = true;
 		}
 		
 		if ( clearDirty ) {
-			clearDirty = false
+			clearDirty = false;
 		} else if ( !clearDirty ) {
 			clearDirty = true;
 		}
@@ -897,13 +906,13 @@ var pixi = (function () {
 		return rect;
 	}
 	function createText(o, noDrag) {
-		if ( !o ) {	var o = {}; }
+		o = o ? o : {};
 		var txt = util.isStr( o ) ? o : o.text;
 		
 		var text = new PIXI.Text(txt, {
-			fontFamily: o.font || 'Arial',
-			fontSize: o.size || '20px',
-			fill: o.color || 'black'
+			fontFamily: o.font || "Arial",
+			fontSize: o.size || "20px",
+			fill: o.color || "black"
 		});
 		text.interactive = true;
 		text.buttonMode = true;
@@ -953,15 +962,15 @@ var pixi = (function () {
 
 var tpl = (function () {
 	var p = {};
-		
+	
 	p.nodes = {};
 	p.links = {};
 	p.idCounter = 0;
 	p.types = [
-		'tv-screen', 'macintosh', 'imac-blue', 'smart-tv', 'imac-red',
-		'imac-grey', 'monitor', 'ipad', 'iphone', 'macbook',
-		'computer', 'gamepad', 'playstation', 'hard-drive',
-		'smartphone', 'smartwatch', 'video-card', 'xbox'
+		"tv-screen", "macintosh", "imac-blue", "smart-tv", "imac-red",
+		"imac-grey", "monitor", "ipad", "iphone", "macbook",
+		"computer", "gamepad", "playstation", "hard-drive",
+		"smartphone", "smartwatch", "video-card", "xbox"
 	];
 	
 	
@@ -995,8 +1004,8 @@ var tpl = (function () {
 		
 		function setThings() {
 			type      = o.type  || 0;
-			id        = o.id    || 'tpl_node_'+(p.idCounter+=1);
-			name      = o.name  || 'Node '+(p.idCounter+=1);
+			id        = o.id    || "tpl_node_"+(p.idCounter+=1);
+			name      = o.name  || "Node "+(p.idCounter+=1);
 			x         = o.x;
 			y         = o.y;
 			thisLinks = o.links || false;
@@ -1065,6 +1074,7 @@ var tpl = (function () {
 			*/
 			
 			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
+				return;
 				var nodeId = node.id;
 				
 				node.links.forEach(function (linkId) {
@@ -1092,7 +1102,7 @@ var tpl = (function () {
 		
 		p.nodes[ id ] = node;
 		
-		pixi.addChild(container, 'nodeContainer', node.pixiEl);
+		pixi.addChild(container, "nodeContainer", node.pixiEl);
 	}
 	var createLink = (function () {
 		var path = {},
@@ -1139,7 +1149,7 @@ var tpl = (function () {
 			p.links[ linkId ] = link;
 			
 			
-			pixi.addChild(container, 'lineContainer', link.pixiEl);
+			pixi.addChild(container, "lineContainer", link.pixiEl);
 			
 			return path;
 		}
@@ -1209,7 +1219,7 @@ var tpl = (function () {
 		});
 	}
 	function draw(data, c, b) {
-		var container = c ? c : 'viewport',
+		var container = c ? c : "viewport",
 			bounds = b ? b : {};
 		
 		drawNodes(data.nodes, container);
@@ -1234,9 +1244,15 @@ var mediator = (function () {
 		Y_2: 6000
 	};
 	p.data = {};    // unreversed for ajax data
-	p.bounds = {};  // adjusted (reversed) to ease bound calculations
+	p.bounds = {};  // reversed to ease bound calculations
 	p.width = 0;
 	p.height = 0;
+	p.counters = {
+		xLeft:  0,
+		xRight: 0,
+		yUp:    0,
+		yDown:  0
+	};
 	
 	function loadData(container) {
 		
@@ -1244,7 +1260,7 @@ var mediator = (function () {
 			data: p.data
 		})
 		.done(function (data) {
-			pixi.clearContainer(container || 'viewport');
+			pixi.clearContainer(container || "viewport");
 			tpl.draw(data, container, p.bounds);
 		});
 	}
@@ -1252,8 +1268,9 @@ var mediator = (function () {
 		var w = width,
 			h = height,
 			hW = w / 2,
-			hH = h / 2;
-		
+			hH = h / 2,
+			b = p.bounds,
+			d = p.data;
 		p.width = w;
 		p.height = h;
 		
@@ -1262,25 +1279,30 @@ var mediator = (function () {
 		// p.data.y1 = -hH;
 		// p.data.y2 = h + hH;
 		
-		p.data.x1 = 0;
-		p.data.x2 = w;
-		p.data.y1 = 0;
-		p.data.y2 = h;
+		d.x1 = 0;
+		d.x2 = w;
+		d.y1 = 0;
+		d.y2 = h;
 		
-		p.bounds.x1 = hW;
-		p.bounds.x2 = -hW;
-		p.bounds.y1 = hH;
-		p.bounds.y2 = -hH;
+		// p.bounds.x1 = hW;
+		// p.bounds.x2 = -hW;
+		// p.bounds.y1 = hH;
+		// p.bounds.y2 = -hH;
+		
+		b.xL = hW;
+		b.xR = -hW;
+		b.yU = hH;
+		b.yD = -hH;
 		
 		console.log(p.bounds);
 		console.log(p.data);
 		ajax({
 			data: p.data
 		})
-		.done(function ( data ) { // {url: 'js/d.txt'}
+		.done(function ( data ) { // {url: "js/d.txt"}
 			console.log(data);
-			t = data
-			a.tpl.draw(data, 'viewport');
+			t = data;
+			a.tpl.draw(data, "viewport");
 		});
 	}
 	function panCallback(pos) {
@@ -1291,21 +1313,111 @@ var mediator = (function () {
 			w = p.width,
 			h = p.height,
 			hW = w / 2,
-			hH = h / 2;
+			hH = h / 2,
+			c = p.counters,
+			odd = util.isNumOdd,
+			cnt;
+		/*
+		if (x >= b.xL) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
+			c.xLeft += 1;
 		
+			
+			
+			b.xL += hW;
+			b.xR += hW;
+			
+			d.x1 -= hW;
+			d.x2 -= hW;
+			
+			console.log("salam");
+			
+			
+			if ( odd(c.xLeft) ) { // 
+				
+				console.log("first");
+				cnt = "xSec1";
+			} else if ( !odd(c.xLeft) ) {
+				
+				console.log("second");
+				cnt = "xSec2";
+			}
+			console.log(b);
+			console.log(d);
+			
+			loadData(cnt);
+		}
+		
+		if (x <= b.xR) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
+			
+			console.log("chetori");
+			b.xL -= hW;
+			b.xR -= hW;
+			
+			d.x1 += hW;
+			d.x2 += hW;
+			
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		*/
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		
+		if (x >= b.xL) { // going left
+			b.xL += hW;
+			b.xR += hW;
+			d.x1 -= hW;
+			d.x2 -= hW;
+			console.log("salam");
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		if (x <= b.xR) { // going right
+			console.log("chetori");
+			b.xL -= hW;
+			b.xR -= hW;
+			d.x1 += hW;
+			d.x2 += hW;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		if (y >= b.yU) { // going up
+			b.yU += hH;
+			b.yD += hH;
+			d.y1 -= hH;
+			d.y2 -= hH;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		if (y <= b.yD) { // going down
+			b.yU -= hH;
+			b.yD -= hH;
+			d.y1 += hH;
+			d.y2 += hH;
+			console.log(b);
+			console.log(d);
+			loadData();
+		}
+		
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		/*
 		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
-			console.log('salam');
+			console.log("salam");
 			b.x1 += hW;
 			b.x2 -= hW;
 			d.x1 -= hW;
 			d.x2 -= hW;
 			console.log(b);
 			console.log(d);
-			loadData('xLeft');
+			loadData("xLeft");
 		}
 		
 		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
-			console.log('chetori');
+			console.log("chetori");
 			b.x1 -= hW;
 			b.x2 += hW;
 			d.x1 += hW;
@@ -1314,36 +1426,9 @@ var mediator = (function () {
 			console.log(d);
 			loadData();
 		}
-		/*
-		if (x >= b.x1) { // x1 512   x 0 1 2 3 4 5 6 7 8 9 (going left)
-			console.log('salam');
-			b.x1 += hW;
-			b.x2 -= hW;
-			
-			d.x1 -= hW;
-			d.x2 -= hW*2;
-			
-			console.log(b);
-			console.log(d);
-			loadData('xLeft');
-		}
-		
-		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
-			console.log('chetori');
-			b.x1 -= hW;
-			b.x2 += hW;
-			
-			d.x1 += hW*2;
-			d.x2 += hW;
-			
-			console.log(b);
-			console.log(d);
-			loadData();
-		}
-		*/
 		
 		if (y >= b.y1) { // y1 175   y1 10 20 30 (going up)
-			console.log('here');
+			console.log("here");
 			b.y1 += hH;
 			b.y2 += hH;
 			d.y1 -= hH;
@@ -1354,7 +1439,7 @@ var mediator = (function () {
 		}
 		
 		if (y <= b.y2) { // y2 -175  y2 -10 -20 -30 (going down)
-			console.log('kitty');
+			console.log("kitty");
 			b.y1 -= hH;
 			b.y2 -= hH;
 			d.y1 += hH;
@@ -1363,18 +1448,24 @@ var mediator = (function () {
 			console.log(d);
 			loadData();
 		}
+		*/
+		console.log(Math.floor(x), Math.floor(y)); 
+	}
+	function zoomCallback(d) {
+		console.log(d.zoomIn);
+		console.log(d.pos.x, d.pos.y);
 		
-		//console.log(Math.floor(x));
 	}
 	function addCustomEvents() {
 		
-		pixi.on('pan', panCallback);
+		pixi.on("pan", panCallback);
+		pixi.on("zoom", zoomCallback);
 		
-		navigation.on('zoom', function () {
-			console.log('zoom');
+		navigation.on("zoom", function () {
+			console.log("zoom");
 			pixi.zoom();
 		});
-		navigation.on('pan', function () {
+		navigation.on("pan", function () {
 			pixi.pan.pan(1, 1);
 		});
 	}
@@ -1383,7 +1474,7 @@ var mediator = (function () {
 		//core.init();
 		//navigation.init();
 		addCustomEvents();
-	};
+	}
 	
 	
 	inst.data = p.data;
@@ -1403,7 +1494,7 @@ var navigation = (function () {
 			rect,
 			dot;
 		
-		p.panel = new PIXI.Graphics(),
+		p.panel = new PIXI.Graphics();
 		p.panelWidth = 400;
 		p.panelHeight = 200;
 		p.panelOffset = 100;
@@ -1426,7 +1517,7 @@ var navigation = (function () {
 		rect.drawRect(0, 0, 150, 150);
 		rect.endFill();
 		rect.alpha = 0.5;
-		rect.TPL_nav = 'box';
+		rect.TPL_nav = "box";
 
 		p.dot = new PIXI.Graphics();
 		p.dotWH = 6;
@@ -1443,7 +1534,7 @@ var navigation = (function () {
 		dot.drawRect(0, 0, p.dotWH, p.dotWH);
 		dot.endFill();
 		dot.position.set( p.dotPos.x, p.dotPos.y );
-		dot.TPL_nav = 'dot';
+		dot.TPL_nav = "dot";
 		
 		p.nav = new PIXI.Container();
 		p.navPos = new PIXI.Point(
@@ -1455,32 +1546,32 @@ var navigation = (function () {
 		nav.addChild(panel);
 		nav.addChild(rect);
 		nav.addChild(dot);
-		addDragDrop(panel, 'panel');
-		addDragDrop(rect, 'rect');
-		addDragDrop(dot, 'dot');
-		pixi.addChild('stage', nav);
+		addDragDrop(panel, "panel");
+		addDragDrop(rect, "rect");
+		addDragDrop(dot, "dot");
+		pixi.addChild("stage", nav);
 	}
 	function addDragDrop(el, name) {
-		if (name === 'rect') {
+		if (name === "rect") {
 			el
-				.on('mousedown', rectDown)
-				.on('touchstart', rectDown)
-				.on('mouseup', rectUp)
-				.on('mouseupoutside', rectUp)
-				.on('touchend', rectUp)
-				.on('touchendoutside', rectUp)
-				.on('mousemove', rectMove)
-				.on('touchmove', rectMove);
-		} else if ( name === 'dot' ) {
+				.on("mousedown", rectDown)
+				.on("touchstart", rectDown)
+				.on("mouseup", rectUp)
+				.on("mouseupoutside", rectUp)
+				.on("touchend", rectUp)
+				.on("touchendoutside", rectUp)
+				.on("mousemove", rectMove)
+				.on("touchmove", rectMove);
+		} else if ( name === "dot" ) {
 			el
-				.on('mousedown', dotDown)
-				.on('touchstart', dotDown)
-				.on('mouseup', dotUp)
-				.on('mouseupoutside', dotUp)
-				.on('touchend', dotUp)
-				.on('touchendoutside', dotUp)
-				.on('mousemove', dotMove)
-				.on('touchmove', dotMove);
+				.on("mousedown", dotDown)
+				.on("touchstart", dotDown)
+				.on("mouseup", dotUp)
+				.on("mouseupoutside", dotUp)
+				.on("touchend", dotUp)
+				.on("touchendoutside", dotUp)
+				.on("mousemove", dotMove)
+				.on("touchmove", dotMove);
 		}
 	}
 	function addCustomPos(el) {
@@ -1517,7 +1608,7 @@ var navigation = (function () {
 		this.mouseIsDown = false;
 	}
 	function rectMove() {
-		this.defaultCursor = 'move';
+		this.defaultCursor = "move";
 		if (this.dragging) {
 			var panel = p.panel,
 				rect = p.rect,
@@ -1561,11 +1652,11 @@ var navigation = (function () {
 			dot.position.x = dotNewPos.x;
 			dot.position.y = dotNewPos.y;
 			
-			inst.publish('pan');
+			inst.publish("pan");
 		}
 	}
 	function dotMove(e) {
-		this.defaultCursor = 'nwse-resize';
+		this.defaultCursor = "nwse-resize";
 		if (this.mouseIsDown) {
 			var currentCursor = e.data.getLocalPosition(this.parent),
 				resizeX = ( currentCursor.x - this.x ),
@@ -1576,7 +1667,7 @@ var navigation = (function () {
 				rect = p.rect,
 				dot = p.dot;
 				
-			rect.defaultCursor = 'nwse-resize';
+			rect.defaultCursor = "nwse-resize";
 			addCustomPos(rect);
 			addCustomPos(panel);
 			var	min = 0,
@@ -1606,7 +1697,7 @@ var navigation = (function () {
 				rect.height += resizeX;
 				dot.position.y += resizeX;
 			}
-			inst.publish('zoom');
+			inst.publish("zoom");
 		}
 	}
 	
