@@ -77,15 +77,6 @@ module.exports = function(grunt) {
 			}
 		},
 		*/
-		ts: {
-			default: {
-				src: ["ts/**/*.ts"],
-				outDir: 'tjs',
-				options: {
-					compile: false,
-				}
-			}
-		},
 		watch: {
 			scripts: {
 				files: [
@@ -96,7 +87,7 @@ module.exports = function(grunt) {
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass', 'ts'], // 'jslint', 'browserify', 'jshint', 'concat'
+				tasks: ['sass'], // 'jslint', 'browserify', 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
@@ -116,7 +107,6 @@ module.exports = function(grunt) {
 	});
 	
 	grunt.loadNpmTasks('grunt-jslint');
-	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
