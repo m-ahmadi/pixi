@@ -2,21 +2,22 @@ var t,s;
 var a = (function () {
 "use strict";
 
+
 var pixi = (function () {
 	var inst = util.extend( coPubsub() ),
 		p = {};
 	
-	p.renderer;
-	p.stage;
-	p.mainContainer;
+	p.renderer = {};
+	p.stage = {};
+	p.mainContainer = {};
 	
-	p.viewport;
-	p.xSec1;
-	p.xSec2;
-	p.ySec1;
-	p.ySec2;
+	p.viewport = {};
+	p.xSec1 = {};
+	p.xSec2 = {};
+	p.ySec1 = {};
+	p.ySec2 = {};
 	
-	p.textures;
+	p.textures = {};
 	
 	function init(callback, panBounds, background) {
 		pan.setBounds(panBounds);
@@ -1253,15 +1254,22 @@ var mediator = (function () {
 		yUp:    0,
 		yDown:  0
 	};
+	p.ajax;
 	
 	function loadData(container) {
+		container = container ? container : "viewport";
+		var abort = p.ajax ? p.ajax.xhr.abort : undefined;
 		
-		ajax({
+		if (abort) {
+			abort();
+		}
+		
+		p.ajax = ajax({
 			data: p.data
 		})
 		.done(function (data) {
 			pixi.clearContainer(container || "viewport");
-			tpl.draw(data, container, p.bounds);
+			tpl.draw(data, container || "viewport", p.bounds);
 		});
 	}
 	function pixiCallback(width, height) {
@@ -1413,7 +1421,7 @@ var mediator = (function () {
 			d.x2 -= hW;
 			console.log(b);
 			console.log(d);
-			loadData("xLeft");
+			loadData();
 		}
 		
 		if (x <= b.x2) { // x2 -512 x -1 -2 -3 -4 -5 -6 -7 (going right)
@@ -1449,7 +1457,7 @@ var mediator = (function () {
 			loadData();
 		}
 		*/
-		console.log(Math.floor(x), Math.floor(y)); 
+		//console.log(Math.floor(x), Math.floor(y)); 
 	}
 	function zoomCallback(d) {
 		console.log(d.zoomIn);

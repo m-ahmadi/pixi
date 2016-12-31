@@ -31,6 +31,19 @@ module.exports = function(grunt) {
 			//beforeconcat: ['public/js/app/**/*.js'],
 			//afterconcat: ['public/js/app.js']
 		},
+		jslint: {
+			client: {
+				src: [
+					'js/fn.js'
+				],
+				directives: {
+					browser: true,
+					predef: [
+						'jQuery', '$', 'PIXI', 'util', 'window', 'document', 'coPubsub'
+					]
+				}
+			}
+		},
 		/*
 		concat: {
 			options: {
@@ -64,17 +77,26 @@ module.exports = function(grunt) {
 			}
 		},
 		*/
-		
+		ts: {
+			default: {
+				src: ["ts/**/*.ts"],
+				outDir: 'tjs',
+				options: {
+					compile: false,
+				}
+			}
+		},
 		watch: {
 			scripts: {
 				files: [
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
+					'ts/**/*.ts',
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass'], // , 'browserify', 'jshint', 'concat'
+				tasks: ['sass', 'ts'], // 'jslint', 'browserify', 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
@@ -93,6 +115,8 @@ module.exports = function(grunt) {
 		}
 	});
 	
+	grunt.loadNpmTasks('grunt-jslint');
+	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-jshint');

@@ -42,7 +42,8 @@ $.ajaxSetup({
 */
 var ajax = (function () {
 	var fns = {},
-		counter = 0;
+		counter = 0,
+		xhr;
 	
 	fns.done = {};
 	fns.fail = {};
@@ -65,17 +66,20 @@ var ajax = (function () {
 		
 		ajax.id = uid;
 		
-		$.ajax({
+		
+		xhr = $.ajax({
 			url: o.url || 'http://localhost:3000',
 			type: o.type || 'GET',
 			dataType: o.dataType || 'json',
 			data: o.data,
-			beforeSend: o.beforeSend
+			beforeSend: o.beforeSend,
+			id: uid
 		})
 		.done(function (data, txt, obj) {
 			
-			execute('done', uid, data, txt, obj);
-			
+			if (this.id === ajax.id) {
+				execute('done', uid, data, txt, obj);
+			};
 		})
 		.fail(function (obj, txt, err) {
 			
@@ -87,6 +91,9 @@ var ajax = (function () {
 			execute('always', uid, obj, txt);
 			
 		});
+		
+		ajax.xhr = xhr;
+		
 		return ajax;
 	};
 	
