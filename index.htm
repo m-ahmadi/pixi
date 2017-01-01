@@ -4,9 +4,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
 	<link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
-	<link rel="stylesheet" type="text/css" href="css/uikit.gradient.css"/>
-	<link rel="stylesheet" type="text/css" href="css/form-advanced.gradient.min.css"/>
-	<link rel="stylesheet" type="text/css" href="css/form-select.gradient.min.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uk/uikit.gradient.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uk/form-advanced.gradient.min.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uk/form-select.gradient.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/folding-cube.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<title>Pixi</title>
@@ -15,6 +15,43 @@
 
 <body>
 <div id="contents">
+
+
+<div id="sidebar" class="uk-offcanvas">
+	<div class="uk-offcanvas-bar">
+		
+		<div class="uk-panel">
+			<h3 class="uk-panel-title">hello?</h3>
+		</div>
+		
+		
+		<table class="uk-table uk-table-hover uk-table-striped grey lighten-4">
+			<caption>Scan</caption>
+			<thead>
+				<tr class="light-blue grey-text text-lighten-5">
+					<th>View</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					
+				</tr>
+			</tfoot>
+			<tbody>
+				<tr>
+					<td>IP</td>
+					
+				</tr>
+				<tr>
+					<td>Hostname</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<button class="uk-button uk-button-success">Save Graphics</button>
+	
+	</div>
+</div>
 
 <div class="sk-folding-cube no-display" id="preloader">
 	<div class="sk-cube1 sk-cube"></div>
@@ -25,7 +62,6 @@
 
 <div id="opt" class="">
 	<form class="uk-form">
-	
 		<div class="uk-form-row">
 			<!-- <label>Name <input class="uk-form-small" type="text" name="name" placeholder="Default: no_name"></label> -->
 			<!-- <label>ID <input class="uk-form-small" type="text" name="id" placeholder="Default: tpl_node_num "></label> -->
@@ -42,6 +78,7 @@
 				<!-- <label>Link to </label> <button id="select_all" class="uk-button">select all</button><br /> -->
 			<!-- </div> -->
 			<!-- <button id="add_device" class="uk-button">create device</button> -->
+			<button id="sidebar" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar'}">side bar</button>
 			
 			<button id="clear" class="uk-button">clear</button>
 			<button id="generate" class="uk-button">draw</button>
@@ -50,14 +87,13 @@
 			<label>link color <input class="uk-form-small" type="text" name="linkcolor" placeholder="000000 (black)"></label>
 			<label>change type every <input class="uk-form-small" type="text" name="each" placeholder="default: 10"></label>
 			<label>use fill img <input type="checkbox" name="fill"></label>
-			
+		</div>
 	</form>
 </div>
 
 
 
 </div>
-
 <script type="text/javascript" src="js/lib/jquery/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="js/lib/uikit.min.js"></script>

@@ -1,3 +1,11 @@
+@import "materialize/mixins";
+@import "materialize/color";
+
+@import "materialize/variables";
+@import "materialize/typography";
+@import "materialize/global";
+
+
 body {
 	width: 100%;
 	margin: 0 auto;

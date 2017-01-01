@@ -1,4 +1,79 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var zoom = (function () {
+	var direction;
+	
+	var getGraphCoordinates = (function () {
+		var ctx = {
+			global: {
+				x: 0,
+				y: 0
+			} // store it inside closure to avoid GC pressure
+		};
+
+		return function (x, y) {
+			ctx.global.x = x;
+			ctx.global.y = y;
+			return PIXI.interaction.InteractionData.prototype.getLocalPosition.call(ctx, p.mainContainer);
+		};
+	}());
+	function zoom(x, y, isZoomIn) {
+		var mainContainer = p.mainContainer;
+		
+		direction = isZoomIn ? 1 : -1;
+		var factor = (1 + direction * 0.1);
+		mainContainer.scale.x *= factor;
+		mainContainer.scale.y *= factor;
+
+		// Technically code below is not required, but helps to zoom on mouse
+		// cursor, instead center of graphGraphics coordinates
+		
+		var beforeTransform = getGraphCoordinates(x, y);
+		mainContainer.updateTransform();
+		var afterTransform = getGraphCoordinates(x, y);
+
+		mainContainer.position.x += (afterTransform.x - beforeTransform.x) * mainContainer.scale.x;
+		mainContainer.position.y += (afterTransform.y - beforeTransform.y) * mainContainer.scale.y;
+		mainContainer.updateTransform();
+	}
+	function zam( e ) {
+		var factor = 1,
+			delta = e.deltaY,
+			local_pt = new PIXI.Point(),
+			point = new PIXI.Point(e.pageX, e.pageY),
+			mainContainer = p.mainContainer;
+
+		PIXI.interaction.InteractionData.prototype.getLocalPosition(mainContainer, local_pt, point);
+
+		if ( delta > 0 ) {
+			// Zoom in
+			factor = 1.1;
+		} else {
+			// Zoom out
+			factor = 1 / 1.1;
+		}
+
+		mainContainer.pivot = local_pt;
+		mainContainer.position = point;
+		mainContainer.scale.set(mainContainer.scale.x * factor);
+	}
+	function zoomba(x, y, isZoomIn) {
+		var direction = (isZoomIn) ? 1 : -1,
+			factor = (1 + direction * 0.1),
+			local_pt = new PIXI.Point(),
+			point = new PIXI.Point(x, y),
+			mainContainer = p.mainContainer;
+		
+		PIXI.interaction.InteractionData.prototype.getLocalPosition(mainContainer, local_pt, point);
+		
+		mainContainer.scale.x *= factor;
+		mainContainer.scale.y *= factor;
+		mainContainer.pivot = local_pt;
+		mainContainer.position = point;
+	}
+	
+	return zoomba;
+}());
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 var mediator = (function () {
 	var inst = {},
 		p = {};

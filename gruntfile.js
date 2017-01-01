@@ -83,7 +83,6 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
-					'ts/**/*.ts',
 					'gruntfile.js',
 					'test/**/*'
 				],

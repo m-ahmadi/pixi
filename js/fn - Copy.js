@@ -1,4 +1,14 @@
-var t,s;
+/*
+	Prefixing variable and property names with type:
+	Boolean		->		b
+	Number		->		n
+	String		->		s
+	Array		->		a
+	Object		->		o
+	Function	->		f
+	Void		->		v
+*/
+
 var a = (function () {
 "use strict";
 
@@ -20,8 +30,6 @@ var pixi = (function () {
 	p.textures = {};
 	
 	function init(callback, panBounds, background) {
-		var r;
-		
 		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
 		p.renderer = PIXI.autoDetectRenderer(
@@ -37,8 +45,6 @@ var pixi = (function () {
 			}
 		//	noWebGL: false,                    // optional
 		);
-		r = p.renderer;
-		
 		// document.body.appendChild( p.renderer.view );
 		$("#contents").append( p.renderer.view );
 		p.stage = new PIXI.Container();
@@ -47,23 +53,19 @@ var pixi = (function () {
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
-		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, r.width / r.resolution * 100000, r.height / r.resolution *100000 );
+		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, p.renderer.width / p.renderer.resolution * 100000, p.renderer.height / p.renderer.resolution *100000 );
 		pan.add( p.mainContainer );
 			
 		$(document).on("mousewheel", function (e) {
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
 			// zoom(e);
-			
-			var zoomIn = e.deltaY > 0,
-				mcPos = p.mainContainer.position,
-				prevPos = {x: mcPos.x, y: mcPos.y};
-			
+			var zoomIn = e.deltaY > 0;
 			zoom(e.pageX, e.pageY, zoomIn);
 			
 			inst.publish("zoom", {
 				zoomIn: zoomIn,
-				pos: mcPos
+				pos: p.mainContainer.position
 			});
 		});
 		createContainers();
@@ -92,10 +94,12 @@ var pixi = (function () {
 		PIXI.loader.add( "images/atlas-0.json" );
 		PIXI.loader.load(function () {
 			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
-			callback(r.width, r.height);
+			callback(p.renderer.width, p.renderer.height);
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		inst.publish("init");
+		
+		
 	}
 	
 	function createContainers() {
@@ -156,8 +160,8 @@ var pixi = (function () {
 	function coPoint(x, y) {
 		return new PIXI.Point(x, y);
 	}
-	function zoom(x, y, zoomIn) {
-		var direction = (zoomIn) ? 1 : -1,
+	function vZoom(nX, nY, bZoomIn) {
+		var direction = (isZoomIn) ? 1 : -1,
 			factor = (1 + direction * 0.1),
 			local_pt = new PIXI.Point(),
 			point = new PIXI.Point(x, y),
@@ -1020,23 +1024,23 @@ var tpl = (function () {
 			*/
 			
 			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
+				return;
 				var nodeId = node.id;
 				
 				node.links.forEach(function (linkId) {
 					var link = tplLinks[linkId],
 						start, end;
-					
-					if (link) {
-						if (link.src === nodeId) {
-							start = node.center;
-						}
 						
-						if (link.dest === nodeId) {
-							end = node.center;
-						}
-						
-						link.pixiEl.changePoints(start, end);
+					if (link.src === nodeId) {
+						start = node.center;
 					}
+					
+					if (link.dest === nodeId) {
+						end = node.center;
+					}
+					
+					link.pixiEl.changePoints(start, end);
+					
 				});
 			});
 		}
@@ -1167,8 +1171,7 @@ var tpl = (function () {
 	function draw(data, c, b) {
 		var container = c ? c : "viewport",
 			bounds = b ? b : {};
-		p.nodes = {};
-		p.links = {};
+		
 		drawNodes(data.nodes, container);
 		drawLinks(data.links, container, bounds);
 	}
@@ -1316,6 +1319,7 @@ var mediator = (function () {
 		}
 		*/
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		
 		if (x >= b.xL) { // going left
 			b.xL += hW;
 			b.xR += hW;
@@ -1406,39 +1410,29 @@ var mediator = (function () {
 	}
 	function zoomCallback(d) {
 		var pos = d.pos,
-			x = pos.x,
-			y = pos.y,
 			b = p.bounds,
-			xL = b.xL,
-			xR = b.xR,
-			yU = b.yU,
-			yD = b.yD,
-			w = p.width,
-			h = p.height,
-			hW = w / 2,
-			hH = h / 2;
+			x = pos.y,
+			y = pos.x;
 		
-		// incX = aX > bX ? aX-bX : bX > aX ? bX-aX : undefined;
-		// incY = aY > bY ? aY-bY : bY > aY ? bY-aY : undefined;
-		// debugger;
-		
-		if (x >= xL) {
-			b.xL = x+hW;
-			b.xR = x-hW;
-			
-			console.log(b);
-		}
-		if (x <= xR) {
+		//debugger;
+		if (x >= b.xL) {
+			// b.xL += ;
+			// b.xR += ;
+			// d.x1
+			// d.x2;
 			
 		}
-		if (y >= yU) {
+		if (x <= b.xR) {
 			
 		}
-		if (y <= yD) {
+		if (y >= b.yU) {
+			
+		}
+		if (y <= b.yD) {
 			
 		}
 		console.log(d.zoomIn);
-		console.log(x, y);
+		console.log(d.pos.x, d.pos.y);
 		
 	}
 	function addCustomEvents() {
