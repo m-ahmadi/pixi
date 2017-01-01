@@ -612,10 +612,10 @@ var pixi = (function () {
 			text,
 			box,
 			imgFill, imgBasePath, imgName, imgExt, img,
-			spriteImg, spriteScale,
+			spriteImg, spriteScale, spriteTint,
 			textContent, textFont, textSize, textColor,
 			boxX, boxY,
-			onmouseup, onmouseupParam;
+			onmouseup, onmouseupParam, onmousedown, onmousedownParam;
 		
 		function setThings() {
 			imgFill     = conf.imgFill      || false;
@@ -623,6 +623,7 @@ var pixi = (function () {
 			imgName     = conf.imgName      || "tv-screen"; // tv-screen computer
 			imgExt      = conf.imgExt       || ".png";
 			spriteScale = conf.spriteScale  || 0.2;
+			spriteTint  = conf.spriteTint   || false;
 			textContent = conf.textContent  || "no_name";
 			textFont    = conf.textFont     || "Arial";
 			textSize    = conf.textSize     || "16px";
@@ -677,6 +678,9 @@ var pixi = (function () {
 			sprite.anchor.set(0, 0);
 			sprite.alpha = 1;
 			sprite.scale.set( spriteScale );
+			if (spriteTint) {
+				sprite.tint = 0xFFCC00 * spriteTint;
+			}
 		}
 		function makeText() {
 			text = new PIXI.Text( textContent, {
@@ -711,7 +715,16 @@ var pixi = (function () {
 		box.setOnmouseup = function (param, fn) {
 			onmouseupParam = param;
 			onmouseup = fn;
-		}
+		};
+		box.setOnmousedown = function (param, fn) {
+			onmousedownParam = param;
+			onmousedown = fn;
+		};
+		box.changeTint = function (n) {
+			if (n) {
+				sprite.tint = n;
+			}
+		};
 		return box;
 	}
 	function bringToFront(el) {
@@ -963,6 +976,7 @@ var tpl = (function () {
 				y: y,
 				imgName: p.types[type],
 				spriteScale: 0.08,
+				spriteTint: type,
 				textContent: name,
 				onmouseup: function () {
 					
@@ -1054,7 +1068,7 @@ var tpl = (function () {
 		var path = {},
 			toggle = false;
 		
-		function create(start, end, srcId, destId, linkId, container) {
+		function create(start, end, srcId, destId, linkId, status, container) {
 			var link, pixiEl, nth, curveLevel,
 				srcdest, destsrc;
 			
@@ -1076,12 +1090,14 @@ var tpl = (function () {
 			if (nth === 1) {
 				pixiEl = pixi.create2pointLine({
 					start: start,
-					end: end
+					end: end,
+					color: 0xCCAA00 * status
 				});
 			} else if (nth > 1) {
 				pixiEl = pixi.create3pointLine({
 					start: start,
 					end: end,
+					color: 0xCCAA00 * status,
 					curveLevel: curveLevel,
 					curveSide: toggle ? false : true
 				});
@@ -1151,6 +1167,7 @@ var tpl = (function () {
 			link.src.id,
 			link.dest.id,
 			link.id,
+			link.status,
 			container
 		);
 	}

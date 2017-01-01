@@ -19,9 +19,14 @@ g.endFill();
 
 
 var s;
-
+/*
+"tv-screen", "macintosh", "imac-blue", "smart-tv", "imac-red",
+	"imac-grey", "monitor", "ipad", "iphone", "macbook",
+	"computer", "gamepad", "playstation", "hard-drive",
+	"smartphone", "smartwatch", "video-card", "xbox"
+*/
 function cb() {
-	s = new PIXI.Sprite(textures['computer-trans.png']);
+	s = new PIXI.Sprite(textures['tv-screen-trans.png']);
 	s.interactive = true;
 	s.buttonMode = true;
 	s.scale.set(0.2);
