@@ -18,6 +18,7 @@ var pixi = (function () {
 	p.ySec2 = {};
 	
 	p.textures = {};
+	p.zoomDisabled = false;
 	
 	function init(callback, panBounds, background) {
 		var r;
@@ -51,20 +52,22 @@ var pixi = (function () {
 		pan.add( p.mainContainer );
 			
 		$(document).on("mousewheel", function (e) {
+			var zoomIn, mcPos, prevPos;
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
 			// zoom(e);
-			
-			var zoomIn = e.deltaY > 0,
+			if (!p.zoomDisabled) {
+				zoomIn = e.deltaY > 0,
 				mcPos = p.mainContainer.position,
 				prevPos = {x: mcPos.x, y: mcPos.y};
-			
-			zoom(e.pageX, e.pageY, zoomIn);
-			
-			inst.publish("zoom", {
-				zoomIn: zoomIn,
-				pos: mcPos
-			});
+				
+				zoom(e.pageX, e.pageY, zoomIn);
+				
+				inst.publish("zoom", {
+					zoomIn: zoomIn,
+					pos: mcPos
+				});
+			}
 		});
 		createContainers();
 		p.stage.addChild( p.mainContainer );
@@ -98,6 +101,9 @@ var pixi = (function () {
 		inst.publish("init");
 	}
 	
+	function disableZoom(v) {
+		p.zoomDisabled = v;
+	}
 	function createContainers() {
 		var viewport, xSec1, xSec2, ySec1, ySec2,
 			main = p.mainContainer;
@@ -915,6 +921,7 @@ var pixi = (function () {
 	inst.clearContainer = clearContainer;
 	inst.addChild = addChild;
 	inst.bringToFront = bringToFront;
+	inst.disableZoom = disableZoom;
 	
 	return inst;
 }());
@@ -955,7 +962,6 @@ var tpl = (function () {
 	}
 	function createNode(o, container) {
 		o = o ? o : {};
-		
 		var node,
 			type, name, id, thisLinks,
 			x, y,
@@ -1161,9 +1167,41 @@ var tpl = (function () {
 		}
 		*/
 		// createLink(start, end, src.id, dest.id, link.id, container);
+		debugger;
+		
+		
+		var srcId, destId, srcNode, destNode, linkId,
+			isObj = util.isObj,
+			isStr = util.isStr;
+		
+		if (link.src) {
+			if ( isObj(link.src) ) {
+				srcId = link.src.id;
+				
+			} else if ( isStr(link.src) ) {
+				srcId = link.src;
+			}
+		} else if (link.source_id) {
+			srcId = link.source_id;
+		}
+		
+		if (link.dest) {
+			if ( isObj(link.dest) ) {
+				destId = link.dest.id;
+			} else if ( isStr(link.dest) ) {
+				destId = link.dest;
+			}
+		} else if (link.destination_id) {
+			destId = link.destination_id;
+		}
+		
+		
+		srcNode = p.nodes[srcId];
+		destNode = p.nodes[destId];
+		
 		createLink(
-			p.nodes[link.src.id].center,
-			p.nodes[link.dest.id].center,
+			srcNode,
+			destNode,
 			link.src.id,
 			link.dest.id,
 			link.id,
@@ -1707,12 +1745,72 @@ var navigation = (function () {
 	return inst;
 }());
 
+var traceroute = (function () {
+	var ws,
+		path = 'ws://192.168.10.13:3000/network/icmp/traceroute';
+	
+	function createSock(opt) {
+		if (opt) { 
+			path += '?get=true';
+		}
+		ws = new WebSocket(path);
+		console.log(ws);
+	}
+	function addHandlers(cb) {
+		ws.onopen = function (e) {
+			console.log("Connection open...");
+			
+			// ws.send("Hello WebSocket!");
+			cb();
+			pixi.clearContainer("viewport");
+		};
+
+		ws.onmessage = function (e) {
+			if (typeof e.data === "string") {
+				console.log("String message received\n", e.data);
+				
+				var data = JSON.parse(e.data);
+				
+				a.tpl.draw(data, "viewport");
+				
+			} else {
+				console.log("Other message received\n", e.data);
+			}
+		};
+
+		ws.onerror = function (e) {
+			console.log("WebSocket Error: " , e);
+		};
+
+
+		ws.onclose = function (e) {
+			console.log("Connection closed", e);
+		};
+	}
+	function trace(arr, opt) {
+		createSock(opt);
+		addHandlers(function () {
+			
+			ws.send( JSON.stringify(arr) );
+		});
+		
+	}
+	
+	return {
+		trace: trace
+		
+	};
+	
+}());
+
+
 
 
 return {
 	pixi: pixi,
 	tpl: tpl,
-	mediator: mediator
+	mediator: mediator,
+	traceroute: traceroute
 };
 	
 

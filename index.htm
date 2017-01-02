@@ -11,6 +11,9 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<title>Pixi</title>
 	
+	
+	<script type="text/javascript" src="js/lib/socket.io-1.4.5.js"></script>
+	<script type="text/javascript" src="js/socket.js"></script>
 </head>
 
 <body>
@@ -22,11 +25,21 @@
 		
 		<div class="uk-panel">
 			<h3 class="uk-panel-title">hello?</h3>
+			
+			<form>
+				<div class="uk-form-row">
+					<textarea id="txtarea_thing" cols="24" rows="6" placeholder="Type Something" style="background: #f3f3f3;">google.com
+cvas.ir</textarea>
+				</div>
+				
+				<button id="scan" class="uk-button">Scan</button>
+				<label>secure<input type="checkbox" name="secure"></label>
+			</form>
 		</div>
 		
 		
 		<table class="uk-table uk-table-hover uk-table-striped grey lighten-4">
-			<caption>Scan</caption>
+			<caption>...</caption>
 			<thead>
 				<tr class="light-blue grey-text text-lighten-5">
 					<th>View</th>

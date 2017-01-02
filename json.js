@@ -10,7 +10,7 @@ var nodes = {},
 	links = {};
 function generateAll() {
 	var totalNodes = 20000,
-		totalLinks = 200000,
+		totalLinks = 400000,
 		minX = -10000,
 		maxX = 10000,
 		minY = -6000,

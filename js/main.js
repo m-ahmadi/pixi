@@ -88,3 +88,27 @@ $('#clear').on('click', function (e) {
 	
 	a.pixi.clearContainer('viewport');
 });
+
+$('#sidebar').on('show.uk.offcanvas', function () {
+	a.pixi.disableZoom(true);
+});
+$('#sidebar').on('hide.uk.offcanvas', function () {
+	a.pixi.disableZoom(false);
+});
+
+$('#scan').on('click', function (e) {
+	var txtarea, checkbox, txt, arr;
+	
+	e.preventDefault();
+	
+	txtarea = $('#txtarea_thing');
+	checkbox = $('input[type="checkbox"][name="secure"]').is(':checked');
+	
+	txt = txtarea.val().trim();
+	if (txt) {
+		arr = txt.split("\n");
+		//console.log(arr, checkbox);
+		
+		a.traceroute.trace(arr, checkbox);
+	}
+});
