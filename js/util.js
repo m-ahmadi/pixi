@@ -17,64 +17,77 @@ if (typeof Object.keys !== 'function') {
 		return keys;
 	};
 }
-var util = {
-	isObj: function (v) {
+var util = (function () {
+	function isObj(v) {
 		return (
 			v &&
 			typeof v === 'object' &&
 			typeof v !== null &&
 			Object.prototype.toString.call(v) === '[object Object]'
 		) ? true : false;
-	},
-	isArr: function (v) {
+	}
+	function isArr(v) {
 		if ( typeof Array.isArray === 'function' ) {
 			return Array.isArray(v);
+		} else {
+			return (
+				v &&
+				typeof v === 'object' &&
+				typeof v.length === 'number' &&
+				typeof v.splice === 'function' &&
+				!v.propertyIsEnumerable('length') &&
+				Object.prototype.toString.call(v) === '[object Array]'
+			) ? true : false;
 		}
-		return (
-			v &&
-			typeof v === 'object' &&
-			typeof v.length === 'number' &&
-			typeof v.splice === 'function' &&
-			!v.propertyIsEnumerable('length') &&
-			Object.prototype.toString.call(v) === '[object Array]'
-		) ? true : false;
-	},
-	getArgs: function (a) {
+	}
+	function getArgs(a) {
 		var args = new Array(a.length),
 			i;
 		for (i=0; i<args.length; i+=1) {
 			args[i] = a[i];
 		}
 		return args;
-	},
-	moveArrItem: function (a, f, t) { // array, from, to
+	}
+	function moveArrItem(a, f, t) { // array, from, to
 		a.splice( t, 0, a.splice(f, 1)[0] );
-	},
-	isInt: function (n) {
-		return n % 1 === 0;
-	},
-	negateNum: function (n) {
-		return Math.abs(n) * -1;
-	},
-	positNum: function (n) {
-		return Math.abs(n);
-	},
-	isNumOdd: function (n) {
-		return (n % 2) ? true : false;
-	},
-	randInt: function (min, max) { // default between 0 and 1
+	}
+	function isInt(n) {
+		return isNum(n)  &&  n % 1 === 0;
+	}
+	function negateNum(n) {
+		return isNum(n) ? Math.abs(n) * -1 : undefined;
+	}
+	function positNum(n) {
+		return isNum(n) ? Math.abs(n) : undefined;
+	}
+	function reverseNumSign(n) {
+		if ( isNum(n) ) {
+			if (n > 0) {
+				return negateNum(n);
+			} else if (n < 0) {
+				return positNum(n);
+			}
+		}
+	}
+	function isNumOdd(n) {
+		return isNum(n)  &&  (n % 2) ? true : false;
+	}
+	function randInt(min, max) { // default between 0 and 1
 		min = min ? Math.ceil(min) : 0;
 		max = max ? Math.floor(max) : 2;
 		return Math.floor(Math.random() * (max - min)) + min;
-	},
-	randFloat: function (min, max) {
+	}
+	function randFloat(min, max) {
 		min = min ? min : 0;
 		max = max ? max : 1;
 		return Math.random() * (max - min) + min;
-	},
-	isEmptyObj: function (o) {
+	}
+	function toDecimalPlace(n, p) {
+		return isNum(n) ? parseFloat( n.toFixed(p) ) : undefined;
+	}
+	function isEmptyObj(o) {
 		var k;
-		if ( this.isObj(o) ) {
+		if ( isObj(o) ) {
 			if ( typeof Object.getOwnPropertyNames === 'function' ) {
 				return Object.getOwnPropertyNames(o).length === 0; // ES5
 			} else {
@@ -86,28 +99,28 @@ var util = {
 				return true;
 			}
 		}
-	},
-	isFunc: function (v) {
-		return ( typeof v === 'function' );
-	},
-	isStr: function (v) {
-		return ( typeof v === 'string' );
-	},
-	isNum: function (v) {
-		return ( typeof v === 'number' );
-	},
-	isBool: function (v) {
-		return ( typeof v === 'boolean' );
-	},
-	isEmptyStr: function (v) {
-		return ( typeof v === 'string'  &&  v.length === 0 );
-	},
-	objLength: function (o) {
-		if ( this.isObj(o) ) {
+	}
+	function isFunc(v) {
+		return typeof v === 'function';
+	}
+	function isStr(v) {
+		return typeof v === 'string';
+	}
+	function isNum(v) {
+		return typeof v === 'number';
+	}
+	function isBool(v) {
+		return typeof v === 'boolean';
+	}
+	function isEmptyStr(v) {
+		return typeof v === 'string'  &&  v.length === 0;
+	}
+	function objLength(o) {
+		if ( isObj(o) ) {
 			return Object.keys(o).length;
 		}
-	},
-	extend: function () {
+	}
+	function extend() {
 		var args = Array.prototype.slice.call(arguments),
 			len = args.length,
 			arr = [],
@@ -117,16 +130,16 @@ var util = {
 			
 		if (len === 1) {
 			first = args[0];
-			if ( this.isArr(first)  &&  first.length > 1 ) {
+			if ( isArr(first)  &&  first.length > 1 ) {
 				last = first.pop();
 				objects = first;
-			} else if ( this.isObj(first) ){
+			} else if ( isObj(first) ){
 				result = Object.create(first);
 			}
 		} else if (len === 2) {
 			first = args[0];
 			last = args[len-1];
-			if ( this.isObj(first) ) {
+			if ( isObj(first) ) {
 				result = Object.create(first);
 			}
 		} else if (len > 2) {
@@ -137,7 +150,7 @@ var util = {
 		if (objects.length !== 0) {
 			arr.push( {} );
 			objects.forEach(function (el, i) {
-				if ( this.isObj(el) ) {
+				if ( isObj(el) ) {
 					Object.keys(el).forEach(function (k) {
 						arr[i][k] = el[k];
 					});
@@ -147,11 +160,37 @@ var util = {
 			result = arr[arr.length-1];
 		}
 		
-		if ( last && this.isObj(last) ) {
+		if ( last && isObj(last) ) {
 			Object.keys(last).forEach(function(key) {
 				result[key] = last[key];
 			});
 		}
 		return result;
 	}
-};
+	function getCommentsInside(selector) {
+		return $(selector).contents().filter( function () { return this.nodeType == 8; } );
+	}
+	
+	return {
+		isObj: isObj,
+		isArr: isArr,
+		getArgs: getArgs,
+		moveArrItem: moveArrItem,
+		isInt: isInt,
+		negateNum: negateNum,
+		positNum: positNum,
+		reverseNumSign: reverseNumSign,
+		isNumOdd: isNumOdd,
+		randInt: randInt,
+		randFloat: randFloat,
+		toDecimalPlace: toDecimalPlace,
+		isEmptyObj: isEmptyObj,
+		isFunc: isFunc,
+		isStr: isStr,
+		isNum: isNum,
+		isEmptyStr: isEmptyStr,
+		objLength: objLength,
+		extend: extend,
+		getCommentsInside: getCommentsInside,
+	};
+}());

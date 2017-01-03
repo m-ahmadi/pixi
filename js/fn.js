@@ -1,4 +1,4 @@
-var t,s;
+var t, s;
 var a = (function () {
 "use strict";
 
@@ -731,6 +731,7 @@ var pixi = (function () {
 				sprite.tint = n;
 			}
 		};
+		
 		return box;
 	}
 	function bringToFront(el) {
@@ -939,7 +940,6 @@ var tpl = (function () {
 		"smartphone", "smartwatch", "video-card", "xbox"
 	];
 	
-	
 	function animateNode(pixiEl, o) {
 		o = o ? o : {};
 		var box = pixiEl;
@@ -960,7 +960,7 @@ var tpl = (function () {
 			onCompleteScope: o.doneCtx
 		});
 	}
-	function createNode(o, container) {
+	function createNode(o, container, coefficient) {
 		o = o ? o : {};
 		var node,
 			type, name, id, thisLinks,
@@ -974,14 +974,13 @@ var tpl = (function () {
 			x         = o.x;
 			y         = o.y;
 			thisLinks = o.links || false;
-			
 		}
 		function createBox() {
 			boxSpriteText = pixi.createBoxSpriteText({
-				x: x,
-				y: y,
+				x: coefficient ? x*coefficient.x : x,
+				y: coefficient ? y*coefficient.y : y,
 				imgName: p.types[type],
-				spriteScale: 0.08,
+				spriteScale: 0.1,
 				spriteTint: type,
 				textContent: name,
 				onmouseup: function () {
@@ -1118,8 +1117,6 @@ var tpl = (function () {
 			
 			
 			pixi.addChild(container, "lineContainer", link.pixiEl);
-			
-			return path;
 		}
 		
 		return create;
@@ -1128,7 +1125,6 @@ var tpl = (function () {
 		createNode( node, container );
 	}
 	function checkLink(link, container, bounds) {
-		//debugger;
 		/*
 		var src = link.src,
 			dest = link.dest,
@@ -1167,8 +1163,6 @@ var tpl = (function () {
 		}
 		*/
 		// createLink(start, end, src.id, dest.id, link.id, container);
-		debugger;
-		
 		
 		var srcId, destId, srcNode, destNode, linkId,
 			isObj = util.isObj,
@@ -1195,23 +1189,23 @@ var tpl = (function () {
 			destId = link.destination_id;
 		}
 		
-		
 		srcNode = p.nodes[srcId];
 		destNode = p.nodes[destId];
 		
 		createLink(
-			srcNode,
-			destNode,
-			link.src.id,
-			link.dest.id,
+			srcNode.center,
+			destNode.center,
+			srcId,
+			destId,
 			link.id,
 			link.status,
 			container
 		);
 	}
-	function drawNodes(nodes, c) {
+	function drawNodes(nodes, c, coefficient) {
 		Object.keys(nodes).forEach(function (k) {
-			checkNode( nodes[k], c );
+			// checkNode( nodes[k], c );
+			createNode( nodes[k], c, coefficient );
 		});
 	}
 	function drawLinks(links, c, b) {
@@ -1219,18 +1213,21 @@ var tpl = (function () {
 			checkLink( links[k], c, b );
 		});
 	}
-	function draw(data, c, b) {
-		var container = c ? c : "viewport",
-			bounds = b ? b : {};
+	function draw(data, container, bounds, coefficient) {
+		container = container ? container : "viewport";
+		bounds = bounds ? bounds : {};
+		coefficient = coefficient ? coefficient : false;
+		
 		p.nodes = {};
 		p.links = {};
-		drawNodes(data.nodes, container);
+		drawNodes(data.nodes, container, coefficient);
 		drawLinks(data.links, container, bounds);
 	}
 	
 	return {
-		nodes: p.nodes,
-		links: p.links,
+		get nodes() { return p.nodes },
+		get links() { return p.links },
+		checkLink: checkLink,
 		draw: draw
 	};
 }());
@@ -1457,7 +1454,7 @@ var mediator = (function () {
 			loadData();
 		}
 		*/
-		//console.log(Math.floor(x), Math.floor(y)); 
+		// console.log(Math.floor(x), Math.floor(y)); 
 	}
 	function zoomCallback(d) {
 		var pos = d.pos,
@@ -1513,7 +1510,8 @@ var mediator = (function () {
 		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
 		//core.init();
 		//navigation.init();
-		addCustomEvents();
+		
+		// addCustomEvents();
 	}
 	
 	
@@ -1747,11 +1745,39 @@ var navigation = (function () {
 
 var traceroute = (function () {
 	var ws,
-		path = 'ws://192.168.10.13:3000/network/icmp/traceroute';
+		path = 'ws://192.168.10.13:3000/network/icmp/traceroute',
+		coefficient,
+		nodes = {},
+		links = {};
 	
+	
+	function filter(data) {
+		var newLinks = data.links,
+			newNodes = data.nodes,
+			diffNodes = {},
+			diffLinks = {};
+			
+		Object.keys(newNodes).forEach(function (k) {
+			if ( !nodes[k] ) {
+				nodes[k] = newNodes[k];
+				diffNodes[k] = newNodes[k];
+			}
+		});
+		Object.keys(newLinks).forEach(function (k) {
+			if ( !links[k] ) {
+				links[k] = newLinks[k];
+				diffLinks[k] = newLinks[k];
+			}
+		});
+		
+		return {
+			links: diffLinks,
+			nodes: diffNodes
+		};
+	}
 	function createSock(opt) {
 		if (opt) { 
-			path += '?get=true';
+			path += '?portscanner=true';
 		}
 		ws = new WebSocket(path);
 		console.log(ws);
@@ -1763,15 +1789,30 @@ var traceroute = (function () {
 			// ws.send("Hello WebSocket!");
 			cb();
 			pixi.clearContainer("viewport");
+			pixi.mainContainer.x = pixi.renderer.width / 2;
+			pixi.mainContainer.y = pixi.renderer.height / 2;
 		};
 
 		ws.onmessage = function (e) {
+			
 			if (typeof e.data === "string") {
-				console.log("String message received\n", e.data);
+				console.log("String message received\n");
 				
 				var data = JSON.parse(e.data);
+				console.log(data);
 				
-				a.tpl.draw(data, "viewport");
+				data = filter(data);
+				
+				var nodesLen = Object.keys(data.nodes).length;
+				var linksLen = Object.keys(data.links).length;
+				console.log(nodesLen, linksLen);
+				coefficient = {
+					x: pixi.renderer.width / (nodesLen + 80),
+					y: pixi.renderer.height / (nodesLen + 80),
+				}
+				// console.log(coefficient);
+				
+				a.tpl.draw(data, "viewport", undefined, coefficient);
 				
 			} else {
 				console.log("Other message received\n", e.data);
@@ -1790,7 +1831,6 @@ var traceroute = (function () {
 	function trace(arr, opt) {
 		createSock(opt);
 		addHandlers(function () {
-			
 			ws.send( JSON.stringify(arr) );
 		});
 		
@@ -1802,8 +1842,6 @@ var traceroute = (function () {
 	};
 	
 }());
-
-
 
 
 return {
