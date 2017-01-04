@@ -970,7 +970,8 @@ var tpl = (function () {
 		function setThings() {
 			type      = o.type  || 0;
 			id        = o.id    || "tpl_node_"+(p.idCounter+=1);
-			name      = o.name  || "Node "+(p.idCounter+=1);
+		//	name      = o.name  || "Node "+(p.idCounter+=1);
+			name      = o.name  || o.management_ip  || "Node "+(p.idCounter+=1);
 			x         = o.x;
 			y         = o.y;
 			thisLinks = o.links || false;
@@ -1188,10 +1189,10 @@ var tpl = (function () {
 		} else if (link.destination_id) {
 			destId = link.destination_id;
 		}
-		
+		//debugger;
 		srcNode = p.nodes[srcId];
 		destNode = p.nodes[destId];
-		
+		//debugger;
 		createLink(
 			srcNode.center,
 			destNode.center,
@@ -1302,14 +1303,14 @@ var mediator = (function () {
 		
 		console.log(p.bounds);
 		console.log(p.data);
-		ajax({
-			data: p.data
-		})
-		.done(function ( data ) { // {url: "js/d.txt"}
-			console.log(data);
-			t = data;
-			a.tpl.draw(data, "viewport");
-		});
+		// ajax({
+			// data: p.data
+		// })
+		// .done(function ( data ) { // {url: "js/d.txt"}
+			// console.log(data);
+			// t = data;
+			// a.tpl.draw(data, "viewport");
+		// });
 	}
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
@@ -1744,11 +1745,14 @@ var navigation = (function () {
 }());
 
 var traceroute = (function () {
-	var ws,
+	var ws = {},
 		path = 'ws://192.168.10.13:3000/network/icmp/traceroute',
-		coefficient,
+		coefficient = {},
 		nodes = {},
-		links = {};
+		links = {},
+		msgCounter = 0,
+		noteMsgs = {},
+		scanBtn = {};
 	
 	
 	function filter(data) {
@@ -1782,21 +1786,49 @@ var traceroute = (function () {
 		ws = new WebSocket(path);
 		console.log(ws);
 	}
+	function abort() {
+		if ( !util.isEmptyObj(ws) ) {
+			ws.close(4999);
+		}
+	}
 	function addHandlers(cb) {
 		ws.onopen = function (e) {
 			console.log("Connection open...");
 			
 			// ws.send("Hello WebSocket!");
 			cb();
-			pixi.clearContainer("viewport");
-			pixi.mainContainer.x = pixi.renderer.width / 2;
-			pixi.mainContainer.y = pixi.renderer.height / 2;
 		};
 
 		ws.onmessage = function (e) {
+			msgCounter += 1;
+			
+			if (msgCounter === 1) { // only for the first msg
+				noteMsgs.init.close();
+				pixi.clearContainer("viewport");
+				pixi.mainContainer.x = pixi.renderer.width / 2;
+				pixi.mainContainer.y = pixi.renderer.height / 2;
+				UIkit.offcanvas.hide(false);
+				
+				noteMsgs.processing = UIkit.notify({
+					message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال دریافت اطلاعات...',
+					status  : 'info',
+					timeout : 0,
+					pos     : 'bottom-right'
+				});
+			}
+			
+			
 			
 			if (typeof e.data === "string") {
 				console.log("String message received\n");
+				noteMsgs.newData = UIkit.notify({
+					message : '<i class="fa fa-check-circle" aria-hidden="true"></i> دریافت اطلاعات جدید.',
+					status  : 'success',
+					timeout : 1000,
+					pos     : 'bottom-right'
+				});
+				
+				
 				
 				var data = JSON.parse(e.data);
 				console.log(data);
@@ -1805,10 +1837,12 @@ var traceroute = (function () {
 				
 				var nodesLen = Object.keys(data.nodes).length;
 				var linksLen = Object.keys(data.links).length;
+				
 				console.log(nodesLen, linksLen);
+				
 				coefficient = {
-					x: pixi.renderer.width / (nodesLen + 80),
-					y: pixi.renderer.height / (nodesLen + 80),
+					x: pixi.renderer.width / (300 + 80),
+					y: pixi.renderer.height / (300 + 80),
 				}
 				// console.log(coefficient);
 				
@@ -1821,14 +1855,40 @@ var traceroute = (function () {
 
 		ws.onerror = function (e) {
 			console.log("WebSocket Error: " , e);
+			
+			noteMsgs.processing.close();
+			noteMsgs.error = UIkit.notify({
+				message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> خطا در برقراری ارتباط!',
+				status  : 'danger',
+				timeout : 2000,
+				pos     : 'bottom-right'
+			});
 		};
 
 
 		ws.onclose = function (e) {
 			console.log("Connection closed", e);
+			scanBtn.removeAttr('disabled');
+			
+			noteMsgs.processing.close();
+			noteMsgs.close = UIkit.notify({
+				message : '<i class="fa fa-check" aria-hidden="true"></i> دریافت کامل اطلاعات با موفقیت به پایان رسید.',
+				status  : 'success',
+				timeout : 2000,
+				pos     : 'bottom-right'
+			});
 		};
 	}
 	function trace(arr, opt) {
+		noteMsgs['init'] = UIkit.notify({
+			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال بررسی...',
+			status  : 'info',
+			timeout : 0,
+			pos     : 'top-center'
+		});
+		scanBtn = $('#scan');
+		scanBtn.attr('disabled', '');
+		
 		createSock(opt);
 		addHandlers(function () {
 			ws.send( JSON.stringify(arr) );
@@ -1837,6 +1897,7 @@ var traceroute = (function () {
 	}
 	
 	return {
+		abort: abort,
 		trace: trace
 		
 	};

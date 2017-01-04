@@ -4,9 +4,12 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
 	<link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
-	<link rel="stylesheet" type="text/css" href="css/uk/uikit.gradient.css"/>
-	<link rel="stylesheet" type="text/css" href="css/uk/form-advanced.gradient.min.css"/>
-	<link rel="stylesheet" type="text/css" href="css/uk/form-select.gradient.min.css"/>
+	<link rel="stylesheet" type="text/css" href="css/byekan-fontface.css"/>
+	<link rel="stylesheet" type="text/css" href="css/font-awesome/font-awesome.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uikit/uikit.gradient.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uikit/form-advanced.gradient.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uikit/form-select.gradient.css"/>
+	<link rel="stylesheet" type="text/css" href="css/uikit/notify.gradient.css"/>
 	<link rel="stylesheet" type="text/css" href="css/folding-cube.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<title>Pixi</title>
@@ -22,18 +25,45 @@
 
 <div id="sidebar" class="uk-offcanvas">
 	<div class="uk-offcanvas-bar">
+	
+		<ul class="uk-nav uk-parent-icon" data-uk-nav>
+			<li class="uk-parent">
+				<a href="#" class="uk-nav-header"><i class="fa fa-wrench fa-lg" aria-hidden="true"></i> Trace Route</a>
+				<ul class="uk-nav-sub">
+					<li><a href="#">T</a></li>
+					<li><a href="#">dolor</a></li>
+					<li><a href="#">dolor</a></li>
+				</ul>
+			
+			</li>
+			
+			<li class="uk-nav-divider"></li>
+			
+			<li class="uk-parent">
+				<a href="#" class="uk-nav-header"><i class="fa fa-wrench fa-lg" aria-hidden="true"></i> Discovery</a>
+				<ul class="uk-nav-sub">
+					<li><a href="#">T</a></li>
+					<li><a href="#">dolor</a></li>
+					<li><a href="#">dolor</a></li>
+				</ul>
+			</li>
+		</ul>
 		
 		<div class="uk-panel">
+			
+			
 			<h3 class="uk-panel-title">hello?</h3>
 			
-			<form>
+			<form class="uk-form">
 				<div class="uk-form-row">
-					<textarea id="txtarea_thing" cols="24" rows="6" placeholder="Type Something" style="background: #f3f3f3;">google.com
+					<textarea id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
 cvas.ir</textarea>
 				</div>
-				
-				<button id="scan" class="uk-button">Scan</button>
-				<label>secure<input type="checkbox" name="secure"></label>
+				<div class="uk-form-row">
+					<button id="scan" class="uk-button uk-text-bold">Scan</button>
+					<label class="uk-text-bold grey-text text-lighten-4">secure <input type="checkbox" name="secure"></label>
+					<!-- <button id="abort" class="uk-button uk-button-danger uk-text-bold" disabled>Abort</button> -->
+				</div>
 			</form>
 		</div>
 		
@@ -91,7 +121,7 @@ cvas.ir</textarea>
 				<!-- <label>Link to </label> <button id="select_all" class="uk-button">select all</button><br /> -->
 			<!-- </div> -->
 			<!-- <button id="add_device" class="uk-button">create device</button> -->
-			<button id="sidebar" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar'}">side bar</button>
+			<button id="sidebar-btn" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'reveal'}">side bar</button>
 			
 			<button id="clear" class="uk-button">clear</button>
 			<button id="generate" class="uk-button">draw</button>
@@ -109,7 +139,8 @@ cvas.ir</textarea>
 </div>
 <script type="text/javascript" src="js/lib/jquery/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery/jquery.mousewheel.js"></script>
-<script type="text/javascript" src="js/lib/uikit.min.js"></script>
+<script type="text/javascript" src="js/lib/uikit/uikit.js"></script>
+<script type="text/javascript" src="js/lib/uikit/notify.js"></script>
 <script type="text/javascript" src="js/lib/pixi/pixi.min.js"></script>
 
 

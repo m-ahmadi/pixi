@@ -111,4 +111,11 @@ $('#scan').on('click', function (e) {
 		
 		a.traceroute.trace(arr, checkbox);
 	}
+	$('#abort').removeAttr('disabled');
 });
+
+$('#abort').on('click', function (e) {
+	e.preventDefault();
+	a.traceroute.abort();
+});
+

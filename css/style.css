@@ -3056,6 +3056,7 @@ nav ul a span.badge {
 body {
   width: 100%;
   margin: 0 auto;
+  font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 #opt {

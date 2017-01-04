@@ -9,7 +9,7 @@
  */
 html {
   /* 1 */
-  font: normal 14px / 20px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 14px / 20px 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
   /* 2 */
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -233,7 +233,7 @@ h4,
 h5,
 h6 {
   margin: 0 0 15px 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: normal;
   color: #444;
   text-transform: none;
@@ -2097,7 +2097,7 @@ html:not(.uk-touch) .uk-nav-offcanvas ul a:hover {
   /* 2 */
   color: #444;
   font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: normal;
   margin-top: -1px;
   margin-left: -1px;
@@ -3951,7 +3951,7 @@ select.uk-form-width-mini {
  ========================================================================== */
 @font-face {
   font-family: 'FontAwesome';
-  src: url("../fonts/fontawesome-webfont.woff2") format('woff2'), url("../fonts/fontawesome-webfont.woff") format("woff"), url("../fonts/fontawesome-webfont.ttf") format("truetype");
+  src: url("../../fonts/fontawesome-webfont.woff2") format('woff2'), url("../../fonts/fontawesome-webfont.woff") format("woff"), url("../../fonts/fontawesome-webfont.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
