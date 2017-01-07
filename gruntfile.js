@@ -86,11 +86,11 @@ module.exports = function(grunt) {
 					filename: 'bundle.js',
 					path: './js/dist'
 				},
-				module: {
-					resolve: {
-						modules: ['js/src']
-					}
-				}
+				// module: {
+					// resolve: {
+						// modules: ['js/src']
+					// }
+				// }
 			}
 		},
 		watch: {
