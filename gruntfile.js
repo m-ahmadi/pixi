@@ -77,6 +77,22 @@ module.exports = function(grunt) {
 			}
 		},
 		*/
+		webpack: {
+			default: {
+				entry: {
+					main: './js/src/main.js'
+				},
+				output: {
+					filename: 'bundle.js',
+					path: './js/dist'
+				},
+				module: {
+					resolve: {
+						modules: ['js/src']
+					}
+				}
+			}
+		},
 		watch: {
 			scripts: {
 				files: [
@@ -86,7 +102,7 @@ module.exports = function(grunt) {
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass'], // 'jslint', 'browserify', 'jshint', 'concat'
+				tasks: ['sass', 'webpack'], // 'jslint', 'browserify', 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
@@ -105,6 +121,7 @@ module.exports = function(grunt) {
 		}
 	});
 	
+	grunt.loadNpmTasks('grunt-webpack');
 	grunt.loadNpmTasks('grunt-jslint');
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
