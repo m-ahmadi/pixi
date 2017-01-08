@@ -1303,14 +1303,14 @@ var mediator = (function () {
 		
 		console.log(p.bounds);
 		console.log(p.data);
-		// ajax({
-			// data: p.data
-		// })
-		// .done(function ( data ) { // {url: "js/d.txt"}
-			// console.log(data);
-			// t = data;
-			// a.tpl.draw(data, "viewport");
-		// });
+		ajax({
+			data: p.data
+		})
+		.done(function ( data ) { // {url: "js/d.txt"}
+			console.log(data);
+			t = data;
+			a.tpl.draw(data, "viewport");
+		});
 	}
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
@@ -1512,7 +1512,7 @@ var mediator = (function () {
 		//core.init();
 		//navigation.init();
 		
-		// addCustomEvents();
+		addCustomEvents();
 	}
 	
 	

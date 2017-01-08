@@ -68,3 +68,6 @@ function coPubsub() {
 	
 	return inst;
 };
+
+
+export default coPubsub
