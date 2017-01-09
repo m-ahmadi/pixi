@@ -194,3 +194,5 @@ var util = (function () {
 		getCommentsInside: getCommentsInside,
 	};
 }());
+
+var u = util;

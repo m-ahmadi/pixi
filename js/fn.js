@@ -313,7 +313,7 @@ var pixi = (function () {
 		var line,
 			start,
 			end,
-			lineWidth,
+			lineWidth, tmpLineWidth,
 			color,
 			p;
 		
@@ -322,7 +322,7 @@ var pixi = (function () {
 			end       =  conf.end       ||  {x: 0, y: 0};
 			lineWidth =  conf.lineWidth ||  2;
 			color     =  conf.color     ||  0x000000;
-			p = calcPoints(start, end, lineWidth);
+			p         =  calcPoints();
 		}
 		function setStart(s) {
 			if (s) {
@@ -351,8 +351,23 @@ var pixi = (function () {
 		function up() {
 			this.alpha = 1;
 		}
-		function move() {
-			//console.log("move");
+		function move(e) {
+			
+		}
+		function over() {
+			tmpLineWidth = lineWidth;
+			lineWidth *= 4;
+			p = calcPoints();
+			line.clear();
+			draw();
+			toggleDirties();
+		}
+		function out() {
+			lineWidth = tmpLineWidth;
+			p = calcPoints();
+			line.clear();
+			draw();
+			toggleDirties();
 		}
 		function addEvents() {
 			line
@@ -362,15 +377,17 @@ var pixi = (function () {
 				.on("mouseupoutside", up)
 				.on("touchend", up)
 				.on("touchendoutside", up)
-				.on("mousemove", move)
-				.on("touchmove", move);
+			//	.on("mousemove", move)
+			//	.on("touchmove", move)
+				.on("mouseover", over)
+				.on("mouseout", out);
 		}
 		function toggleDirties() {
 			var dirty = line.dirty,
 				clearDirty = line.clearDirty;
 			
-			dirty = (dirty) ? false : true;
-			clearDirty = (clearDirty) ? false : true;
+			dirty = dirty ? false : true;
+			clearDirty = clearDirty ? false : true;
 		}
 		function calcPoints() {
 			var half = lineWidth / 2,
@@ -427,7 +444,7 @@ var pixi = (function () {
 		function changePoints(s, e) {
 			setStart(s);
 			setEnd(e);
-			p = calcPoints(start, end, lineWidth);
+			p = calcPoints();
 			line.clear();
 			draw();
 			toggleDirties();
@@ -444,6 +461,7 @@ var pixi = (function () {
 			var line;
 			
 			line = new PIXI.Graphics();
+			line.uid = 
 			line.interactive = true;
 			line.buttonMode = true;
 			line.lineStyle(0);
@@ -458,6 +476,7 @@ var pixi = (function () {
 		
 		setThings();
 		create();
+		
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
 		Object.defineProperty(line, "points", {
@@ -1512,7 +1531,7 @@ var mediator = (function () {
 		//core.init();
 		//navigation.init();
 		
-		addCustomEvents();
+		// addCustomEvents();
 	}
 	
 	
@@ -1747,13 +1766,13 @@ var navigation = (function () {
 var traceroute = (function () {
 	var ws = {},
 		path = 'ws://192.168.10.13:3000/network/icmp/traceroute',
+		openCallback,
 		coefficient = {},
 		nodes = {},
 		links = {},
 		msgCounter = 0,
 		noteMsgs = {},
 		scanBtn = {};
-	
 	
 	function filter(data) {
 		var newLinks = data.links,
@@ -1787,100 +1806,107 @@ var traceroute = (function () {
 		console.log(ws);
 	}
 	function abort() {
-		if ( !util.isEmptyObj(ws) ) {
+		if ( !u.isEmptyObj(ws) ) {
 			ws.close(4999);
 		}
 	}
 	function addHandlers(cb) {
-		ws.onopen = function (e) {
-			console.log("Connection open...");
+		openCallback = cb;
+		
+		ws.onopen = onopen;
+		ws.onmessage = onmessage;
+		ws.onerror = onerror;
+		ws.onclose = onclose;
+	}
+	function onopen(e) {
+		var cb = openCallback;
+		
+		console.log("Connection open...");
 			
-			// ws.send("Hello WebSocket!");
+		// ws.send("Hello WebSocket!");
+		
+		if ( u.isFunc(cb) ) {
 			cb();
-		};
-
-		ws.onmessage = function (e) {
-			msgCounter += 1;
+		}
+	}
+	function onmessage(e) {
+		msgCounter += 1;
 			
-			if (msgCounter === 1) { // only for the first msg
-				noteMsgs.init.close();
-				pixi.clearContainer("viewport");
-				pixi.mainContainer.x = pixi.renderer.width / 2;
-				pixi.mainContainer.y = pixi.renderer.height / 2;
-				UIkit.offcanvas.hide(false);
-				
-				noteMsgs.processing = UIkit.notify({
-					message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال دریافت اطلاعات...',
-					status  : 'info',
-					timeout : 0,
-					pos     : 'bottom-right'
-				});
-			}
+		if (msgCounter === 1) { // only for the first msg
+			noteMsgs.init.close();
+			pixi.clearContainer("viewport");
+			pixi.mainContainer.x = pixi.renderer.width / 2;
+			pixi.mainContainer.y = pixi.renderer.height / 2;
+			UIkit.offcanvas.hide(false);
 			
-			
-			
-			if (typeof e.data === "string") {
-				console.log("String message received\n");
-				noteMsgs.newData = UIkit.notify({
-					message : '<i class="fa fa-check-circle" aria-hidden="true"></i> دریافت اطلاعات جدید.',
-					status  : 'success',
-					timeout : 1000,
-					pos     : 'bottom-right'
-				});
-				
-				
-				
-				var data = JSON.parse(e.data);
-				console.log(data);
-				
-				data = filter(data);
-				
-				var nodesLen = Object.keys(data.nodes).length;
-				var linksLen = Object.keys(data.links).length;
-				
-				console.log(nodesLen, linksLen);
-				
-				coefficient = {
-					x: pixi.renderer.width / (300 + 80),
-					y: pixi.renderer.height / (300 + 80),
-				}
-				// console.log(coefficient);
-				
-				a.tpl.draw(data, "viewport", undefined, coefficient);
-				
-			} else {
-				console.log("Other message received\n", e.data);
-			}
-		};
-
-		ws.onerror = function (e) {
-			console.log("WebSocket Error: " , e);
-			
-			noteMsgs.processing.close();
-			noteMsgs.error = UIkit.notify({
-				message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> خطا در برقراری ارتباط!',
-				status  : 'danger',
-				timeout : 2000,
+			noteMsgs.processing = UIkit.notify({
+				message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال دریافت اطلاعات...',
+				status  : 'info',
+				timeout : 0,
 				pos     : 'bottom-right'
 			});
-		};
-
-
-		ws.onclose = function (e) {
-			console.log("Connection closed", e);
-			scanBtn.removeAttr('disabled');
-			
-			noteMsgs.processing.close();
-			noteMsgs.close = UIkit.notify({
-				message : '<i class="fa fa-check" aria-hidden="true"></i> دریافت کامل اطلاعات با موفقیت به پایان رسید.',
+		}
+		
+		
+		
+		if ( u.isStr(e.data) ) {
+			console.log("String message received\n");
+			noteMsgs.newData = UIkit.notify({
+				message : '<i class="fa fa-check-circle" aria-hidden="true"></i> دریافت اطلاعات جدید.',
 				status  : 'success',
-				timeout : 2000,
+				timeout : 1000,
 				pos     : 'bottom-right'
 			});
-		};
+			
+			
+			
+			var data = JSON.parse(e.data);
+			console.log(data);
+			
+			data = filter(data);
+			
+			var nodesLen = Object.keys(data.nodes).length;
+			var linksLen = Object.keys(data.links).length;
+			
+			console.log(nodesLen, linksLen);
+			
+			coefficient = {
+				x: pixi.renderer.width / (300 + 80),
+				y: pixi.renderer.height / (300 + 80),
+			}
+			// console.log(coefficient);
+			
+			a.tpl.draw(data, "viewport", undefined, coefficient);
+			
+		} else {
+			console.log("Other message received\n", e.data);
+		}
+	}
+	function onerror(e) {
+		console.log("WebSocket Error: " , e);
+			
+		noteMsgs.processing.close();
+		noteMsgs.error = UIkit.notify({
+			message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> خطا در برقراری ارتباط!',
+			status  : 'danger',
+			timeout : 2000,
+			pos     : 'bottom-right'
+		});
+	}
+	function onclose(e) {
+		console.log("Connection closed", e);
+		scanBtn.removeAttr('disabled');
+		
+		noteMsgs.processing.close();
+		noteMsgs.close = UIkit.notify({
+			message : '<i class="fa fa-check" aria-hidden="true"></i> دریافت کامل اطلاعات با موفقیت به پایان رسید.',
+			status  : 'success',
+			timeout : 2000,
+			pos     : 'bottom-right'
+		});
 	}
 	function trace(arr, opt) {
-		noteMsgs['init'] = UIkit.notify({
+		noteMsgs.init = UIkit.notify({
 			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال بررسی...',
 			status  : 'info',
 			timeout : 0,
