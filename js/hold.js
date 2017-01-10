@@ -1,4 +1,204 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var addDragDrop = (function () {
+	function down(e) {
+		e.stopPropagation();
+		this.data = e.data;
+		this.alpha = 0.5;
+		this.dragging = true;
+		this.dragPoint = e.data.getLocalPosition(this.parent);
+		this.dragPoint.x -= this.position.x;
+		this.dragPoint.y -= this.position.y;
+		
+		bringToFront(this);
+	}
+	function up() {
+		this.alpha = 1;
+		this.dragging = false;
+		this.data = null;
+		
+		if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
+			core.adjustLines(this);
+		}
+	}
+	function move() {
+		if ( this.dragging ) {
+			var newPosition = this.data.getLocalPosition(this.parent);
+			this.position.x = newPosition.x - this.dragPoint.x;
+			this.position.y = newPosition.y - this.dragPoint.y;
+		}
+	}
+	
+	function add(el) {
+		el
+			.on("mousedown", down) 
+			.on("touchstart", down)
+			.on("mouseup", up)
+			.on("mouseupoutside", up)
+			.on("touchend", up)
+			.on("touchendoutside", up)
+			.on("mousemove", move)
+			.on("touchmove", move);
+	}
+	
+	
+	return add;
+}());
+function bringToFront(el) {
+	// reorder children for z-index
+	var arr = p.mainContainer.children;
+	arr.splice( arr.indexOf(el), 1 );
+	arr.push(el);
+}
+function createSprite(o, noDrag) {
+	// var sprite = new PIXI.Sprite.fromImage(o.image);
+	var sprite = new PIXI.Sprite( PIXI.TextureCache[o.image] );
+	sprite.interactive = true;
+	sprite.buttonMode = true;
+	sprite.anchor.set(0, 0);
+	sprite.scale.set(o.scale);
+	sprite.alpha = o.alpha || 0;
+	sprite.rotation = o.rotation || 0;
+	sprite.position.x = o.x;
+	sprite.position.y = o.y;
+	
+	if ( !noDrag ) {
+		addDragDrop(sprite);
+	}
+	
+	return sprite;
+}
+function createLine(conf, noDrag) {
+	var line = new PIXI.Graphics(),
+		points,
+		i;
+	
+	conf = conf ? conf : {};
+	
+	if ( util.isObj(conf) ) {
+		points = conf.points || [];
+	} else if ( util.isArr(conf) ) {
+		points = conf;
+	}
+	
+	
+	if ( points.length === 0 ) {
+		points = [0, 0, 1, 1];
+	}
+	
+	
+	line.interactive = true;
+	line.buttonMode = true;
+	line.beginFill();
+	line.lineStyle(
+		conf.thickness || 2,
+		conf.color || 0x000000,
+		conf.alpha || 1
+	);
+	
+	line.moveTo( points[0], points[1] );
+	for (i=2; i < points.length ;i+=2) {
+		line.lineTo( points[i], points[i+1] );
+	}
+	line.lineTo( points[0], points[1] );
+	line.endFill();
+	line.hitArea = new PIXI.Polygon([
+		
+	]);
+	
+	if ( !noDrag ) {
+		addDragDrop(line);
+	}
+	
+	return line;
+}
+function redrawLine(ctx, o) {
+	var points,
+		i,
+		dirty,
+		clearDirty;
+	
+	if ( util.isObj(o) ) {
+		points = o.points;
+	} else if ( util.isArr(o) ) {
+		points = o;
+	}
+	
+	ctx.clear();
+	ctx.beginFill();
+	ctx.lineStyle(
+		o.thickness || 2,
+		o.color     || 0x000000,
+		o.alpha     || 1
+	);
+	
+	ctx.moveTo( points[0], points[1] );
+	for (i=2; i < points.length ;i+=2) {
+		ctx.lineTo( points[i], points[i+1] );
+	}
+	ctx.lineTo( points[0], points[1] );
+	ctx.endFill();
+	
+	
+	dirty = ctx.dirty;
+	clearDirty = ctx.clearDirty;
+	
+	if ( dirty ) {
+		dirty = false;
+	} else if ( !dirty ) {
+		dirty = true;
+	}
+	
+	if ( clearDirty ) {
+		clearDirty = false;
+	} else if ( !clearDirty ) {
+		clearDirty = true;
+	}
+	
+}
+function createRect(o, noDrag) {
+	var rect = new PIXI.Graphics();
+	
+	rect.interactive = true;
+	rect.buttonMode = true;
+	rect.beginFill(o.color);
+	rect.lineStyle(
+		o.lineWidth || 0,
+		o.lineColor || 0x000000,
+		o.alpha || 1
+	);
+	rect.drawRect(
+		o.x || 0,
+		o.y || 0,
+		o.width,
+		o.height
+	);
+	rect.endFill();
+	
+	if ( !noDrag ) {
+		addDragDrop(rect);
+	}
+	
+	return rect;
+}
+function createText(o, noDrag) {
+	o = o ? o : {};
+	var txt = util.isStr( o ) ? o : o.text;
+	
+	var text = new PIXI.Text(txt, {
+		fontFamily: o.font || "Arial",
+		fontSize: o.size || "20px",
+		fill: o.color || "black"
+	});
+	text.interactive = true;
+	text.buttonMode = true;
+	
+	if ( !noDrag ) {
+		addDragDrop(text);
+	}
+	
+	return text;
+}
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);
 

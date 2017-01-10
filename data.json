@@ -76,7 +76,7 @@
 	
 	Also the names shouldn't be any of the following:
 	
-	Note a reserve word:
+	Not a reserve word:
 		abstract
 		boolean break byte
 		case catch char class const continue

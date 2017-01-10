@@ -21,7 +21,7 @@ var pixi = (function () {
 	p.zoomDisabled = false;
 	
 	function init(callback, panBounds, background) {
-		var r;
+		var r, renW, renH, renReso;
 		
 		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
@@ -39,6 +39,9 @@ var pixi = (function () {
 		//	noWebGL: false,                    // optional
 		);
 		r = p.renderer;
+		renW = r.width;
+		renH = r.height;
+		renReso = r.resolution;
 		
 		// document.body.appendChild( p.renderer.view );
 		$("#contents").append( p.renderer.view );
@@ -48,7 +51,7 @@ var pixi = (function () {
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		p.mainContainer.interactive = true;
-		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, r.width / r.resolution * 100000, r.height / r.resolution *100000 );
+		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
 		pan.add( p.mainContainer );
 			
 		$(document).on("mousewheel", function (e) {
@@ -95,7 +98,7 @@ var pixi = (function () {
 		PIXI.loader.add( "images/atlas-0.json" );
 		PIXI.loader.load(function () {
 			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
-			callback(r.width, r.height);
+			callback(renW, renH);
 		});
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		inst.publish("init");
@@ -218,8 +221,6 @@ var pixi = (function () {
 				p.mainContainer.position.y = mcY > 0 ? bY1 : mcY < 0 ? bY2 : undefined;
 			}
 			
-			
-			
 			prevX = pos.x;
 			prevY = pos.y;
 			
@@ -262,50 +263,6 @@ var pixi = (function () {
 			pan: pan,
 			add: add
 		};
-	}());
-	var addDragDrop = (function () {
-		function down(e) {
-			e.stopPropagation();
-			this.data = e.data;
-			this.alpha = 0.5;
-			this.dragging = true;
-			this.dragPoint = e.data.getLocalPosition(this.parent);
-			this.dragPoint.x -= this.position.x;
-			this.dragPoint.y -= this.position.y;
-			
-			bringToFront(this);
-		}
-		function up() {
-			this.alpha = 1;
-			this.dragging = false;
-			this.data = null;
-			
-			if ( this.TPL_Stuff  &&  this.TPL_Stuff.links ) {
-				core.adjustLines(this);
-			}
-		}
-		function move() {
-			if ( this.dragging ) {
-				var newPosition = this.data.getLocalPosition(this.parent);
-				this.position.x = newPosition.x - this.dragPoint.x;
-				this.position.y = newPosition.y - this.dragPoint.y;
-			}
-		}
-		
-		function add(el) {
-			el
-				.on("mousedown", down) 
-				.on("touchstart", down)
-				.on("mouseup", up)
-				.on("mouseupoutside", up)
-				.on("touchend", up)
-				.on("touchendoutside", up)
-				.on("mousemove", move)
-				.on("touchmove", move);
-		}
-		
-		
-		return add;
 	}());
 	function create2pointLine(conf) {
 		conf = conf ? conf : {};
@@ -639,7 +596,7 @@ var pixi = (function () {
 			imgFill, imgBasePath, imgName, imgExt, img,
 			spriteImg, spriteScale, spriteTint,
 			textContent, textFont, textSize, textColor,
-			boxX, boxY,
+			boxX, boxY, boxAlpha,
 			onmouseup, onmouseupParam, onmousedown, onmousedownParam;
 		
 		function setThings() {
@@ -655,8 +612,10 @@ var pixi = (function () {
 			textColor   = conf.textColor    || "black";
 			boxX        = conf.x            || 0;
 			boxY        = conf.y            || 0;
-			// spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
-			spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill":"-trans") + imgExt;
+			boxAlpha    = conf.boxAlpha;
+			boxAlpha    = u.isUndef(boxAlpha) ? 1 : boxAlpha;
+		//	spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
+			spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -723,7 +682,7 @@ var pixi = (function () {
 			box.interactive = true;
 			box.buttonMode = true;
 			box.scale.set(1);
-			box.alpha = 1;
+			box.alpha = boxAlpha;
 			box.position.x = boxX;
 			box.position.y = boxY;
 			box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
@@ -753,162 +712,6 @@ var pixi = (function () {
 		
 		return box;
 	}
-	function bringToFront(el) {
-		// reorder children for z-index
-		var arr = p.mainContainer.children;
-		arr.splice( arr.indexOf(el), 1 );
-		arr.push(el);
-	}
-	function createSprite(o, noDrag) {
-		// var sprite = new PIXI.Sprite.fromImage(o.image);
-		var sprite = new PIXI.Sprite( PIXI.TextureCache[o.image] );
-		sprite.interactive = true;
-		sprite.buttonMode = true;
-		sprite.anchor.set(0, 0);
-		sprite.scale.set(o.scale);
-		sprite.alpha = o.alpha || 0;
-		sprite.rotation = o.rotation || 0;
-		sprite.position.x = o.x;
-		sprite.position.y = o.y;
-		
-		if ( !noDrag ) {
-			addDragDrop(sprite);
-		}
-		
-		return sprite;
-	}
-	function createLine(conf, noDrag) {
-		var line = new PIXI.Graphics(),
-			points,
-			i;
-		
-		conf = conf ? conf : {};
-		
-		if ( util.isObj(conf) ) {
-			points = conf.points || [];
-		} else if ( util.isArr(conf) ) {
-			points = conf;
-		}
-		
-		
-		if ( points.length === 0 ) {
-			points = [0, 0, 1, 1];
-		}
-		
-		
-		line.interactive = true;
-		line.buttonMode = true;
-		line.beginFill();
-		line.lineStyle(
-			conf.thickness || 2,
-			conf.color || 0x000000,
-			conf.alpha || 1
-		);
-		
-		line.moveTo( points[0], points[1] );
-		for (i=2; i < points.length ;i+=2) {
-			line.lineTo( points[i], points[i+1] );
-		}
-		line.lineTo( points[0], points[1] );
-		line.endFill();
-		line.hitArea = new PIXI.Polygon([
-			
-		]);
-		
-		if ( !noDrag ) {
-			addDragDrop(line);
-		}
-		
-		return line;
-	}
-	function redrawLine(ctx, o) {
-		var points,
-			i,
-			dirty,
-			clearDirty;
-		
-		if ( util.isObj(o) ) {
-			points = o.points;
-		} else if ( util.isArr(o) ) {
-			points = o;
-		}
-		
-		ctx.clear();
-		ctx.beginFill();
-		ctx.lineStyle(
-			o.thickness || 2,
-			o.color     || 0x000000,
-			o.alpha     || 1
-		);
-		
-		ctx.moveTo( points[0], points[1] );
-		for (i=2; i < points.length ;i+=2) {
-			ctx.lineTo( points[i], points[i+1] );
-		}
-		ctx.lineTo( points[0], points[1] );
-		ctx.endFill();
-		
-		
-		dirty = ctx.dirty;
-		clearDirty = ctx.clearDirty;
-		
-		if ( dirty ) {
-			dirty = false;
-		} else if ( !dirty ) {
-			dirty = true;
-		}
-		
-		if ( clearDirty ) {
-			clearDirty = false;
-		} else if ( !clearDirty ) {
-			clearDirty = true;
-		}
-		
-	}
-	function createRect(o, noDrag) {
-		var rect = new PIXI.Graphics();
-		
-		rect.interactive = true;
-		rect.buttonMode = true;
-		rect.beginFill(o.color);
-		rect.lineStyle(
-			o.lineWidth || 0,
-			o.lineColor || 0x000000,
-			o.alpha || 1
-		);
-		rect.drawRect(
-			o.x || 0,
-			o.y || 0,
-			o.width,
-			o.height
-		);
-		rect.endFill();
-		
-		if ( !noDrag ) {
-			addDragDrop(rect);
-		}
-		
-		return rect;
-	}
-	function createText(o, noDrag) {
-		o = o ? o : {};
-		var txt = util.isStr( o ) ? o : o.text;
-		
-		var text = new PIXI.Text(txt, {
-			fontFamily: o.font || "Arial",
-			fontSize: o.size || "20px",
-			fill: o.color || "black"
-		});
-		text.interactive = true;
-		text.buttonMode = true;
-		
-		if ( !noDrag ) {
-			addDragDrop(text);
-		}
-		
-		return text;
-	}
-	
 	
 	Object.defineProperties(inst, {
 		"renderer": {
@@ -924,23 +727,14 @@ var pixi = (function () {
 			get: function () { return p.textures; }
 		}
 	});
+	
 	inst.init = init;
-	inst.animate = animate;
 	inst.coPoint = coPoint;
-	inst.addDragDrop = addDragDrop;
-	inst.createSprite = createSprite;
 	inst.create2pointLine = create2pointLine;
 	inst.create3pointLine = create3pointLine;
 	inst.createBoxSpriteText = createBoxSpriteText;
-	inst.createLine = createLine;
-	inst.redrawLine = redrawLine;
-	inst.createRect = createRect;
-	inst.createText = createText;
-	inst.zoom = zoom;
-	inst.pan = pan;
 	inst.clearContainer = clearContainer;
 	inst.addChild = addChild;
-	inst.bringToFront = bringToFront;
 	inst.disableZoom = disableZoom;
 	
 	return inst;
@@ -963,21 +757,21 @@ var tpl = (function () {
 		o = o ? o : {};
 		var box = pixiEl;
 		
-		TweenLite.to(box, 0.3, {
+		TweenLite.to(box, 1, {
 			alpha: 1,
 			yoyo: true,
 			ease: Linear.easeInOut
 		});
 
-		TweenLite.to(box.scale, 0.3, {
-			x: 1,
-			y: 1,
-			yoyo: true,
-			ease: Linear.easeInOut,
-			onComplete: o.done,
-			onCompleteParams: o.doneParams,
-			onCompleteScope: o.doneCtx
-		});
+		// TweenLite.to(box.scale, 0.3, {
+			// x: 1,
+			// y: 1,
+			// yoyo: true,
+			// ease: Linear.easeInOut,
+			// onComplete: o.done,
+			// onCompleteParams: o.doneParams,
+			// onCompleteScope: o.doneCtx
+		// });
 	}
 	function createNode(o, container, coefficient) {
 		o = o ? o : {};
@@ -1003,6 +797,7 @@ var tpl = (function () {
 				spriteScale: 0.1,
 				spriteTint: type,
 				textContent: name,
+				boxAlpha: 0,
 				onmouseup: function () {
 					
 				},
@@ -1088,6 +883,9 @@ var tpl = (function () {
 		p.nodes[ id ] = node;
 		
 		pixi.addChild(container, "nodeContainer", node.pixiEl);
+		
+		animateNode(node.pixiEl);
+		
 	}
 	var createLink = (function () {
 		var path = {},

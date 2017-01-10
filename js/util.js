@@ -112,6 +112,9 @@ var util = (function () {
 	function isBool(v) {
 		return typeof v === 'boolean';
 	}
+	function isUndef(v) {
+		return typeof v === 'undefined';
+	}
 	function isEmptyStr(v) {
 		return typeof v === 'string'  &&  v.length === 0;
 	}
@@ -188,6 +191,8 @@ var util = (function () {
 		isFunc: isFunc,
 		isStr: isStr,
 		isNum: isNum,
+		isBool: isBool,
+		isUndef: isUndef,
 		isEmptyStr: isEmptyStr,
 		objLength: objLength,
 		extend: extend,
