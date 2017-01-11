@@ -100,7 +100,7 @@ var util = (function () {
 			}
 		}
 	}
-	function isFunc(v) {
+	function isFn(v) {
 		return typeof v === 'function';
 	}
 	function isStr(v) {
@@ -188,7 +188,7 @@ var util = (function () {
 		randFloat: randFloat,
 		toDecimalPlace: toDecimalPlace,
 		isEmptyObj: isEmptyObj,
-		isFunc: isFunc,
+		isFn: isFn,
 		isStr: isStr,
 		isNum: isNum,
 		isBool: isBool,

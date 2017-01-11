@@ -21,7 +21,7 @@ var pixi = (function () {
 	p.zoomDisabled = false;
 	
 	function init(callback, panBounds, background) {
-		var r, renW, renH, renReso;
+		var renderer, renW, renH, renReso, stage, mainContainer;
 		
 		pan.setBounds(panBounds);
 		PIXI.utils.skipHello();
@@ -38,21 +38,24 @@ var pixi = (function () {
 			}
 		//	noWebGL: false,                    // optional
 		);
-		r = p.renderer;
-		renW = r.width;
-		renH = r.height;
-		renReso = r.resolution;
 		
-		// document.body.appendChild( p.renderer.view );
-		$("#contents").append( p.renderer.view );
 		p.stage = new PIXI.Container();
 		p.mainContainer = new PIXI.Container();
 		
+		renderer = p.renderer;
+		renW = renderer.width;
+		renH = renderer.height;
+		renReso = renderer.resolution;
+		stage = p.stage;
+		mainContainer = p.mainContainer;
+		
+		// document.body.appendChild( p.renderer.view );
+		$("#contents").append( renderer.view );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
-		p.mainContainer.interactive = true;
-		p.mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
-		pan.add( p.mainContainer );
+		mainContainer.interactive = true;
+		mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
+		pan.add( mainContainer );
 			
 		$(document).on("mousewheel", function (e) {
 			var zoomIn, mcPos, prevPos;
@@ -73,10 +76,10 @@ var pixi = (function () {
 			}
 		});
 		createContainers();
-		p.stage.addChild( p.mainContainer );
+		stage.addChild( mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		requestAnimationFrame( animate );
-		p.renderer.render( p.stage );
+		renderer.render( mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		/* var basePath = "images/raw/edited/",
 		images = [
@@ -268,17 +271,19 @@ var pixi = (function () {
 		conf = conf ? conf : {};
 		
 		var line,
-			start,
-			end,
+			start, end,
 			lineWidth, tmpLineWidth,
-			color,
-			p;
+			alpha, color,
+			p,
+			onmousedown, onmousedownParam;
 		
 		function setThings() {
 			start     =  conf.start     ||  {x: 0, y: 0};
 			end       =  conf.end       ||  {x: 0, y: 0};
 			lineWidth =  conf.lineWidth ||  2;
 			color     =  conf.color     ||  0x000000;
+			alpha     =  conf.alpha;
+			alpha     =  u.isNum(alpha) ? alpha : 1;
 			p         =  calcPoints();
 		}
 		function setStart(s) {
@@ -304,12 +309,13 @@ var pixi = (function () {
 		function down(e) {
 			e.stopPropagation();
 			this.alpha = 0.5;
+			
+			if ( u.isFn(onmousedown) ) {
+				onmousedown.apply(undefined, onmousedownParam);
+			}
 		}
 		function up() {
 			this.alpha = 1;
-		}
-		function move(e) {
-			
 		}
 		function over() {
 			tmpLineWidth = lineWidth;
@@ -418,7 +424,6 @@ var pixi = (function () {
 			var line;
 			
 			line = new PIXI.Graphics();
-			line.uid = 
 			line.interactive = true;
 			line.buttonMode = true;
 			line.lineStyle(0);
@@ -433,7 +438,12 @@ var pixi = (function () {
 		
 		setThings();
 		create();
+		line.alpha = alpha;
 		
+		line.setOnmousedown = function (param, fn) {
+			onmousedownParam = param;
+			onmousedown = fn;
+		};
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
 		Object.defineProperty(line, "points", {
@@ -597,7 +607,9 @@ var pixi = (function () {
 			spriteImg, spriteScale, spriteTint,
 			textContent, textFont, textSize, textColor,
 			boxX, boxY, boxAlpha,
-			onmouseup, onmouseupParam, onmousedown, onmousedownParam;
+			onmouseup, onmouseupParam,
+			onmousedown, onmousedownParam,
+			onmove, onmoveParam;
 		
 		function setThings() {
 			imgFill     = conf.imgFill      || false;
@@ -613,7 +625,7 @@ var pixi = (function () {
 			boxX        = conf.x            || 0;
 			boxY        = conf.y            || 0;
 			boxAlpha    = conf.boxAlpha;
-			boxAlpha    = u.isUndef(boxAlpha) ? 1 : boxAlpha;
+			boxAlpha    = u.isNum(boxAlpha) ? boxAlpha : 1;
 		//	spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
 			spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
 		}
@@ -626,13 +638,15 @@ var pixi = (function () {
 			this.dragPoint.x -= this.position.x;
 			this.dragPoint.y -= this.position.y;
 			
-			//bringToFront(this);
+			if ( u.isFn(onmousedown) ) {
+				onmousedown.apply(undefined, onmousedownParam);
+			}
 		}
 		function up() {
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
-			if ( util.isFunc(onmouseup) ) {
+			if ( u.isFn(onmouseup) ) {
 				onmouseup.apply(undefined, onmouseupParam);
 			}
 		}
@@ -641,6 +655,10 @@ var pixi = (function () {
 				var newPosition = this.data.getLocalPosition(this.parent);
 				this.position.x = newPosition.x - this.dragPoint.x;
 				this.position.y = newPosition.y - this.dragPoint.y;
+				
+				if ( u.isFn(onmove) ) {
+					onmove.apply(undefined, onmoveParam);
+				}
 			}
 		}
 		function addEvents(el) {
@@ -704,6 +722,10 @@ var pixi = (function () {
 			onmousedownParam = param;
 			onmousedown = fn;
 		};
+		box.setOnmove = function (param, fn) {
+			onmoveParam = param;
+			onmove = fn;
+		};
 		box.changeTint = function (n) {
 			if (n) {
 				sprite.tint = n;
@@ -723,6 +745,9 @@ var pixi = (function () {
 		"mainContainer": {
 			get: function () { return p.mainContainer; }
 		},
+		"viewport": {
+			get: function () { return p.viewport; }
+		},
 		"textures": {
 			get: function () { return p.textures; }
 		}
@@ -740,6 +765,47 @@ var pixi = (function () {
 	return inst;
 }());
 
+var ani = (function () {
+	function fade(inOut, pixiEl, o) {
+		o = o ? o : {};
+		
+		TweenLite.to(
+			pixiEl,
+			o.dur || 0.5,
+			{
+				alpha: inOut ? 1 : 0,
+				yoyo: true,
+				ease: Linear.easeInOut,
+				onComplete: o.done,
+				onCompleteParams: o.donePar,
+				onCompleteScope: o.doneCtx
+			}
+		);
+	}
+	function fadeIn(pixiEl, o) {
+		fade(true, pixiEl, o);
+	}
+	function fadeOut(pixiEl, o) {
+		fade(false, pixiEl, o);
+	}
+	/*
+	TweenLite.to(box.scale, 0.3, {
+		x: 1,
+		y: 1,
+		yoyo: true,
+		ease: Linear.easeInOut,
+		onComplete: o.done,
+		onCompleteParams: o.doneParams,
+		onCompleteScope: o.doneCtx
+	});
+	*/
+	
+	return {
+		fadeIn: fadeIn,
+		fadeOut: fadeOut
+	};
+}());
+
 var tpl = (function () {
 	var p = {};
 	
@@ -753,26 +819,6 @@ var tpl = (function () {
 		"smartphone", "smartwatch", "video-card", "xbox"
 	];
 	
-	function animateNode(pixiEl, o) {
-		o = o ? o : {};
-		var box = pixiEl;
-		
-		TweenLite.to(box, 1, {
-			alpha: 1,
-			yoyo: true,
-			ease: Linear.easeInOut
-		});
-
-		// TweenLite.to(box.scale, 0.3, {
-			// x: 1,
-			// y: 1,
-			// yoyo: true,
-			// ease: Linear.easeInOut,
-			// onComplete: o.done,
-			// onCompleteParams: o.doneParams,
-			// onCompleteScope: o.doneCtx
-		// });
-	}
 	function createNode(o, container, coefficient) {
 		o = o ? o : {};
 		var node,
@@ -846,12 +892,30 @@ var tpl = (function () {
 			node.pixiEl = boxSpriteText;
 			addTplnodeCustomPositionGetters(opt);
 		}
+		function bringToFront(arr, el) {
+			arr.splice( arr.indexOf(el), 1 );
+			arr.push(el);
+		}
 		function addHandler() {
-			/*
-			boxSpriteText.setOnmousedown(function () {
-				// clear line
-			};
-			*/
+			
+			boxSpriteText.setOnmousedown([p.links], function (tplLinks) {
+				
+				bringToFront(
+				//                nodeContainer
+					pixi.viewport.children[1].children,
+					boxSpriteText
+				);
+				
+				node.links.forEach(function (linkId) {
+					var link = tplLinks[linkId];
+					
+					if (link) {
+						link.pixiEl.clear();
+					}
+					
+				});
+			});
+			
 			
 			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
 				var nodeId = node.id;
@@ -884,7 +948,7 @@ var tpl = (function () {
 		
 		pixi.addChild(container, "nodeContainer", node.pixiEl);
 		
-		animateNode(node.pixiEl);
+		ani.fadeIn(node.pixiEl);
 		
 	}
 	var createLink = (function () {
@@ -914,7 +978,8 @@ var tpl = (function () {
 				pixiEl = pixi.create2pointLine({
 					start: start,
 					end: end,
-					color: 0xCCAA00 * status
+					color: 0xCCAA00 * status,
+					alpha: 0
 				});
 			} else if (nth > 1) {
 				pixiEl = pixi.create3pointLine({
@@ -926,6 +991,20 @@ var tpl = (function () {
 				});
 			}
 			
+			
+			var setOndown = pixiEl.setOnmousedown;
+			if ( u.isFn(setOndown) ) {
+				setOndown(undefined, function () {
+					//                     lineContainer
+					var arr = pixi.viewport.children[0].children,
+						el = pixiEl;
+					
+					arr.splice( arr.indexOf(el), 1 );
+					arr.push(el);
+				});
+			}
+			
+			
 			link.pixiEl = pixiEl;
 			link.id = linkId;
 			link.src = srcId;
@@ -935,6 +1014,9 @@ var tpl = (function () {
 			
 			
 			pixi.addChild(container, "lineContainer", link.pixiEl);
+			
+			// animate(link.pixiEl);
+			ani.fadeIn(pixiEl);
 		}
 		
 		return create;
@@ -1329,7 +1411,7 @@ var mediator = (function () {
 		//core.init();
 		//navigation.init();
 		
-		// addCustomEvents();
+		addCustomEvents();
 	}
 	
 	
@@ -1623,7 +1705,7 @@ var traceroute = (function () {
 			
 		// ws.send("Hello WebSocket!");
 		
-		if ( u.isFunc(cb) ) {
+		if ( u.isFn(cb) ) {
 			cb();
 		}
 	}

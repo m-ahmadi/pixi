@@ -3,7 +3,7 @@ var renderer = PIXI.autoDetectRenderer(
 	window.innerWidth,
 	window.innerHeight,
 	{
-		backgroundColor : 0x1099bb,
+		backgroundColor : 0xAB9988,
 		antialias: true
 	}
 );
@@ -13,15 +13,19 @@ var stage = new PIXI.Container();
 var box = new PIXI.Graphics();
 box.interactive = true;
 box.buttonMode = true;
-box.beginFill(0x0000FF, 1);
-box.lineStyle(2, 0x00FF00, 1)
-box.drawRect(0, 0, 200, 100);
+box.beginFill(0xFFFF00, 1);
+box.lineStyle(10, 0xFF0000, 1)
+box.drawRect(0, 0, 200, 200);
 box.endFill();
 
+var text = new PIXI.Text("Hello from the outside, I must've called a thousound times.");
 
 
 
+
+addDragDrop(box);
 stage.addChild(box);
+stage.addChild(text);
 
 animate();
 function animate() {
