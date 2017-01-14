@@ -1,0 +1,29 @@
+<h3>Single Var Statement.</h3>
+
+<p> </p>
+<ul>
+	<li>Use single var statements.</li>
+	<li>Do not use multiple var statements unless you have a good excuse.</li>
+</ul>
+<pre><code class="language-javascript">
+function foo() {
+	var a, b, c,
+		d, e, f,
+		g = 1,
+		h = '.png',
+		i = false,
+		j = 0x4400FF;
+}
+</code></pre>
+
+<p>You can see the above code is easily gets cluttered and harder to read with multiple var statements:</p>
+<pre><code class="language-javascript">
+function foo() {
+	var a, b, c;
+	var	d, e, f;
+	var	g = 1;
+	var	h = '.png';
+	var	i = false;
+	var	j = 0x4400FF;
+}
+</code></pre>

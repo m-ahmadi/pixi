@@ -1,0 +1,11 @@
+@font-face {
+	font-family: 'Roboto';
+	src: url('../fonts/proximanova.eot');
+	src: url('../fonts/proximanova.eot?#iefix') format('embedded-opentype'),
+		 url('../fonts/proximanova.woff2')      format('woff2'),
+		 url('../fonts/proximanova.woff')       format('woff'),
+		 url('../fonts/proximanova.ttf')        format('truetype'),
+		 url('../fonts/proximanova.svg#Roboto') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}

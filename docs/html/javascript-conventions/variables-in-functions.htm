@@ -1,0 +1,42 @@
+<h3>Variables in functions.</h3>
+
+
+
+<p>Define all variables at the top of the function:</p>
+<pre><code class="language-javascript">
+function foo() {
+	var a = 1,
+		b = 'something',
+		c = false,
+		e, d, g,
+		a;
+	
+	// no var statement after this point
+}
+</code></pre>
+
+<p>Try to define variables in the order they are used:</p>
+<pre><code class="language-javascript">
+function foo() {
+	var a = true,
+		b = 2;
+		
+	if (a) {
+		check(b);
+	}
+}
+</code></pre>
+
+
+<p>Try to give as much information as you can about the flow of the function, by the way you order/group/initialize the variables:</p>
+<pre><code class="language-javascript">
+function foo() {
+	var a = 2,  // seperate variable
+		b = 3,  // seperate variable
+		c, d,   // these two are probably related
+		d,		// you don't know what the type will be
+		e = '', // you know the type will be string
+		f = {}, // you know the type will be object
+		g = []; // you know the type will be array
+}
+</code></pre>

@@ -1,0 +1,35 @@
+html {
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	     -o-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+*, *:before, *:after {
+	-webkit-box-sizing: inherit;
+	   -moz-box-sizing: inherit;
+	     -o-box-sizing: inherit;
+	    -ms-box-sizing: inherit;
+	        box-sizing: inherit;
+}
+
+body {
+	font-family: 'Roboto';
+	width: 100%;
+	padding: 0 10px;
+	margin: 0 auto;
+}
+
+#sidebar {
+	position: fixed;
+	width: 20%;
+    border-right: 1px solid #e3e3e3;
+    overflow: auto;
+    float: left;
+}
+
+#contents {
+	width: 76%;
+    float: right;
+    margin: 5px;
+}
