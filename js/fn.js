@@ -4,7 +4,7 @@ var a = (function () {
 
 
 var pixi = (function () {
-	var inst = util.extend( coPubsub() ),
+	var inst = util.extend( newPubSub() ),
 		p = {};
 	
 	p.renderer = {};
@@ -1423,7 +1423,7 @@ var mediator = (function () {
 }());
 
 var navigation = (function () {
-	var inst = util.extend( coPubsub() ),
+	var inst = util.extend( newPubSub() ),
 		p = {};
 	
 	function init() {

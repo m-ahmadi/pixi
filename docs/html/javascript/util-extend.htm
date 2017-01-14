@@ -1,0 +1,62 @@
+<h3>util.extend()</h3>
+
+<h4>util.extend( obj1, obj2 [, obj3, ...] )</h4>
+<p>Be sure to check <a href="#!inheritance" class="ctn-link">Inheritance</a> first.</p>
+
+<table class="uk-table">
+	<tr>
+		<th>Arg</th>
+		<th>Desc</th>
+	</tr>
+	<tr>
+		<td><code>obj1</code></td>
+		<td>The base object, all the next objects inherit from this object.</td>
+	</tr>
+	<tr>
+		<td><code>obj2</code></td>
+		<td>It inherits from <code>obj1</code></td>
+	</tr>
+	<tr>
+		<td><code>obj3</code></td>
+		<td>It inherits from <code>obj2</code> (which itself inherited from <code>obj1</code>)</td>
+	</tr>
+</table>
+
+<p>See <a href="https://github.com/m-ahmadi/util.git" target="_blank">util on github</a> for more information.</p>
+
+<pre><code class="language-javascript">
+function newEmpoloye(jobTitle, id) {
+	var inst = {},
+		idCounter = 0;
+	
+	inst.jobTitle  = jobTitle || 'uknown_title';
+	inst.employeId = id       || 'employe_'+(idCounter+=1);
+	
+	return inst;
+}
+
+function newPerson(name, age) {
+	var inst = {};
+	
+	inst.name = name || 'no_name';
+	inst.age  = age  || false;
+	
+	return inst;
+}
+
+var person = newPerson('ali', 26);,
+	employee = newEmpoloye('product_manager'),
+
+util.extend(person, employe);
+/*
+	employee.name     // 'ali'
+	employee.age      // 26
+	employee.jobTitle // 'product_manager'
+	employe.id        // 'employe_1'
+	
+	You can think of it this way:
+	class Employee extends Person {
+	
+	}
+*/
+</code></pre>

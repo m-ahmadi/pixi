@@ -1,0 +1,25 @@
+<h3>Class</h3>
+
+<p>Avoid using constructor functions that are instantiated with the <code class="language-javascript">new</code> keyword and named using PascalCase naming convention.</p>
+<pre><code class="language-javascript">
+// Don't do this:
+function Person(name, age) {
+	this.name = name || 'John';
+	this.age  = age  || 20;;
+}
+var ali = new Person('ali', 26);
+</code></pre>
+
+<p>Use regular functions as constructors, and prefix their names with the letters `new` (newPerson).</p>
+<pre><code class="language-javascript">
+// do this instead:
+function newPerson(name, age) {
+	var inst = {};
+	
+	inst.name = name || 'John';
+	inst.age  = age  || 20;
+	
+	return inst;
+}
+var ali = newPerson('ali', 26);
+</code></pre>

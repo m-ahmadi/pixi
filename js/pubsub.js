@@ -1,6 +1,6 @@
-function coPubsub() {
+function newPubSub() {
 	"use strict";
-	if ( this instanceof coPubsub ) { throw new Error('coPubsub() was called with new'); }
+	if ( this instanceof newPubSub ) { throw new Error('newPubSub() was called with new'); }
 	
 	var subscribers = {},
 		inst = {};

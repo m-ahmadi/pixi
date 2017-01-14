@@ -1,0 +1,24 @@
+<h3>PubSub</h3>
+
+<h4>coPubSub()</h4>
+
+
+<p>Takes no arguments.<br/>
+Returns an object that has the capability of registering subscribers (listeners), and publish (emit) events to them.<br />
+Any object can inhert from this object, so they can have these capabilities too.<br />
+Be sure to check <a href="#!util-extend" class="ctn-link">util.extend()</a>.
+</p>
+
+<pre><code class="language-javascript">
+var phone = util.extend( coPubSub() ),
+	person = util.extend( coPerson() );
+
+
+phone.on('ringing', function (e) {
+	console.log(e);  // {callerId: 104, callerName: 'mohammad'}
+	person.answerPhone();
+});
+
+
+phone.emit('ringing', {callerId: 104, callerName: 'mohammad'});
+</code></pre>

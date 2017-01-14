@@ -1,0 +1,53 @@
+<h3>TwoPointLine</h3>
+
+<p>Creates a line, that can only have two points:<br/>
+A starting point, and an ending point.
+</p>
+
+
+<label class="uk-text-lead">Methods</label>
+<table class="uk-table">
+	
+	<tr>
+		<th>Method</th>
+		<th>Arg</th>
+		<th>Desc</th>
+	</tr>
+	<tr>
+		<td><code>changeColor( hexNum )</code></td>
+		<td><code>color</code> A hex number.</td>
+		<td>Changes the color of the line.</td>
+	</tr>
+	<tr>
+		<td><code>changePoints( start, end )</code></td>
+		<td><code>start</code>An object containing x and y number properties.<br />
+		<code>end</code> An object containing x and y number properties.
+		</td>
+		<td>Changes the start and end points of the line.<br />
+		If only one of the parameters is provided, then it only changes that point, and the the other one will be left untouched. 
+		</td>
+	</tr>
+	<tr>
+		<td><code>setOnmousedown( param, fn )</code></td>
+		<td><code>param</code>A value passed to the callback function.<br />
+		<code>fn</code>The callback function.
+		</td>
+		<td>Sets a handler to be fired whenever, the mousedown happens on the line.<br />
+		If only one of the parameters is provided, then it only changes that point, and the the other one will be left untouched. 
+		</td>
+	</tr>
+</table>
+
+<pre><code class="language-javascript">
+var config, line;
+
+config = {
+	start:      startPoint,		// Object containing an `x` and `y` property. default: {x: 0, y: 0}
+	end:        endPoint,		// Object containing an `x` and `y` property. default: {x: 0, y: 0}
+	lineWidth:  number,         // Number line width of the line. default: 4
+	color:      hexNumber,      // Number (hex) color of the line. default: 0x000000 (black)
+	alpha:      number,         // Number opacity of the line. 1: visible, 2: hidden. default: 1
+};
+
+line = newTwoPointLine(config);
+</code></pre>

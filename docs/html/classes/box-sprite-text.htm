@@ -1,0 +1,62 @@
+<h3>BoxSpriteText</h3>
+
+<p>Creates a collection made out of three elements, a box, an image and a text.<br/>
+</p>
+
+
+<label class="uk-text-lead">Methods</label>
+<table class="uk-table">
+	
+	<tr>
+		<th>Method</th>
+		<th>Args</th>
+		<th>Desc</th>
+	</tr>
+	<tr>
+		<td>changeColor( <code>hexNum</code> )</td>
+		<td><code>color</code>: A hex number.</td>
+		<td>Changes the color of the line.</td>
+	</tr>
+	<tr>
+		<td>changePoints( <code>start</code>, <code>end</code> )</td>
+		<td><code>start</code>: An object containing x and y number properties.<br />
+		<code>end</code>: An object containing x and y number properties.
+		</td>
+		<td>Changes the start and end points of the line.<br />
+		If only one of the parameters is provided, then it only changes that point, and the the other one will be left untouched. 
+		</td>
+	</tr>
+	<tr>
+		<td>setOnmousedown( <code>param</code>, <code>fn</code> )</td>
+		<td><code>param</code>: A value passed to the callback function.<br />
+		<code>fn</code>:The callback function.
+		</td>
+		<td>Sets a handler to be fired whenever, the mousedown happens on the line.<br />
+		If only one of the parameters is provided, then it only changes that point, and the the other one will be left untouched. 
+		</td>
+	</tr>
+</table>
+
+<pre><code class="language-javascript">
+var config, boxSpriteText;
+
+config = {
+	imgFill:      // unstable default: false;
+	imgBasePath:  "images/raw/edited/"; // images/
+	imgName:      "tv-screen"; // tv-screen computer
+	imgExt:       ".png";
+	spriteScale:  0.2;
+	spriteTint:   false;
+	textContent:  "no_name";
+	textFont:     "Arial";
+	textSize:     "16px";
+	textColor:    "black";
+	boxX:         0;
+	boxY:         0;
+	boxAlpha:     1;
+//	spriteImg:    conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
+	spriteImg:    conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
+};
+
+node = newBoxSpriteText(config);
+</code></pre>

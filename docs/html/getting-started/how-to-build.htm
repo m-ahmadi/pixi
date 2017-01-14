@@ -1,0 +1,33 @@
+<h3>How to build the project.</h3>
+
+<p>First clone the repository and install the dev dependencies:</p>
+
+<pre><code class="lang-bash">
+$ git clone git@repo.ravanertebat.com:cvas/topology-front.git
+$ cd topology-front
+$ npm install
+</code></pre>
+
+<p>After the installation has completed, you can build the project by one these three ways:<br/>
+<ul>
+	<li>Build by running an npm script.</li>
+	<li>Build by running the webpack CLI.</li>
+	<li>Build by running grunt.</li>
+</ul>
+</p>
+
+<p>Using npm scripts:</p>
+<pre><code class="lang-bash">
+$ npm run build
+</code></pre>
+
+
+<p>Using webpack CLI:</p>
+<pre><code class="lang-bash">
+$ webpack js/src/main.js js/bundle.js
+</code></pre>
+
+<p>Using grunt (this way, grunt start watching the project and rebuild on file change/add/remove etc.):</p>
+<pre><code class="lang-bash">
+$ grunt
+</code></pre>
