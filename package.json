@@ -6,7 +6,7 @@
   "main": "index.htm",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"build": "webpack js/src/main.js js/bundle.js",
+	"build": "webpack js/src/main.js js/bundle.js"
   },
   "author": "Mohammad Ahmadi",
   "repository": {
