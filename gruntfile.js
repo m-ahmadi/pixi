@@ -69,7 +69,7 @@ module.exports = function(grunt) {
 		browserify: {
 			all: {
 				files: {
-					src: 'js/src/index.ts',
+					src: 'js/src/main.ts',
 					dest: 'js/bundle.js'
 				},
 				options: {
@@ -99,6 +99,7 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
+					'js/src/**/*.ts',
 					'gruntfile.js',
 					'test/**/*'
 				],
@@ -115,6 +116,7 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
+					'js/src/**/*.ts',
 					'test/**/*'
 				]
 			}
