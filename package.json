@@ -6,7 +6,7 @@
   "main": "index.htm",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"build": "webpack js/src/main.js js/bundle.js"
+    "build": "webpack js/src/main.js js/bundle.js"
   },
   "author": "Mohammad Ahmadi",
   "repository": {
@@ -25,6 +25,8 @@
     "grunt-jslint": "^1.1.14",
     "grunt-webpack": "^2.0.0-beta.6",
     "jshint-stylish": "^2.2.1",
+    "tsify": "^3.0.0",
+    "typescript": "^2.1.5",
     "webpack": "^2.2.0-rc.3"
   },
   "dependencies": {

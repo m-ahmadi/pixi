@@ -1,4 +1,5 @@
-var t, s;
+var baseRoot = '192.168.10.13:3000';
+
 var a = (function () {
 "use strict";
 
@@ -1202,14 +1203,14 @@ var mediator = (function () {
 		
 		console.log(p.bounds);
 		console.log(p.data);
-		ajax({
-			data: p.data
-		})
-		.done(function ( data ) { // {url: "js/d.txt"}
-			console.log(data);
-			t = data;
-			a.tpl.draw(data, "viewport");
-		});
+		// ajax({
+			// data: p.data
+		// })
+		// .done(function ( data ) { // {url: "js/d.txt"}
+			// console.log(data);
+			// t = data;
+			// a.tpl.draw(data, "viewport");
+		// });
 	}
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
@@ -1411,7 +1412,7 @@ var mediator = (function () {
 		//core.init();
 		//navigation.init();
 		
-		addCustomEvents();
+		// addCustomEvents();
 	}
 	
 	
@@ -1645,14 +1646,17 @@ var navigation = (function () {
 
 var traceroute = (function () {
 	var ws = {},
-		path = 'ws://192.168.10.13:3000/network/icmp/traceroute',
+		path = 'ws://'+ baseRoot +'/network/icmp/traceroute', // window.location.host
 		openCallback,
 		coefficient = {},
 		nodes = {},
 		links = {},
 		msgCounter = 0,
 		noteMsgs = {},
-		scanBtn = {};
+		scanBtn = {}
+	
+	// var v = prompt('change the address if you want:', path);
+	// if (v) { path = v;}
 	
 	function filter(data) {
 		var newLinks = data.links,
@@ -1764,8 +1768,9 @@ var traceroute = (function () {
 	}
 	function onerror(e) {
 		console.log("WebSocket Error: " , e);
-			
-		noteMsgs.processing.close();
+		
+		noteMsgs.init.close();
+		// noteMsgs.processing.close();
 		noteMsgs.error = UIkit.notify({
 			message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> خطا در برقراری ارتباط!',
 			status  : 'danger',
@@ -1777,10 +1782,11 @@ var traceroute = (function () {
 		console.log("Connection closed", e);
 		scanBtn.removeAttr('disabled');
 		
-		noteMsgs.processing.close();
+		// noteMsgs.processing.close();
+		noteMsgs.init.close();
 		noteMsgs.close = UIkit.notify({
-			message : '<i class="fa fa-check" aria-hidden="true"></i> دریافت کامل اطلاعات با موفقیت به پایان رسید.',
-			status  : 'success',
+			message : '<i class="fa fa-info" aria-hidden="true"></i> پایان دریافت.', // fa fa-check
+			status  : 'info',
 			timeout : 2000,
 			pos     : 'bottom-right'
 		});

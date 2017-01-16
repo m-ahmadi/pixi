@@ -119,6 +119,4 @@ $('#abort').on('click', function (e) {
 	a.traceroute.abort();
 });
 
-
-
 });
