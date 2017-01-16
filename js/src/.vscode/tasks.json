@@ -3,10 +3,7 @@
     // for the documentation about the tasks.json format
     "version": "0.1.0",
     "command": "grunt",
-    "isBuildCommand": true,
-    "echoCommand": true,
-    "args": ["browserify"],
-    "showOutput": "always",
-    "isWatching": false,
-    "problemMatcher": "$tsc-watch"
+    "isShellCommand": true,
+    "args": ["--no-color", "browserify"],
+    "showOutput": "always"
 }

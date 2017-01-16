@@ -1,0 +1,120 @@
+import * as $ from '../lib/jquery/jquery-3.1.1.min.js';
+
+
+$.support.cors = true;
+
+$.ajaxSetup({
+	crossDomain: true
+});
+/*
+$.ajaxSetup({
+	accepts : null,                 // PlainObject (default: depends on DataType)
+	async : true,                   // Boolean (default: true) ("async: false" deprecated as of jQuery 1.8)
+	beforeSend :          null,     // Function ( jqXHR jqXHR, PlainObject settings )
+	cache :               null,     // Boolean (default: true, false for dataType 'script' and 'jsonp')
+	complete :            null,     // Function ( jqXHR jqXHR, String textStatus )
+	contents :            null,     // PlainObject
+	contentType :         null,     // String (default: 'application/x-www-form-urlencoded; charset=UTF-8')
+	context :             null,     // PlainObject
+	converters :          null,     // PlainObject (default: {"* text": window.String, "text html": true, "text json": jQuery.parseJSON, "text xml": jQuery.parseXML})
+	crossDomain :         null,     // Boolean (default: false for same-domain requests, true for cross-domain requests)
+	data :                null,     // PlainObject or String
+	dataFilter :          null,     // Function ( String data, String type )
+	dataType :            'text',   // String (default: Intelligent Guess (xml, json, script, or html))
+	error :               null,     // Function ( jqXHR jqXHR, String textStatus, String errorThrown )
+	global : true,                  // Boolean (default: true)
+	headers : {},                   // PlainObject (default: {})
+	ifModified :          null,     // Boolean (default: false)
+	isLocal :             null,     // Boolean (default: depends on current location protocol)
+	jsonp :               null,     // String { jsonp: false, jsonpCallback: "callbackName" }
+	jsonpCallback :       null,     // String or Function
+	mimeType :            null,     // String
+	password :            null,     // String
+	processData :         null,     // Boolean (default: true)
+	scriptCharset :       null,     // String
+	statusCode :          null,     // PlainObject (default: {})
+	success :             null,     // Function ( PlainObject data, String textStatus, jqXHR jqXHR )
+	timeout :             null,     // Number
+	traditional : false,            // Boolean
+	type :                null,     // String (default: 'GET')
+	url :                 null,     // String  (default: The current page)
+	username :            null,     // String
+	xhr :                 null,     // Function (default: ActiveXObject when available (IE), the XMLHttpRequest otherwise)
+	xhrFields :           null,     // PlainObject
+});
+*/
+var ajax = (function () {
+	var fns: any  = {},
+		counter = 0,
+		xhr;
+	
+	fns.done = {};
+	fns.fail = {};
+	fns.always = {};
+	
+	function u() {
+		return 'a'+(counter+=1);
+	}
+	function execute(type: string, uid: string, a: any, b: any, c:any) {
+		var o = fns[type],
+			f = o[uid];
+		if (typeof f === 'function') {
+			f(a, b, c);
+		}
+	}
+	function ajax(o) {
+		o = o ? o : {};
+		
+		var uid = u();
+		
+		ajax.id = uid;
+		
+		
+		xhr = $.ajax({
+			url: o.url || 'http://localhost:3000',
+			type: o.type || 'GET',
+			dataType: o.dataType || 'json',
+			data: o.data,
+			beforeSend: o.beforeSend,
+			id: uid
+		})
+		.done(function (data, txt, obj) {
+			
+			if (this.id === ajax.id) {
+				execute('done', uid, data, txt, obj);
+			};
+		})
+		.fail(function (obj, txt, err) {
+			
+			execute('fail', uid, obj, txt, err);
+			
+		})
+		.always(function (obj, txt) {
+			
+			execute('always', uid, obj, txt);
+			
+		});
+		
+		ajax.xhr = xhr;
+		
+		return ajax;
+	};
+	
+	ajax.done = function (fn) {
+		fns.done[this.id] = fn;
+		return this;
+	};
+	ajax.fail = function (fn) {
+		fns.fail[this.id] = fn;
+		return this;
+	};
+	ajax.always = function (fn) {
+		fns.always[this.id] = fn;
+		return this;
+	};
+	ajax.callbacks = fns;
+	
+	return ajax;
+}());
+
+export default ajax
