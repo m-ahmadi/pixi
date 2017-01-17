@@ -5,16 +5,17 @@
   "version": "1.0.0",
   "main": "index.htm",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack js/src/main.js js/bundle.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mohammad Ahmadi",
   "repository": {
     "type": "git",
     "url": "https://github.com/m-ahmadi/pixi.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
+    "@types/jquery": "^2.0.39",
+    "@types/pixi.js": "^4.3.1",
     "express": "^4.14.0",
     "grunt": "^1.0.1",
     "grunt-browserify": "^5.0.0",
@@ -25,12 +26,15 @@
     "grunt-jslint": "^1.1.14",
     "grunt-webpack": "^2.0.0-beta.6",
     "jshint-stylish": "^2.2.1",
-    "tsd": "^0.6.5",
     "tsify": "^3.0.0",
     "typescript": "^2.1.5",
     "webpack": "^2.2.0-rc.3"
   },
   "dependencies": {
-    "pixi.js": "^4.2.3"
+    "gsap": "^1.19.0",
+    "jquery": "^3.1.1",
+    "jquery-mousewheel": "^3.1.13",
+    "pixi.js": "^4.3.2",
+    "uikit": "^2.27.2"
   }
 }

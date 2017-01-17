@@ -1,5 +1,6 @@
-declare var TweenLite: any; // Magic
-declare var Linear: any; // Magic
+import {TweenLite, Linear} from 'gsap/src/minified/TweenLite.min.js';
+
+
 
 var ani = (function () {
 	function fade(inOut, pixiEl, o) {
@@ -18,10 +19,10 @@ var ani = (function () {
 			}
 		);
 	}
-	function fadeIn(pixiEl, o) {
+	function fadeIn(pixiEl, o?) {
 		fade(true, pixiEl, o);
 	}
-	function fadeOut(pixiEl, o) {
+	function fadeOut(pixiEl, o?) {
 		fade(false, pixiEl, o);
 	}
 	/*

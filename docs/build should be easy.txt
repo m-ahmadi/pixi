@@ -1,0 +1,16 @@
+Clone the UIkit repository.
+
+	git clone git://github.com/uikit/uikit.git
+	cd uikit
+
+Install the Node dependencies.
+
+	npm install
+
+Build UIkit. The result will end up in the dist/ folder.
+
+	npm run compile
+
+You can also watch for file changes and re-compile automatically.
+
+	npm run watch

@@ -1,14 +1,14 @@
-let window: any;
+declare let window: any;
 
 
-import pixi from './pixi';
+import wpix from './wpix';
 import tpl from './tpl';
-import ani from './ani';
+import wani from './wani';
 import navigation from './navigation';
 import traceroute from './traceroute';
 import mediator from './mediator';
 
-window.pixi = pixi;
+window.wpix = wpix;
 window.tpl = tpl;
 
-console.log(pixi);
+console.log(wpix);

@@ -17,7 +17,7 @@ if (typeof Object.keys !== 'function') {
 		return keys;
 	};
 }
-var util = (function () {
+var util: any = (function () {
 	function isObj(v) {
 		return (
 			v &&
@@ -170,9 +170,6 @@ var util = (function () {
 		}
 		return result;
 	}
-	function getCommentsInside(selector) {
-		return $(selector).contents().filter( function () { return this.nodeType == 8; } );
-	}
 	
 	return {
 		isObj: isObj,
@@ -195,8 +192,7 @@ var util = (function () {
 		isUndef: isUndef,
 		isEmptyStr: isEmptyStr,
 		objLength: objLength,
-		extend: extend,
-		getCommentsInside: getCommentsInside,
+		extend: extend
 	};
 }());
 

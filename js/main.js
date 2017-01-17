@@ -26,7 +26,7 @@ $('#select_all').on('click', function (e) {
 	
 });
 $('#add_device').on('click', function (e) {
-	var name,
+	var name, id,
 		x, y,
 		type,
 		links;

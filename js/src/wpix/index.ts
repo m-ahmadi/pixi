@@ -1,9 +1,14 @@
-import * as $ from '../../lib/jquery/jquery-3.1.1.js';
+import * as PIXI from 'pixi.js';
+import * as $ from 'jquery';
 import util from '../util';
+
+
+
+let u = util;
 
 let renderer;
 
-var pixi = (function () {
+var wpix = (function () {
 	var inst = util.extend( newPubSub() ),
 		p: any = {};
 	
@@ -57,7 +62,7 @@ var pixi = (function () {
 		mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
 		pan.add( mainContainer );
 			
-		$(document).on("mousewheel", function (e) {
+		$(document).on("mousewheel", function (e: any) {
 			var zoomIn, mcPos, prevPos;
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
@@ -186,7 +191,7 @@ var pixi = (function () {
 		var isDragging = false,
 			prevX,
 			prevY,
-			bounds = {};
+			bounds: any = {};
 		
 		function down(e) {
 			isDragging = true;
@@ -362,7 +367,7 @@ var pixi = (function () {
 				sY = start.y,
 				eX = end.x,
 				eY = end.y,
-				results = {};
+				results: any = {};
 
 			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
 					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
@@ -432,7 +437,7 @@ var pixi = (function () {
 		}
 		function create() {
 			line = createElement();
-			addEvents( line );
+			addEvents();
 			draw();
 		}
 		
@@ -765,4 +770,4 @@ var pixi = (function () {
 	return inst;
 }());
 
-export default pixi
+export default wpix

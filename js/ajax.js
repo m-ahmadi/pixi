@@ -3,6 +3,7 @@ $.support.cors = true;
 $.ajaxSetup({
 	crossDomain: true
 });
+
 /*
 $.ajaxSetup({
 	accepts : null,                 // PlainObject (default: depends on DataType)
@@ -40,6 +41,7 @@ $.ajaxSetup({
 	xhrFields :           null,     // PlainObject
 });
 */
+
 var ajax = (function () {
 	var fns = {},
 		counter = 0,

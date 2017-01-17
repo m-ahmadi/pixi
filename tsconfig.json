@@ -5,5 +5,10 @@
         "allowJs": true,
         "noImplicitAny": false,
         "sourceMap": false
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "js/hold.js",
+        "js/src/deprecated.js"
+    ]
 }

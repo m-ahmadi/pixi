@@ -1,6 +1,10 @@
+import newPubSub from '../pubsub';
+import util from '../util';
+import wpix from '../wpix';
+
 var navigation = (function () {
 	var inst = util.extend( newPubSub() ),
-		p = {};
+		p: any = {};
 	
 	function init() {
 		var nav,
@@ -8,7 +12,7 @@ var navigation = (function () {
 			rect,
 			dot;
 		
-		p.panel = new PIXI.Graphics();
+		p.panel = new wpix.Graphics();
 		p.panelWidth = 400;
 		p.panelHeight = 200;
 		p.panelOffset = 100;
@@ -20,9 +24,9 @@ var navigation = (function () {
 		panel.endFill();
 		//panel.position.set( panelPos.x, panelPos.y ); 
 		
-		p.rect = new PIXI.Graphics();
-		p.rectWidth = pixi.renderer.width / 10;
-		p.rectHeight = pixi.renderer.height / 3;
+		p.rect = new wpix.Graphics();
+		p.rectWidth = wpix.renderer.width / 10;
+		p.rectHeight = wpix.renderer.height / 3;
 		rect = p.rect;
 		rect.interactive = true;
 		rect.buttonMode = true;
@@ -33,7 +37,7 @@ var navigation = (function () {
 		rect.alpha = 0.5;
 		rect.TPL_nav = "box";
 
-		p.dot = new PIXI.Graphics();
+		p.dot = new wpix.Graphics();
 		p.dotWH = 6;
 		p.dotHalf = p.dotWH / 2;
 		p.dotPos = {
@@ -50,9 +54,9 @@ var navigation = (function () {
 		dot.position.set( p.dotPos.x, p.dotPos.y );
 		dot.TPL_nav = "dot";
 		
-		p.nav = new PIXI.Container();
-		p.navPos = new PIXI.Point(
-			pixi.renderer.width - (p.panelWidth + p.panelOffset),
+		p.nav = new wpix.Container();
+		p.navPos = new wpix.Point(
+			wpix.renderer.width - (p.panelWidth + p.panelOffset),
 			50
 		);
 		nav = p.nav;
@@ -63,7 +67,7 @@ var navigation = (function () {
 		addDragDrop(panel, "panel");
 		addDragDrop(rect, "rect");
 		addDragDrop(dot, "dot");
-		pixi.addChild("stage", nav);
+		wpix.addChild("stage", nav);
 	}
 	function addDragDrop(el, name) {
 		if (name === "rect") {
@@ -139,8 +143,8 @@ var navigation = (function () {
 			var min = 0,
 				maxX = panel.width - rect.width,
 				maxY = panel.height - rect.height,
-				rectNewPos = new PIXI.Point(),
-				dotNewPos = new PIXI.Point();
+				rectNewPos = new wpix.Point(),
+				dotNewPos = new wpix.Point();
 			
 			if ( newX > min  &&  newX <= maxX ) {
 				rectNewPos.x = newX

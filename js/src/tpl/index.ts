@@ -1,3 +1,7 @@
+import wpix from '../wpix';
+import wani from '../wani';
+import u from '../util';
+
 var tpl = (function () {
 	var p: any = {};
 	
@@ -11,7 +15,7 @@ var tpl = (function () {
 		"smartphone", "smartwatch", "video-card", "xbox"
 	];
 	
-	function createNode(o, container, coefficient) {
+	function createNode(o, container?, coefficient?) {
 		o = o ? o : {};
 		var node,
 			type, name, id, thisLinks,
@@ -28,7 +32,7 @@ var tpl = (function () {
 			thisLinks = o.links || false;
 		}
 		function createBox() {
-			boxSpriteText = pixi.createBoxSpriteText({
+			boxSpriteText = wpix.createBoxSpriteText({
 				x: coefficient ? x*coefficient.x : x,
 				y: coefficient ? y*coefficient.y : y,
 				imgName: p.types[type],
@@ -42,7 +46,7 @@ var tpl = (function () {
 				onmouseupParam: undefined
 			});
 		}
-		function addTplnodeCustomPositionGetters(o) {
+		function addTplnodeCustomPositionGetters() {
 			var b = boxSpriteText;
 			
 			function midX() {
@@ -65,15 +69,15 @@ var tpl = (function () {
 					get: function () { return b.x + b.width; }
 				},
 				//--------------------------------------------------------
-				"topLeft"  : {  get: function () { return pixi.coPoint( this.left  , this.top  ); }  },
-				"topRight" : {  get: function () { return pixi.coPoint( this.right , this.top  ); }  },
-				"bottLeft" : {  get: function () { return pixi.coPoint( this.left  , this.bott ); }  },
-				"bottRight": {  get: function () { return pixi.coPoint( this.right , this.bott ); }  },
-				"topMid"   : {  get: function () { return pixi.coPoint( midX()     , this.top  ); }  },
-				"bottMid"  : {  get: function () { return pixi.coPoint( midX()     , this.bott ); }  },
-				"leftMid"  : {  get: function () { return pixi.coPoint( this.left  , midY()    ); }  },
-				"rightMid" : {  get: function () { return pixi.coPoint( this.right , midY()    ); }  },
-				"center"   : {  get: function () { return pixi.coPoint( midX()     , midY()    ); }  }
+				"topLeft"  : {  get: function () { return wpix.coPoint( this.left  , this.top  ); }  },
+				"topRight" : {  get: function () { return wpix.coPoint( this.right , this.top  ); }  },
+				"bottLeft" : {  get: function () { return wpix.coPoint( this.left  , this.bott ); }  },
+				"bottRight": {  get: function () { return wpix.coPoint( this.right , this.bott ); }  },
+				"topMid"   : {  get: function () { return wpix.coPoint( midX()     , this.top  ); }  },
+				"bottMid"  : {  get: function () { return wpix.coPoint( midX()     , this.bott ); }  },
+				"leftMid"  : {  get: function () { return wpix.coPoint( this.left  , midY()    ); }  },
+				"rightMid" : {  get: function () { return wpix.coPoint( this.right , midY()    ); }  },
+				"center"   : {  get: function () { return wpix.coPoint( midX()     , midY()    ); }  }
 			});
 		}
 		function createTplNode() {
@@ -81,8 +85,8 @@ var tpl = (function () {
 			node.id = id;
 			node.name = name;
 			node.links = thisLinks;
-			node.pixiEl = boxSpriteText;
-			addTplnodeCustomPositionGetters(opt);
+			node.wpixEl = boxSpriteText;
+			addTplnodeCustomPositionGetters();
 		}
 		function bringToFront(arr, el) {
 			arr.splice( arr.indexOf(el), 1 );
@@ -94,7 +98,7 @@ var tpl = (function () {
 				
 				bringToFront(
 				//                nodeContainer
-					pixi.viewport.children[1].children,
+					wpix.viewport.children[1].children,
 					boxSpriteText
 				);
 				
@@ -102,7 +106,7 @@ var tpl = (function () {
 					var link = tplLinks[linkId];
 					
 					if (link) {
-						link.pixiEl.clear();
+						link.wpixEl.clear();
 					}
 					
 				});
@@ -125,7 +129,7 @@ var tpl = (function () {
 							end = node.center;
 						}
 						
-						link.pixiEl.changePoints(start, end);
+						link.wpixEl.changePoints(start, end);
 					}
 				});
 			});
@@ -138,9 +142,9 @@ var tpl = (function () {
 		
 		p.nodes[ id ] = node;
 		
-		pixi.addChild(container, "nodeContainer", node.pixiEl);
+		wpix.addChild(container, "nodeContainer", node.wpixEl);
 		
-		ani.fadeIn(node.pixiEl);
+		wani.fadeIn(node.wpixEl);
 		
 	}
 	var createLink = (function () {
@@ -148,7 +152,7 @@ var tpl = (function () {
 			toggle = false;
 		
 		function create(start, end, srcId, destId, linkId, status, container) {
-			var link, pixiEl, nth, curveLevel,
+			var link, wpixEl, nth, curveLevel,
 				srcdest, destsrc;
 			
 			srcdest = srcId + destId;
@@ -167,14 +171,14 @@ var tpl = (function () {
 			curveLevel = (nth-1)*2;
 			
 			if (nth === 1) {
-				pixiEl = pixi.create2pointLine({
+				wpixEl = wpix.create2pointLine({
 					start: start,
 					end: end,
 					color: 0xCCAA00 * status,
 					alpha: 0
 				});
 			} else if (nth > 1) {
-				pixiEl = pixi.create3pointLine({
+				wpixEl = wpix.create3pointLine({
 					start: start,
 					end: end,
 					color: 0xCCAA00 * status,
@@ -184,12 +188,12 @@ var tpl = (function () {
 			}
 			
 			
-			var setOndown = pixiEl.setOnmousedown;
+			var setOndown = wpixEl.setOnmousedown;
 			if ( u.isFn(setOndown) ) {
 				setOndown(undefined, function () {
 					//                     lineContainer
-					var arr = pixi.viewport.children[0].children,
-						el = pixiEl;
+					var arr = wpix.viewport.children[0].children,
+						el = wpixEl;
 					
 					arr.splice( arr.indexOf(el), 1 );
 					arr.push(el);
@@ -197,7 +201,7 @@ var tpl = (function () {
 			}
 			
 			
-			link.pixiEl = pixiEl;
+			link.wpixEl = wpixEl;
 			link.id = linkId;
 			link.src = srcId;
 			link.dest = destId;
@@ -205,10 +209,10 @@ var tpl = (function () {
 			p.links[ linkId ] = link;
 			
 			
-			pixi.addChild(container, "lineContainer", link.pixiEl);
+			wpix.addChild(container, "lineContainer", link.wpixEl);
 			
-			// animate(link.pixiEl);
-			ani.fadeIn(pixiEl);
+			// animate(link.wpixEl);
+			wani.fadeIn(wpixEl);
 		}
 		
 		return create;
@@ -257,8 +261,8 @@ var tpl = (function () {
 		// createLink(start, end, src.id, dest.id, link.id, container);
 		
 		var srcId, destId, srcNode, destNode, linkId,
-			isObj = util.isObj,
-			isStr = util.isStr;
+			isObj = u.isObj,
+			isStr = u.isStr;
 		
 		if (link.src) {
 			if ( isObj(link.src) ) {
@@ -305,7 +309,7 @@ var tpl = (function () {
 			checkLink( links[k], c, b );
 		});
 	}
-	function draw(data, container, bounds, coefficient) {
+	function draw(data: any, container?: string, bounds?: any, coefficient?: any) {
 		container = container ? container : "viewport";
 		bounds = bounds ? bounds : {};
 		coefficient = coefficient ? coefficient : false;

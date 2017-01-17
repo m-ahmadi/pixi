@@ -1,16 +1,14 @@
 import * as $ from 'jquery';
 
+
 $.support.cors = true;
 
 $.ajaxSetup({
 	crossDomain: true
 });
 
-var ajax: any = {};
-
-
-ajax = (function () {
-	var fns: any = {},
+var ajax: any = (function () {
+	var fns: any  = {},
 		counter = 0,
 		xhr,
 		jax: any;
@@ -22,7 +20,7 @@ ajax = (function () {
 	function u() {
 		return 'a'+(counter+=1);
 	}
-	function execute(type, uid, a?, b?, c?) {
+	function execute(type: string, uid: string, a?: any, b?: any, c?:any) {
 		var o = fns[type],
 			f = o[uid];
 		if (typeof f === 'function') {
@@ -32,22 +30,24 @@ ajax = (function () {
 	jax = function (o: any) {
 		o = o ? o : {};
 		
-		let uid = u();
-		let cnf: any = {};
+		var uid: string = u();
+		var opt: any = {};
 		
-		jax.id = uid;
+		ajax.id = uid;
+		
+		
+		
+		opt.url = o.url || 'http://localhost:3000';
+		opt.type = o.type || 'GET';
+		opt.dataType = o.dataType || 'json';
+		opt.data = o.data;
+		opt.beforeSend = o.beforeSend;
+		opt.id = uid;
 
-		cnf.url = o.url            || 'http://localhost:3000',
-		cnf.type = o.type          || 'GET',
-		cnf.dataType = o.dataType  || 'json',
-		cnf.data = o.data,
-		cnf.beforeSend = o.beforeSend,
-		cnf.id = uid
-		
-		xhr = $.ajax(cnf)
+		xhr = $.ajax(opt)
 		.done(function (data, txt, obj) {
 			
-			if (this.id === jax.id) {
+			if (this.id === ajax.id) {
 				execute('done', uid, data, txt, obj);
 			};
 		})
@@ -62,26 +62,26 @@ ajax = (function () {
 			
 		});
 		
-		jax.xhr = xhr;
+		ajax.xhr = xhr;
 		
-		return jax;
+		return ajax;
 	};
 	
-	jax.done = function (fn) {
+	ajax.done = function (fn) {
 		fns.done[this.id] = fn;
 		return this;
 	};
-	jax.fail = function (fn) {
+	ajax.fail = function (fn) {
 		fns.fail[this.id] = fn;
 		return this;
 	};
-	jax.always = function (fn) {
+	ajax.always = function (fn) {
 		fns.always[this.id] = fn;
 		return this;
 	};
-	jax.callbacks = fns;
+	ajax.callbacks = fns;
 	
-	return jax;
+	return ajax;
 }());
 
 export default ajax

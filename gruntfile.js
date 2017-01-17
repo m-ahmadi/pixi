@@ -75,8 +75,10 @@ module.exports = function(grunt) {
 				options: {
 					watch: true,
 					plugin: ['tsify']
+					
 				}
-			}
+			},
+			
 		},
 		
 		
@@ -99,7 +101,7 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
-					'js/src/**/*.ts',
+					'js/**/*.ts',
 					'gruntfile.js',
 					'test/**/*'
 				],
@@ -116,7 +118,7 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
-					'js/src/**/*.ts',
+					'js/**/*.ts',
 					'test/**/*'
 				]
 			}

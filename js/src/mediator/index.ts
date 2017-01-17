@@ -1,7 +1,15 @@
+import util from '../util';
+
+import wpix from '../wpix';
+import tpl from '../tpl';
+import navigation from '../navigation';
 import ajax from '../ajax';
 
+
+declare var window: any;
+
 var mediator = (function () {
-	var inst = {},
+	var inst: any = {},
 		p: any = {};
 	
 	p.GLOBAL_BOUNDS = {
@@ -22,7 +30,7 @@ var mediator = (function () {
 	};
 	p.ajax;
 	
-	function loadData(container) {
+	function loadData(container?: string) {
 		container = container ? container : "viewport";
 		var abort = p.ajax ? p.ajax.xhr.abort : undefined;
 		
@@ -34,11 +42,11 @@ var mediator = (function () {
 			data: p.data
 		})
 		.done(function (data) {
-			pixi.clearContainer(container || "viewport");
+			wpix.clearContainer(container || "viewport");
 			tpl.draw(data, container || "viewport", p.bounds);
 		});
 	}
-	function pixiCallback(width, height) {
+	function wpixCallback(width, height) {
 		var w = width,
 			h = height,
 			hW = w / 2,
@@ -70,14 +78,14 @@ var mediator = (function () {
 		
 		console.log(p.bounds);
 		console.log(p.data);
-		// ajax({
-			// data: p.data
-		// })
-		// .done(function ( data ) { // {url: "js/d.txt"}
-			// console.log(data);
-			// t = data;
-			// a.tpl.draw(data, "viewport");
-		// });
+		ajax({
+			data: p.data
+		})
+		.done(function ( data ) { // {url: "js/d.txt"}
+			console.log(data);
+			window.t = data;
+			tpl.draw(data, "viewport");
+		});
 	}
 	function panCallback(pos) {
 		var x = Math.floor(pos.x),
@@ -263,19 +271,19 @@ var mediator = (function () {
 	}
 	function addCustomEvents() {
 		
-		pixi.on("pan", panCallback);
-		pixi.on("zoom", zoomCallback);
+		wpix.on("pan", panCallback);
+		wpix.on("zoom", zoomCallback);
 		
 		navigation.on("zoom", function () {
 			console.log("zoom");
-			pixi.zoom();
+			wpix.zoom();
 		});
 		navigation.on("pan", function () {
-			pixi.pan.pan(1, 1);
+			wpix.pan.pan(1, 1);
 		});
 	}
 	function init() {
-		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
+		wpix.init(wpixCallback, p.GLOBAL_BOUNDS);
 		//core.init();
 		//navigation.init();
 		
