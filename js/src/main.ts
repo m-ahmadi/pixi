@@ -1,5 +1,4 @@
-declare let window: any;
-
+declare let window;
 
 import wpix from './wpix';
 import tpl from './tpl';

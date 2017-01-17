@@ -5,6 +5,9 @@ import tpl from '../tpl';
 import UIkit from 'uikit';
 
 let u = util;
+declare var WebSocket, console, Object, JSON;
+
+var baseRoot: string;
 
 var traceroute = (function () {
 	var ws: any = {},
