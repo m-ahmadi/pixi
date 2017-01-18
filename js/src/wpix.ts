@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import * as $ from 'jquery';
-import util from '../util';
-
+import util from './util';
+import newPubSub from './pubsub';
 
 
 let u = util;

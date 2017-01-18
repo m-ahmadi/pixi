@@ -1,8 +1,9 @@
 import * as $ from 'jquery';
-import util from '../util';
-import wpix from '../wpix';
-import tpl from '../tpl';
-import UIkit from 'uikit';
+import util from './util';
+import wpix from './wpix';
+import tpl from './tpl';
+import UIkit from 'uikit/dist/js/uikit';
+import 'uikit/dist/js/components/notify';
 
 let u = util;
 declare var WebSocket, console, Object, JSON;

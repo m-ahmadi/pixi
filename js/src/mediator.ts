@@ -1,9 +1,9 @@
-import util from '../util';
+import util from './util';
 
-import wpix from '../wpix';
-import tpl from '../tpl';
-import navigation from '../navigation';
-import ajax from '../ajax';
+import wpix from './wpix';
+import tpl from './tpl';
+import navigation from './navigation';
+import ajax from './ajax';
 
 
 declare var window: any;
