@@ -1,146 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var util_1 = require("./util");
-var PubSub = (function () {
-    function PubSub() {
-        this.subscribe = function (evt, fn, par) {
-            var events, add = function (str) {
-                if (typeof this.subscribers[str] === 'undefined') {
-                    this.subscribers[str] = [];
-                }
-                this.subscribers[str].push({
-                    fn: fn,
-                    par: par
-                });
-            };
-            if (typeof evt === 'string') {
-                if (evt.indexOf(' ') === -1) {
-                    add(evt);
-                }
-                else {
-                    events = evt.split(' ');
-                    events.forEach(function (el) {
-                        add(el);
-                    });
-                }
-            }
-            else if (util_1.default.isObj(evt)) {
-                Object.keys(evt).forEach(function (i) {
-                    if (typeof this.subscribers[i] === 'undefined') {
-                        this.subscribers[i] = [];
-                    }
-                    if (typeof evt[i] === 'function') {
-                        this.subscribers[i].push({
-                            fn: evt[i],
-                            par: undefined
-                        });
-                    }
-                    else if (util_1.default.isObj(evt[i])) {
-                        this.subscribers[i].push({
-                            fn: evt[i].fn,
-                            par: evt[i].par
-                        });
-                    }
-                });
-            }
-        };
-        this.subscribers = {};
-    }
-    PubSub.prototype.publish = function (evtName, evtData) {
-        if (typeof this.subscribers[evtName] !== 'undefined') {
-            this.subscribers[evtName].forEach(function (i) {
-                i.fn(evtData, i.par);
-            });
-        }
-    };
-    PubSub.prototype.getSubscribers = function () {
-        return this.subscribers;
-    };
-    PubSub.prototype.on = function (evt, fn, par) {
-        this.subscribe(evt, fn, par);
-    };
-    PubSub.prototype.emit = function (evtName, evtData) {
-        this.publish(evtName, evtData);
-    };
-    return PubSub;
-}());
-Object.defineProperty(exports, "__esModule", { value: true });
-/*function newPubSub() {
-    "use strict";
-    if ( this instanceof newPubSub ) { throw new Error('newPubSub() was called with new'); }
-    
-    var subscribers = {},
-        inst: any = {};
-    
-    inst.getSubscribers = function () {
-        return subscribers;
-    };
-    
-    inst.subscribe = function (evt, fn, par) {
-        var events,
-            add = function (str) {
-                if ( typeof subscribers[str] === 'undefined' ) {
-                    subscribers[str] = [];
-                }
-                subscribers[str].push({
-                    fn: fn,
-                    par: par
-                });
-            };
-        
-        if (typeof evt === 'string') {
-            if ( evt.indexOf(' ') === -1 ) {
-                add(evt);
-            } else {
-                events = evt.split(' ');
-                events.forEach(function (el) {
-                    add(el);
-                });
-            }
-        } else if ( util.isObj(evt) ) {
-            Object.keys(evt).forEach(function (i) {
-                if (typeof subscribers[i] === 'undefined') {
-                    subscribers[i] = [];
-                }
-                if ( typeof evt[i] === 'function' ) {
-                    subscribers[i].push({
-                        fn: evt[i],
-                        par: undefined
-                    });
-                } else if ( util.isObj(evt[i]) ) {
-                    subscribers[i].push({
-                        fn: evt[i].fn,
-                        par: evt[i].par
-                    });
-                }
-            });
-        }
-    };
-    
-    inst.publish = function (evtName, evtData) {
-        if (typeof subscribers[evtName] !== 'undefined') {
-            subscribers[evtName].forEach(function (i) {
-                i.fn(evtData, i.par);
-            });
-        }
-    };
-    
-    inst.on = function (evt, fn, par) { // alias
-        this.subscribe(evt, fn, par);
-    };
-    
-    inst.emit = function (evtName, evtData) { // alias
-        this.publish(evtName, evtData);
-    };
-    
-    return inst;
-};
-
-export default newPubSub*/
-exports.default = PubSub;
-
-},{"./util":9}],2:[function(require,module,exports){
-"use strict";
 $.support.cors = true;
 $.ajaxSetup({
     crossDomain: true
@@ -205,10 +64,10 @@ ajax = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ajax;
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 var util_1 = require("./util");
-var PubSub_1 = require("./PubSub");
+var pubsub_1 = require("./pubsub");
 var wpix_1 = require("./wpix");
 var tpl_1 = require("./tpl");
 var mediator_1 = require("./mediator");
@@ -217,7 +76,7 @@ var navigation_1 = require("./navigation");
 var traceroute_1 = require("./traceroute");
 var page_1 = require("./page");
 window.util = util_1.default;
-window.PubSub = PubSub_1.default;
+window.newPubSub = pubsub_1.default;
 window.wpix = wpix_1.default;
 window.wani = wani_1.default;
 window.tpl = tpl_1.default;
@@ -226,7 +85,7 @@ window.traceroute = traceroute_1.default;
 window.mediator = mediator_1.default;
 page_1.default.onReady(mediator_1.default.init);
 
-},{"./PubSub":1,"./mediator":4,"./navigation":5,"./page":6,"./tpl":7,"./traceroute":8,"./util":9,"./wani":10,"./wpix":11}],4:[function(require,module,exports){
+},{"./mediator":3,"./navigation":4,"./page":5,"./pubsub":6,"./tpl":7,"./traceroute":8,"./util":9,"./wani":10,"./wpix":11}],3:[function(require,module,exports){
 "use strict";
 var util_1 = require("../util");
 var wpix_1 = require("../wpix");
@@ -474,13 +333,13 @@ var mediator = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = mediator;
 
-},{"../ajax":2,"../navigation":5,"../tpl":7,"../util":9,"../wpix":11}],5:[function(require,module,exports){
+},{"../ajax":1,"../navigation":4,"../tpl":7,"../util":9,"../wpix":11}],4:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
-var PubSub_1 = require("../PubSub");
+var pubsub_1 = require("../pubsub");
 var util_1 = require("../util");
 var navigation = (function () {
-    var inst = util_1.default.extend(new PubSub_1.default()), p = {};
+    var inst = util_1.default.extend(pubsub_1.default()), p = {};
     function init() {
         var nav, panel, rect, dot;
         p.panel = new wpix_1.default.Graphics();
@@ -655,7 +514,7 @@ var navigation = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = navigation;
 
-},{"../PubSub":1,"../util":9,"../wpix":11}],6:[function(require,module,exports){
+},{"../pubsub":6,"../util":9,"../wpix":11}],5:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
 var traceroute_1 = require("../traceroute");
@@ -712,7 +571,79 @@ page.onReady = onReady;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = page;
 
-},{"../traceroute":8,"../util":9,"../wpix":11}],7:[function(require,module,exports){
+},{"../traceroute":8,"../util":9,"../wpix":11}],6:[function(require,module,exports){
+"use strict";
+var util_1 = require("./util");
+function newPubSub() {
+    "use strict";
+    if (this instanceof newPubSub) {
+        throw new Error('newPubSub() was called with new');
+    }
+    var subscribers = {}, inst = {};
+    inst.getSubscribers = function () {
+        return subscribers;
+    };
+    inst.subscribe = function (evt, fn, par) {
+        var events, add = function (str) {
+            if (typeof subscribers[str] === 'undefined') {
+                subscribers[str] = [];
+            }
+            subscribers[str].push({
+                fn: fn,
+                par: par
+            });
+        };
+        if (typeof evt === 'string') {
+            if (evt.indexOf(' ') === -1) {
+                add(evt);
+            }
+            else {
+                events = evt.split(' ');
+                events.forEach(function (el) {
+                    add(el);
+                });
+            }
+        }
+        else if (util_1.default.isObj(evt)) {
+            Object.keys(evt).forEach(function (i) {
+                if (typeof subscribers[i] === 'undefined') {
+                    subscribers[i] = [];
+                }
+                if (typeof evt[i] === 'function') {
+                    subscribers[i].push({
+                        fn: evt[i],
+                        par: undefined
+                    });
+                }
+                else if (util_1.default.isObj(evt[i])) {
+                    subscribers[i].push({
+                        fn: evt[i].fn,
+                        par: evt[i].par
+                    });
+                }
+            });
+        }
+    };
+    inst.publish = function (evtName, evtData) {
+        if (typeof subscribers[evtName] !== 'undefined') {
+            subscribers[evtName].forEach(function (i) {
+                i.fn(evtData, i.par);
+            });
+        }
+    };
+    inst.on = function (evt, fn, par) {
+        this.subscribe(evt, fn, par);
+    };
+    inst.emit = function (evtName, evtData) {
+        this.publish(evtName, evtData);
+    };
+    return inst;
+}
+;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = newPubSub;
+
+},{"./util":9}],7:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
 var wani_1 = require("../wani");
@@ -1370,11 +1301,11 @@ exports.default = ani;
 },{}],11:[function(require,module,exports){
 "use strict";
 var util_1 = require("../util");
-var PubSub_1 = require("../PubSub");
+var pubsub_1 = require("../pubsub");
 var u = util_1.default;
 var renderer;
 var wpix = (function () {
-    var inst = util_1.default.extend(new PubSub_1.default()), p = {};
+    var inst = util_1.default.extend(pubsub_1.default()), p = {};
     p.renderer = {};
     p.stage = {};
     p.mainContainer = {};
@@ -2022,4 +1953,4 @@ var wpix = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = wpix;
 
-},{"../PubSub":1,"../util":9}]},{},[3]);
+},{"../pubsub":6,"../util":9}]},{},[2]);

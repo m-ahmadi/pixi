@@ -1,7 +1,5 @@
-import * as PIXI from 'pixi.js';
-import * as $ from 'jquery';
-import util from './util';
-import newPubSub from './pubsub';
+import util from '../util';
+import PubSub from '../PubSub';
 
 
 let u = util;
@@ -9,7 +7,7 @@ let u = util;
 let renderer;
 
 var wpix = (function () {
-	var inst = util.extend( newPubSub() ),
+	var inst = util.extend( new PubSub() ),
 		p: any = {};
 	
 	p.renderer = {};

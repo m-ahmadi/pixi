@@ -1,27 +1,27 @@
-enum NodeStatus {
+export enum NodeStatus {
     nomal,
     low,
     high,
     abnormal
 }
-enum LinkStatus {
+export enum LinkStatus {
     nomal,
     low,
     high,
     abnormal
 }
-enum NodeType {
+export enum NodeType {
     lowEnd,
     midEnd,
     highEnd
 }
 
-interface Point {
+export interface Point {
     x: number;
     y: number;
 }
 
-interface Node {
+export interface Node {
     name: string;
     id: string;
     x: Point;
@@ -29,13 +29,13 @@ interface Node {
     status: NodeStatus;
     type: NodeType;
 }
-interface Link {
+export interface Link {
     id: number;
     name: string;
     src: LinkTarget;
     dest: LinkTarget
 }
-interface LinkTarget {
+export interface LinkTarget {
     id: number;
     x: number;
     y: number;

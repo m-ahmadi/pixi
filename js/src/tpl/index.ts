@@ -1,6 +1,6 @@
-import wpix from './wpix';
-import wani from './wani';
-import u from './util';
+import wpix from '../wpix';
+import wani from '../wani';
+import u from '../util';
 
 var tpl = (function () {
 	var p: any = {};

@@ -1,8 +1,7 @@
-import * as $ from 'jquery';
-import wpix from './wpix';
-import traceroute from './traceroute';
-import mediator from './mediator';
-import util from './util';
+import wpix from '../wpix';
+import traceroute from '../traceroute';
+import mediator from '../mediator';
+import util from '../util';
 let u = util;
 
 function onReady(callback?) {
@@ -70,4 +69,7 @@ function onReady(callback?) {
 	});
 }
 
-export { onReady };
+let page: any = {};
+page.onReady = onReady;
+
+export default page

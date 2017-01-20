@@ -1,12 +1,9 @@
-import * as $ from 'jquery';
-import util from './util';
-import wpix from './wpix';
-import tpl from './tpl';
-import UIkit from 'uikit/dist/js/uikit';
-import 'uikit/dist/js/components/notify';
+import util from '../util';
+import wpix from '../wpix';
+import tpl from '../tpl';
 
+declare let UIkit: any;
 let u = util;
-declare var WebSocket, console, Object, JSON;
 
 var baseRoot: string;
 

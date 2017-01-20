@@ -1,6 +1,5 @@
-import {TweenLite, Linear} from 'gsap/src/minified/TweenLite.min.js';
-
-
+declare let TweenLite: any;
+declare let Linear: any
 
 var ani = (function () {
 	function fade(inOut, pixiEl, o) {

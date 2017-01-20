@@ -1,6 +1,76 @@
 import util from './util';
 
-function newPubSub() {
+class PubSub {
+	private subscribers: any;
+
+	constructor() {
+		this.subscribers = {};
+	}
+	
+	private subscribe = function (evt, fn, par) {
+		var events,
+			add = function (str) {
+				if ( typeof this.subscribers[str] === 'undefined' ) {
+					this.subscribers[str] = [];
+				}
+				this.subscribers[str].push({
+					fn: fn,
+					par: par
+				});
+			};
+		
+		if (typeof evt === 'string') {
+			if ( evt.indexOf(' ') === -1 ) {
+				add(evt);
+			} else {
+				events = evt.split(' ');
+				events.forEach(function (el) {
+					add(el);
+				});
+			}
+		} else if ( util.isObj(evt) ) {
+			Object.keys(evt).forEach(function (i) {
+				if (typeof this.subscribers[i] === 'undefined') {
+					this.subscribers[i] = [];
+				}
+				if ( typeof evt[i] === 'function' ) {
+					this.subscribers[i].push({
+						fn: evt[i],
+						par: undefined
+					});
+				} else if ( util.isObj(evt[i]) ) {
+					this.subscribers[i].push({
+						fn: evt[i].fn,
+						par: evt[i].par
+					});
+				}
+			});
+		}
+	}
+	
+	private publish(evtName, evtData) {
+		if (typeof this.subscribers[evtName] !== 'undefined') {
+			this.subscribers[evtName].forEach(function (i) {
+				i.fn(evtData, i.par);
+			});
+		}
+	}
+	
+	public getSubscribers(): {} {
+		return this.subscribers;
+	}
+
+	public on(evt, fn, par) { // alias
+		this.subscribe(evt, fn, par);
+	}
+
+	public emit(evtName, evtData) { // alias
+		this.publish(evtName, evtData);
+	}
+
+}
+
+/*function newPubSub() {
 	"use strict";
 	if ( this instanceof newPubSub ) { throw new Error('newPubSub() was called with new'); }
 	
@@ -71,4 +141,6 @@ function newPubSub() {
 	return inst;
 };
 
-export default newPubSub
+export default newPubSub*/
+
+export default PubSub

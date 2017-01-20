@@ -1,9 +1,9 @@
-import wpix from './wpix';
-import newPubSub from './pubsub';
-import util from './util';
+import wpix from '../wpix';
+import PubSub from '../PubSub';
+import util from '../util';
 
 var navigation = (function () {
-	var inst = util.extend( newPubSub() ),
+	var inst = util.extend( new PubSub() ),
 		p: any = {};
 	
 	function init() {

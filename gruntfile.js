@@ -65,22 +65,20 @@ module.exports = function(grunt) {
 		},
 		*/
 		
-		
+		/*
 		browserify: {
 			all: {
 				files: {
-					src: 'js/src/main.ts',
-					dest: 'js/bundle.js'
+					"js/bundle.js": ["js/src/main.ts"]
 				},
 				options: {
 					watch: true,
 					plugin: ['tsify']
-					
 				}
 			},
 			
 		},
-		
+		*/
 		
 		/*
 		webpack: {
@@ -101,11 +99,10 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
-					'js/**/*.ts',
 					'gruntfile.js',
 					'test/**/*'
 				],
-				tasks: ['sass', 'browserify'], // 'webpack', 'jslint', 'browserify', 'jshint', 'concat'
+				tasks: ['sass'], // 'webpack', 'jslint', 'browserify', 'jshint', 'concat'
 				options: {
 					spawn: false,
 					reload: true
@@ -118,7 +115,6 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
-					'js/**/*.ts',
 					'test/**/*'
 				]
 			}
