@@ -1,7 +1,7 @@
 declare let window: any;
 
 import util        from './util';
-import PubSub   from './PubSub';
+import PubSub      from './PubSub';
 import wpix        from './wpix';
 import tpl         from './tpl';
 import mediator    from './mediator';
@@ -10,6 +10,19 @@ import navigation  from './navigation';
 import traceroute  from './traceroute';
 import page        from './page';
 
+import TwoPointLine from './wpix/TwoPointLine'
+window.TwoPointLine = TwoPointLine;
+
+module containerManager {
+    export function asad() {
+        console.log(util);
+        return  2;
+
+    }
+}
+
+
+window.b = containerManager;
 
 window.util       = util;
 window.PubSub     = PubSub;

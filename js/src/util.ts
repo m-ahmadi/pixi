@@ -170,6 +170,9 @@ var util: any = (function () {
 		}
 		return result;
 	}
+	function getCommentsInside(selector) {
+		return $(selector).contents().filter( function () { return this.nodeType == 8; } );
+	}
 	
 	return {
 		isObj: isObj,
@@ -192,7 +195,8 @@ var util: any = (function () {
 		isUndef: isUndef,
 		isEmptyStr: isEmptyStr,
 		objLength: objLength,
-		extend: extend
+		extend: extend,
+		getCommentsInside: getCommentsInside
 	};
 }());
 

@@ -1,6 +1,7 @@
 import util from '../util';
 import PubSub from '../PubSub';
 
+export * from './TwoPointLine';
 
 let u = util;
 

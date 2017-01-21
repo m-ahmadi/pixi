@@ -51,7 +51,7 @@ var pixi = (function () {
 		mainContainer = p.mainContainer;
 		
 		// document.body.appendChild( p.renderer.view );
-		$("#contents").append( renderer.view );
+		$("#canvas").append( renderer.view );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		mainContainer.interactive = true;
@@ -213,13 +213,25 @@ var pixi = (function () {
 				negate = util.negateNum,
 				posit = util.positNum;
 			
+			
+			var openedPopup = popupManager.activeBox,
+				pTop = openedPopup ? parseInt( openedPopup.css('top'), 10) : undefined,
+				pLeft = openedPopup ? parseInt( openedPopup.css('left'), 10) : undefined;
+			
 			if (mcX <= bX1    &&    mcX >= bX2) {
+				if (openedPopup) {
+					openedPopup.css('left', pLeft += dx);
+				}
 				p.mainContainer.position.x += dx;
 			} else {
 				p.mainContainer.position.x = mcX > 0 ? bX1 : mcX < 0 ? bX2 : undefined;
 			}
 			
 			if (mcY <= bY1    &&    mcY >= bY2) {
+				if (openedPopup) {
+					openedPopup.css('top', pTop += dy);
+				}
+				
 				p.mainContainer.position.y += dy;
 			} else {
 				p.mainContainer.position.y = mcY > 0 ? bY1 : mcY < 0 ? bY2 : undefined;
@@ -276,7 +288,8 @@ var pixi = (function () {
 			lineWidth, tmpLineWidth,
 			alpha, color,
 			p,
-			onmousedown, onmousedownParam;
+			onmousedown, onmousedownParam,
+			onmouseup, onmouseupParam;
 		
 		function setThings() {
 			start     =  conf.start     ||  {x: 0, y: 0};
@@ -317,6 +330,9 @@ var pixi = (function () {
 		}
 		function up() {
 			this.alpha = 1;
+			if ( u.isFn(onmouseup) ) {
+				onmousedown.apply(undefined, onmouseupParam);
+			}
 		}
 		function over() {
 			tmpLineWidth = lineWidth;
@@ -444,6 +460,14 @@ var pixi = (function () {
 		line.setOnmousedown = function (param, fn) {
 			onmousedownParam = param;
 			onmousedown = fn;
+		};
+		line.setOnmouseup = function (param, fn) {
+			onmouseupParam = param;
+			onmouseup = fn;
+		};
+		line.setOnmousemove = function (param, fn) {
+			onmousemoveParam = param;
+			onmousemove = fn;
 		};
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
@@ -610,7 +634,8 @@ var pixi = (function () {
 			boxX, boxY, boxAlpha,
 			onmouseup, onmouseupParam,
 			onmousedown, onmousedownParam,
-			onmove, onmoveParam;
+			onmousemove, onmousemoveParam,
+			counter = 0;
 		
 		function setThings() {
 			imgFill     = conf.imgFill      || false;
@@ -640,25 +665,25 @@ var pixi = (function () {
 			this.dragPoint.y -= this.position.y;
 			
 			if ( u.isFn(onmousedown) ) {
-				onmousedown.apply(undefined, onmousedownParam);
+				onmousedown.apply(this, onmousedownParam ? [e].concat(onmousedownParam) : [e]);
 			}
 		}
-		function up() {
+		function up(e) {
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
 			if ( u.isFn(onmouseup) ) {
-				onmouseup.apply(undefined, onmouseupParam);
+				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
 			}
 		}
-		function move() {
+		function move(e) {
 			if ( this.dragging ) {
 				var newPosition = this.data.getLocalPosition(this.parent);
 				this.position.x = newPosition.x - this.dragPoint.x;
 				this.position.y = newPosition.y - this.dragPoint.y;
 				
-				if ( u.isFn(onmove) ) {
-					onmove.apply(undefined, onmoveParam);
+				if ( u.isFn(onmousemove) ) {
+					onmousemove.apply(this, onmousemoveParam ? [e].concat(onmousemoveParam) : [e]);
 				}
 			}
 		}
@@ -723,9 +748,9 @@ var pixi = (function () {
 			onmousedownParam = param;
 			onmousedown = fn;
 		};
-		box.setOnmove = function (param, fn) {
-			onmoveParam = param;
-			onmove = fn;
+		box.setOnmousemove = function (param, fn) {
+			onmousemoveParam = param;
+			onmousemove = fn;
 		};
 		box.changeTint = function (n) {
 			if (n) {
@@ -899,7 +924,30 @@ var tpl = (function () {
 		}
 		function addHandler() {
 			
-			boxSpriteText.setOnmousedown([p.links], function (tplLinks) {
+			boxSpriteText.setOnmousedown([node, p.links], function (e, node, tplLinks) {
+				var links = node.links;
+				
+				var html = ''+
+					'<table class="uk-table">'
+				+		'<tr>'
+				+			'<th>Node Name</th>'
+				+			'<th>Node Id</th>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+	'</table>';
+				
+				popupManager.create(html, node.topLeft);
 				
 				bringToFront(
 				//                nodeContainer
@@ -907,36 +955,52 @@ var tpl = (function () {
 					boxSpriteText
 				);
 				
-				node.links.forEach(function (linkId) {
-					var link = tplLinks[linkId];
-					
-					if (link) {
-						link.pixiEl.clear();
-					}
-					
-				});
+				if ( links ) {
+					links.forEach(function (linkId) {
+						var link = tplLinks[linkId];
+						if (link) {
+							link.pixiEl.clear();
+						}
+					});
+				}
 			});
 			
-			
-			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (node, tplLinks, tplNodes) {
-				var nodeId = node.id;
+			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (e, node, tplLinks, tplNodes) {
+				var nodeId = node.id,
+					links = node.links;
 				
-				node.links.forEach(function (linkId) {
-					var link = tplLinks[linkId],
-						start, end;
+				
+				if (links) {
+					links.forEach(function (linkId) {
+						var link = tplLinks[linkId],
+							start, end;
+						
+						if (link) {
+							if (link.src === nodeId) {
+								start = node.center;
+							}
+							
+							if (link.dest === nodeId) {
+								end = node.center;
+							}
+							
+							link.pixiEl.changePoints(start, end);
+						}
+					});
+				}
+				
+			});
+			
+			boxSpriteText.setOnmousemove(undefined, function (e) {
+				// var pos = e.data.global,
+					// bubble = popupManager.activeBox,
+					// pTop = bubble ? parseInt( bubble.css('top'), 10) : undefined,
+					// pLeft = bubble ? parseInt( bubble.css('left'), 10) : undefined;
 					
-					if (link) {
-						if (link.src === nodeId) {
-							start = node.center;
-						}
-						
-						if (link.dest === nodeId) {
-							end = node.center;
-						}
-						
-						link.pixiEl.changePoints(start, end);
-					}
-				});
+				// if (bubble) {
+					// bubble.css('left', (pos.x - 40)+'px');
+					// bubble.css('top', (pos.y - (bubble.height() + 40)) +'px');
+				// }
 			});
 		}
 		
@@ -1792,6 +1856,8 @@ var mediator = (function () {
 		pixi.on("pan", panCallback);
 		pixi.on("zoom", zoomCallback);
 		
+		
+		
 		navigation.on("zoom", function () {
 			console.log("zoom");
 			pixi.zoom();
@@ -1816,12 +1882,56 @@ var mediator = (function () {
 	return inst;
 }());
 
+var popupManager = (function () {
+	var activeBox,
+		counter = 0,
+		bubbles = {};
+	
+	function create(v, pos) {
+		removeAll();
+		var html = u.getCommentsInside('#bubble-template')[0].nodeValue.trim(),
+			uid;
+			
+		uid = 'bubble_'+(counter+=1);
+		bubbles[uid] = null;
+		
+		html = $(html);
+		html.attr('id', uid);
+		html.find('.bbl-content').html(v);
+		$('#popups').append(html);
+		
+		if (pos) {
+			
+			html.css({
+				left: (pos.x - 40)  + 'px',
+				top: (pos.y - (html.height() + 40)) +'px'
+			});
+		}
+		
+		
+		activeBox = html;
+	}
+
+	function remove(bubbleId) {
+		$('#popups '+bubbleId).remove();
+	}
+	function removeAll() {
+		$('#popups').empty();
+	}
+	
+	return {
+		get activeBox() { return activeBox; },
+		create: create,
+		remove: remove
+	};
+}());
 
 return {
 	pixi: pixi,
 	tpl: tpl,
 	mediator: mediator,
-	traceroute: traceroute
+	traceroute: traceroute,
+	popupManager: popupManager
 };
 	
 

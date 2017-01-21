@@ -67,6 +67,10 @@ function onReady(callback?) {
 		e.preventDefault();
 		traceroute.abort();
 	});
+
+	$('.popup-close').on('click', function (e) {
+		e.preventDefault();
+	});
 }
 
 let page: any = {};

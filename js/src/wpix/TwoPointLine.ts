@@ -2,7 +2,7 @@ import * as sh from '../shared';
 import u from '../util';
 
 
-class TwoPointLine {
+export default class TwoPointLine {
 	private line: any;
 	private start: sh.Point;
 	private end: sh.Point;
@@ -23,30 +23,43 @@ class TwoPointLine {
 		this.width   =  conf.width     ||  2;
 		this.color   =  conf.color     ||  0x000000;
 		this.alpha   =  conf.alpha;
-		this.alpha   =  u.isNum(alpha) ? alpha : 1;
+		this.alpha   =  u.isNum(this.alpha) ? this.alpha : 1;
 		this.p       =  this.calcPoints();
 
+		this.create();
+		// line.alpha = alpha;
+		this.line.setOnmousedown = function (param, fn) {
+			this.onmousedownParam = param;
+			this.onmousedown = fn;
+		};
+		this.line.changePoints = this.changePoints;
+		this.line.changeColor = this.changeColor;
+		Object.defineProperty(this.line, "points", {
+			get: function () { return {start: this.start, end: this.end}; }
+		});
+		
+		return this.line;
 	}
 	
 	
 	private setStart(s) {
 		if (s) {
-			start = s;
+			this.start = s;
 		}
 	}
 	private setEnd(e) {
 		if (e) {
-			end = e;
+			this.end = e;
 		}
 	}
-	private setLineWidth(w) {
+	private setWidth(w) {
 		if (w) {
-			lineWidth = w;
+			this.width = w;
 		}
 	}
 	private setColor(c) {
 		if (c) {
-			color = c;
+			this.color = c;
 		}
 	}
 	private down(e) {
@@ -54,57 +67,57 @@ class TwoPointLine {
 		this.alpha = 0.5;
 		
 		if ( u.isFn(onmousedown) ) {
-			onmousedown.apply(undefined, onmousedownParam);
+			onmousedown.apply(undefined, this.onmousedownParam);
 		}
 	}
 	private up() {
 		this.alpha = 1;
 	}
 	private over() {
-		tmpLineWidth = lineWidth;
-		lineWidth *= 4;
-		p = calcPoints();
-		line.clear();
-		draw();
-		toggleDirties();
+		this.tmpWidth = this.width;
+		this.width *= 4;
+		this.p = this.calcPoints();
+		this.line.clear();
+		this.draw();
+		this.toggleDirties();
 	}
 	private out() {
-		lineWidth = tmpLineWidth;
-		p = calcPoints();
-		line.clear();
-		draw();
-		toggleDirties();
+		this.width = this.tmpWidth;
+		this.p = this.calcPoints();
+		this.line.clear();
+		this.draw();
+		this.toggleDirties();
 	}
 	private addEvents() {
-		line
-			.on("mousedown", down) 
-			.on("touchstart", down)
-			.on("mouseup", up)
-			.on("mouseupoutside", up)
-			.on("touchend", up)
-			.on("touchendoutside", up)
+		this.line
+			.on("mousedown", this.down) 
+			.on("touchstart", this.down)
+			.on("mouseup", this.up)
+			.on("mouseupoutside", this.up)
+			.on("touchend", this.up)
+			.on("touchendoutside", this.up)
 		//	.on("mousemove", move)
 		//	.on("touchmove", move)
-			.on("mouseover", over)
-			.on("mouseout", out);
+			.on("mouseover", this.over)
+			.on("mouseout", this.out);
 	}
 	private toggleDirties() {
-		var dirty = line.dirty,
-			clearDirty = line.clearDirty;
+		var dirty = this.line.dirty,
+			clearDirty = this.line.clearDirty;
 		
 		dirty = dirty ? false : true;
 		clearDirty = clearDirty ? false : true;
 	}
 	private calcPoints() {
-		var half = lineWidth / 2,
+		var half = this.width / 2,
 			sLeft = {},
 			sRight = {},
 			eRight = {},
 			eLeft = {},
-			sX = start.x,
-			sY = start.y,
-			eX = end.x,
-			eY = end.y,
+			sX = this.start.x,
+			sY = this.start.y,
+			eX = this.end.x,
+			eY = this.end.y,
 			results: any = {};
 
 		if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
@@ -142,20 +155,24 @@ class TwoPointLine {
 		return results;
 	}
 	private changeColor(c) {
-		setColor(c);
-		line.clear();
-		draw();
-		toggleDirties();
+		this.setColor(c);
+		this.line.clear();
+		this.draw();
+		this.toggleDirties();
 	}
 	private changePoints(s, e) {
-		setStart(s);
-		setEnd(e);
-		p = calcPoints();
-		line.clear();
-		draw();
-		toggleDirties();
+		this.setStart(s);
+		this.setEnd(e);
+		this.p = this.calcPoints();
+		this.line.clear();
+		this.draw();
+		this.toggleDirties();
 	}
 	private draw() {
+		let line = this.line,
+			color = this.color,
+			p = this.p;
+		
 		line.beginFill( color );
 		line.moveTo( p.sLeft.x, p.sLeft.y );
 		line.lineTo( p.sRight.x, p.sRight.y );
@@ -164,7 +181,7 @@ class TwoPointLine {
 		line.endFill();
 	}
 	private createElement() {
-		var line;
+		let line;
 		
 		line = new PIXI.Graphics();
 		line.interactive = true;
@@ -174,24 +191,8 @@ class TwoPointLine {
 		return line;
 	}
 	private create() {
-		line = createElement();
-		addEvents();
-		draw();
+		this.line = this.createElement();
+		this.addEvents();
+		this.draw();
 	}
-	
-	setThings();
-	create();
-	line.alpha = alpha;
-	
-	line.setOnmousedown = function (param, fn) {
-		onmousedownParam = param;
-		onmousedown = fn;
-	};
-	line.changePoints = changePoints;
-	line.changeColor = changeColor;
-	Object.defineProperty(line, "points", {
-		get: function () { return {start: start, end: end}; }
-	});
-	
-	return line;
 }

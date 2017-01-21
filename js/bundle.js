@@ -216,6 +216,17 @@ var wani_1 = require("./wani");
 var navigation_1 = require("./navigation");
 var traceroute_1 = require("./traceroute");
 var page_1 = require("./page");
+var TwoPointLine_1 = require("./wpix/TwoPointLine");
+window.TwoPointLine = TwoPointLine_1.default;
+var containerManager;
+(function (containerManager) {
+    function asad() {
+        console.log(util_1.default);
+        return 2;
+    }
+    containerManager.asad = asad;
+})(containerManager || (containerManager = {}));
+window.b = containerManager;
 window.util = util_1.default;
 window.PubSub = PubSub_1.default;
 window.wpix = wpix_1.default;
@@ -226,7 +237,7 @@ window.traceroute = traceroute_1.default;
 window.mediator = mediator_1.default;
 page_1.default.onReady(mediator_1.default.init);
 
-},{"./PubSub":1,"./mediator":4,"./navigation":5,"./page":6,"./tpl":7,"./traceroute":8,"./util":9,"./wani":10,"./wpix":11}],4:[function(require,module,exports){
+},{"./PubSub":1,"./mediator":4,"./navigation":5,"./page":6,"./tpl":7,"./traceroute":8,"./util":9,"./wani":10,"./wpix":12,"./wpix/TwoPointLine":11}],4:[function(require,module,exports){
 "use strict";
 var util_1 = require("../util");
 var wpix_1 = require("../wpix");
@@ -474,7 +485,7 @@ var mediator = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = mediator;
 
-},{"../ajax":2,"../navigation":5,"../tpl":7,"../util":9,"../wpix":11}],5:[function(require,module,exports){
+},{"../ajax":2,"../navigation":5,"../tpl":7,"../util":9,"../wpix":12}],5:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
 var PubSub_1 = require("../PubSub");
@@ -655,7 +666,7 @@ var navigation = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = navigation;
 
-},{"../PubSub":1,"../util":9,"../wpix":11}],6:[function(require,module,exports){
+},{"../PubSub":1,"../util":9,"../wpix":12}],6:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
 var traceroute_1 = require("../traceroute");
@@ -706,13 +717,16 @@ function onReady(callback) {
         e.preventDefault();
         traceroute_1.default.abort();
     });
+    $('.popup-close').on('click', function (e) {
+        e.preventDefault();
+    });
 }
 var page = {};
 page.onReady = onReady;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = page;
 
-},{"../traceroute":8,"../util":9,"../wpix":11}],7:[function(require,module,exports){
+},{"../traceroute":8,"../util":9,"../wpix":12}],7:[function(require,module,exports){
 "use strict";
 var wpix_1 = require("../wpix");
 var wani_1 = require("../wani");
@@ -991,7 +1005,7 @@ var tpl = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = tpl;
 
-},{"../util":9,"../wani":10,"../wpix":11}],8:[function(require,module,exports){
+},{"../util":9,"../wani":10,"../wpix":12}],8:[function(require,module,exports){
 "use strict";
 var util_1 = require("../util");
 var wpix_1 = require("../wpix");
@@ -1134,7 +1148,7 @@ var traceroute = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = traceroute;
 
-},{"../tpl":7,"../util":9,"../wpix":11}],9:[function(require,module,exports){
+},{"../tpl":7,"../util":9,"../wpix":12}],9:[function(require,module,exports){
 "use strict";
 if (typeof Object.create !== 'function') {
     Object.create = function (o) {
@@ -1300,6 +1314,9 @@ var util = (function () {
         }
         return result;
     }
+    function getCommentsInside(selector) {
+        return $(selector).contents().filter(function () { return this.nodeType == 8; });
+    }
     return {
         isObj: isObj,
         isArr: isArr,
@@ -1321,7 +1338,8 @@ var util = (function () {
         isUndef: isUndef,
         isEmptyStr: isEmptyStr,
         objLength: objLength,
-        extend: extend
+        extend: extend,
+        getCommentsInside: getCommentsInside
     };
 }());
 var u = util;
@@ -1370,7 +1388,175 @@ exports.default = ani;
 },{}],11:[function(require,module,exports){
 "use strict";
 var util_1 = require("../util");
+var TwoPointLine = (function () {
+    function TwoPointLine(conf) {
+        conf = conf ? conf : {};
+        this.start = conf.start || { x: 0, y: 0 };
+        this.end = conf.end || { x: 0, y: 0 };
+        this.width = conf.width || 2;
+        this.color = conf.color || 0x000000;
+        this.alpha = conf.alpha;
+        this.alpha = util_1.default.isNum(this.alpha) ? this.alpha : 1;
+        this.p = this.calcPoints();
+        this.create();
+        // line.alpha = alpha;
+        this.line.setOnmousedown = function (param, fn) {
+            this.onmousedownParam = param;
+            this.onmousedown = fn;
+        };
+        this.line.changePoints = this.changePoints;
+        this.line.changeColor = this.changeColor;
+        Object.defineProperty(this.line, "points", {
+            get: function () { return { start: this.start, end: this.end }; }
+        });
+        return this.line;
+    }
+    TwoPointLine.prototype.setStart = function (s) {
+        if (s) {
+            this.start = s;
+        }
+    };
+    TwoPointLine.prototype.setEnd = function (e) {
+        if (e) {
+            this.end = e;
+        }
+    };
+    TwoPointLine.prototype.setWidth = function (w) {
+        if (w) {
+            this.width = w;
+        }
+    };
+    TwoPointLine.prototype.setColor = function (c) {
+        if (c) {
+            this.color = c;
+        }
+    };
+    TwoPointLine.prototype.down = function (e) {
+        e.stopPropagation();
+        this.alpha = 0.5;
+        if (util_1.default.isFn(onmousedown)) {
+            onmousedown.apply(undefined, this.onmousedownParam);
+        }
+    };
+    TwoPointLine.prototype.up = function () {
+        this.alpha = 1;
+    };
+    TwoPointLine.prototype.over = function () {
+        this.tmpWidth = this.width;
+        this.width *= 4;
+        this.p = this.calcPoints();
+        this.line.clear();
+        this.draw();
+        this.toggleDirties();
+    };
+    TwoPointLine.prototype.out = function () {
+        this.width = this.tmpWidth;
+        this.p = this.calcPoints();
+        this.line.clear();
+        this.draw();
+        this.toggleDirties();
+    };
+    TwoPointLine.prototype.addEvents = function () {
+        this.line
+            .on("mousedown", this.down)
+            .on("touchstart", this.down)
+            .on("mouseup", this.up)
+            .on("mouseupoutside", this.up)
+            .on("touchend", this.up)
+            .on("touchendoutside", this.up)
+            .on("mouseover", this.over)
+            .on("mouseout", this.out);
+    };
+    TwoPointLine.prototype.toggleDirties = function () {
+        var dirty = this.line.dirty, clearDirty = this.line.clearDirty;
+        dirty = dirty ? false : true;
+        clearDirty = clearDirty ? false : true;
+    };
+    TwoPointLine.prototype.calcPoints = function () {
+        var half = this.width / 2, sLeft = {}, sRight = {}, eRight = {}, eLeft = {}, sX = this.start.x, sY = this.start.y, eX = this.end.x, eY = this.end.y, results = {};
+        if ((sX < eX && sY < eY) ||
+            (sX > eX && sY > eY)) {
+            sLeft = new PIXI.Point(sX - half, sY + half);
+            sRight = new PIXI.Point(sX + half, sY - half);
+            eRight = new PIXI.Point(eX + half, eY - half);
+            eLeft = new PIXI.Point(eX - half, eY + half);
+        }
+        else if ((sX > eX && sY < eY) ||
+            (sX < eX && sY > eY)) {
+            sLeft = new PIXI.Point(sX - half, sY - half);
+            sRight = new PIXI.Point(sX + half, sY + half);
+            eRight = new PIXI.Point(eX + half, eY + half);
+            eLeft = new PIXI.Point(eX - half, eY - half);
+        }
+        else if (sX === eX &&
+            (sY > eY || sY < eY)) {
+            sLeft = new PIXI.Point(sX - half, sY);
+            sRight = new PIXI.Point(sX + half, sY);
+            eRight = new PIXI.Point(eX + half, eY);
+            eLeft = new PIXI.Point(eX - half, eY);
+        }
+        else if (sY === eY &&
+            (sX < eX || sX > eX)) {
+            sLeft = new PIXI.Point(sX, sY + half);
+            sRight = new PIXI.Point(sX, sY - half);
+            eRight = new PIXI.Point(eX, eY - half);
+            eLeft = new PIXI.Point(eX, eY + half);
+        }
+        results.sLeft = sLeft;
+        results.sRight = sRight;
+        results.eRight = eRight;
+        results.eLeft = eLeft;
+        return results;
+    };
+    TwoPointLine.prototype.changeColor = function (c) {
+        this.setColor(c);
+        this.line.clear();
+        this.draw();
+        this.toggleDirties();
+    };
+    TwoPointLine.prototype.changePoints = function (s, e) {
+        this.setStart(s);
+        this.setEnd(e);
+        this.p = this.calcPoints();
+        this.line.clear();
+        this.draw();
+        this.toggleDirties();
+    };
+    TwoPointLine.prototype.draw = function () {
+        var line = this.line, color = this.color, p = this.p;
+        line.beginFill(color);
+        line.moveTo(p.sLeft.x, p.sLeft.y);
+        line.lineTo(p.sRight.x, p.sRight.y);
+        line.lineTo(p.eRight.x, p.eRight.y);
+        line.lineTo(p.eLeft.x, p.eLeft.y);
+        line.endFill();
+    };
+    TwoPointLine.prototype.createElement = function () {
+        var line;
+        line = new PIXI.Graphics();
+        line.interactive = true;
+        line.buttonMode = true;
+        line.lineStyle(0);
+        return line;
+    };
+    TwoPointLine.prototype.create = function () {
+        this.line = this.createElement();
+        this.addEvents();
+        this.draw();
+    };
+    return TwoPointLine;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = TwoPointLine;
+
+},{"../util":9}],12:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+var util_1 = require("../util");
 var PubSub_1 = require("../PubSub");
+__export(require("./TwoPointLine"));
 var u = util_1.default;
 var renderer;
 var wpix = (function () {
@@ -2022,4 +2208,4 @@ var wpix = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = wpix;
 
-},{"../PubSub":1,"../util":9}]},{},[3]);
+},{"../PubSub":1,"../util":9,"./TwoPointLine":11}]},{},[3]);

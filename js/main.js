@@ -119,4 +119,13 @@ $('#abort').on('click', function (e) {
 	a.traceroute.abort();
 });
 
+
+
+$('#popups').on('click', '.popup-close', function (e) {
+	e.preventDefault();
+	$(this).parent().remove();
+});
+	
+	
+
 });
