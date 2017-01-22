@@ -217,7 +217,7 @@ var pixi = (function () {
 			var opened = popupManager.activeBox,
 				pTop = opened ? parseInt( opened.css('top'), 10) : undefined,
 				pLeft = opened ? parseInt( opened.css('left'), 10) : undefined;
-			console.log(pLeft, pTop);
+			
 			if (mcX <= bX1    &&    mcX >= bX2) {
 				if (opened) {
 					opened.css('left', pLeft += dx);
@@ -1910,12 +1910,8 @@ var popupManager = (function () {
 				left: 0,
 				top: 0
 			});
-			
 			left = (pos.x - 40)  + pixi.mainContainer.position.x + 'px';
 			top = (pos.y - (div.height() + 40)) + pixi.mainContainer.position.y + 'px';
-			
-			console.log(pos);
-			console.log(left, top);
 			div.css({
 				left: left,
 				top: top

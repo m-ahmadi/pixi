@@ -1,0 +1,48 @@
+.bubble {
+	position: absolute;
+	z-index: 2;
+	top: 0px;
+	left: 0px;
+	// padding: 2px;
+	background: #efefef;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border: #DDDDDD solid 1px;
+	
+	& :after {
+		content: '';
+		position: absolute;
+		border-style: solid;
+		border-width: 37px 11px 0;
+		border-color: #efefef transparent;
+		display: block;
+		width: 0;
+		z-index: 1;
+		bottom: -37px;
+		left: 27px;
+	}
+	
+	& :before {
+		content: '';
+		position: absolute;
+		border-style: solid;
+		border-width: 37px 11px 0;
+		border-color: #DDDDDD transparent;
+		display: block;
+		width: 0;
+		z-index: 0;
+		bottom: -38px;
+		left: 27px;
+	}
+	
+	.bbl-content {
+		padding: 10px;
+	}
+	
+	button {
+		color: #b70000;
+		font-size: 17px;
+		font-weight: bold;
+	}
+}

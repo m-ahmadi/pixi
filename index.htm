@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" style="overflow-x: hidden"> <!-- en en-US -->
+<html lang="en-US" style="overflow: hidden"> <!-- en en-US -->
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
@@ -15,22 +15,73 @@
 	<link rel="stylesheet" type="text/css" href="css/folding-cube.css"/>
 	
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	<title>Pixi</title>
+	<title>Topology</title>
 </head>
 
 <body>
 
 <header id="main-header">
-	<button id="sidebar-btn" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"><i class="fa fa-bars" aria-hidden="true"></i></button>
+	<!-- <button id="sidebar-btn" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"> -->
+		<!-- <i class="fa fa-bars" aria-hidden="true"></i> -->
+	<!-- </button> -->
+	
+	<button id="sidebar-btn" class="uk-button">
+		<i class="fa fa-bars" aria-hidden="true"></i>
+	</button>
+	
+	<label class="uk-text-primary uk-text-bold uk-text-large">Topology Front</label>
 </header>
 
 
-<div class="newSide"></div>
+<div id="newSide" class="no-display">
+	<ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon uk-contrast" data-uk-nav="multiple: true">
+		<li><a href="#">Item</a></li>
+		<li class=""><a href="#">Active</a></li>
 
+		<li class="uk-parent">
+			<a href="#">Parent</a>
+			<ul class="uk-nav-sub">
+				<li><a href="#">Sub item</a></li>
+				<li><a href="#">Sub item</a></li>
+			</ul>
+		</li>
+
+		<li class="uk-parent uk-active">
+			<a href="#"><i class="fa fa-wrench" aria-hidden="true"></i> Parent</a>
+			<ul class="uk-nav-sub">
+				<li><a href="#"><i class="fa fa-wrench" aria-hidden="true"></i> hasht</a></li>
+				<li><a href="#">lash</a></li>
+			</ul>
+		</li>
+
+		<li><a href="#">Item</a></li>
+
+		<li class="uk-nav-header">Header</li>
+		<li class="uk-parent">
+			<a href="#"><i class="uk-icon-star"></i> Parent</a>
+		</li>
+		<li><a href="#"><i class="uk-icon-twitter"></i> Item</a></li>
+		<li class="uk-nav-divider"></li>
+		<li><a href="#"><i class="uk-icon-rss"></i> Item</a></li>
+	</ul>
+</div>
+
+
+<div id="bubble-template">
+	<!--  
+	<div class="bubble">
+		<button class="uk-button uk-button-small j-popup-close">x</button>
+		<div class="bbl-content">
+			<p>salam olaghe aziz halet chetore</p>
+		</div>
+	</div>
+	-->
+</div>
+<div id="popups"></div>
+	
+</div>
 
 <div id="contents">
-
-
 
 
 
@@ -120,9 +171,7 @@ cvas.ir</textarea>
 
 
 
-<div id="popups"></div>
 
-</div>
 
 
 
@@ -133,6 +182,7 @@ cvas.ir</textarea>
 <!-------------------------------------- Main Libs ----------------------------------------------->
 
 <script type="text/javascript" src="js/lib/jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="js/lib/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="js/lib/uikit/uikit.js"></script>
 <script type="text/javascript" src="js/lib/uikit/notify.js"></script>
@@ -161,18 +211,5 @@ cvas.ir</textarea>
 <!-------------------------------------- Jasmine Specs ------------------------------------------->
 <!-- <script type="text/javascript" src="jasmine/spec/pixiWrapperSpec.js"></script> -->
 <!------------------------------------------------------------------------------------------------>
-
-
-<div id="bubble-template">
-	<!--  
-	<div class="bubble">
-		<a href="#" class="uk-close popup-close"></a>
-		<div class="bbl-content">
-			<p>salam olaghe aziz halet chetore</p>
-		</div>
-	</div>
-	-->
-</div>
-
 </body>
 </html>

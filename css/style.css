@@ -3053,44 +3053,6 @@ nav ul a span.badge {
   padding: 0 !important;
 }
 
-body {
-  width: 100%;
-  margin: 0 auto;
-  font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-#contents {
-  width: 100%;
-}
-
-#main-header {
-  width: 100%;
-  padding: 10px;
-  background: #f2f2f2;
-}
-
-canvas {
-  z-index: -1;
-  position: fixed;
-}
-
-#popups {
-  position: relative;
-  z-index: 0;
-}
-
-.newSide {
-  width: 20%;
-  height: 600px;
-  display: none;
-  background: red;
-  float: left;
-}
-
-.no-display {
-  display: none;
-}
-
 .bubble {
   position: absolute;
   z-index: 2;
@@ -3128,6 +3090,56 @@ canvas {
 }
 .bubble .bbl-content {
   padding: 10px;
+}
+.bubble button {
+  color: #b70000;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+body {
+  width: 100%;
+  margin: 0 auto;
+  font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#contents {
+  width: 100%;
+}
+
+#main-header {
+  width: 100%;
+  padding: 10px;
+  background: #f2f2f2;
+  position: relative;
+  z-index: 1;
+}
+
+canvas {
+  z-index: -1;
+}
+
+#popups {
+  position: relative;
+  z-index: 0;
+}
+
+#newSide {
+  position: absolute;
+  width: 20%;
+  height: 600px;
+  background: #333;
+  z-index: 1;
+}
+#newSide a {
+  text-decoration: none;
+}
+#newSide ul.uk-nav-sub > li {
+  padding-left: 20px;
+}
+
+.no-display {
+  display: none;
 }
 
 /*# sourceMappingURL=style.css.map */
