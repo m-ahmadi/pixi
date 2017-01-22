@@ -3053,8 +3053,25 @@ nav ul a span.badge {
   padding: 0 !important;
 }
 
+body {
+  width: 100%;
+  margin: 0 auto;
+  font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#contents {
+  width: 100%;
+}
+
+#main-header {
+  width: 100%;
+  padding: 10px;
+  background: #f2f2f2;
+}
+
 canvas {
   z-index: -1;
+  position: fixed;
 }
 
 #popups {
@@ -3062,22 +3079,12 @@ canvas {
   z-index: 0;
 }
 
-body {
-  width: 100%;
-  margin: 0 auto;
-  font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-#opt {
-  width: 100%;
-  background: #f2f2f2;
-  padding: 10px;
-  position: fixed;
-  z-index: 1;
-}
-
-#devices label {
-  padding: 5px;
+.newSide {
+  width: 20%;
+  height: 600px;
+  display: none;
+  background: red;
+  float: left;
 }
 
 .no-display {
@@ -3095,8 +3102,7 @@ body {
   border-radius: 5px;
   border: #DDDDDD solid 1px;
 }
-
-.bubble:after {
+.bubble :after {
   content: '';
   position: absolute;
   border-style: solid;
@@ -3108,8 +3114,7 @@ body {
   bottom: -37px;
   left: 27px;
 }
-
-.bubble:before {
+.bubble :before {
   content: '';
   position: absolute;
   border-style: solid;
@@ -3121,8 +3126,7 @@ body {
   bottom: -38px;
   left: 27px;
 }
-
-.bbl-content {
+.bubble .bbl-content {
   padding: 10px;
 }
 

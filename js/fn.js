@@ -51,7 +51,7 @@ var pixi = (function () {
 		mainContainer = p.mainContainer;
 		
 		// document.body.appendChild( p.renderer.view );
-		$("#canvas").append( renderer.view );
+		$("#contents").append( renderer.view );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		mainContainer.interactive = true;
@@ -214,13 +214,13 @@ var pixi = (function () {
 				posit = util.positNum;
 			
 			
-			var openedPopup = popupManager.activeBox,
-				pTop = openedPopup ? parseInt( openedPopup.css('top'), 10) : undefined,
-				pLeft = openedPopup ? parseInt( openedPopup.css('left'), 10) : undefined;
-			
+			var opened = popupManager.activeBox,
+				pTop = opened ? parseInt( opened.css('top'), 10) : undefined,
+				pLeft = opened ? parseInt( opened.css('left'), 10) : undefined;
+			console.log(pLeft, pTop);
 			if (mcX <= bX1    &&    mcX >= bX2) {
-				if (openedPopup) {
-					openedPopup.css('left', pLeft += dx);
+				if (opened) {
+					opened.css('left', pLeft += dx);
 				}
 				p.mainContainer.position.x += dx;
 			} else {
@@ -228,8 +228,8 @@ var pixi = (function () {
 			}
 			
 			if (mcY <= bY1    &&    mcY >= bY2) {
-				if (openedPopup) {
-					openedPopup.css('top', pTop += dy);
+				if (opened) {
+					opened.css('top', pTop += dy);
 				}
 				
 				p.mainContainer.position.y += dy;
@@ -876,7 +876,7 @@ var tpl = (function () {
 				onmouseupParam: undefined
 			});
 		}
-		function addTplnodeCustomPositionGetters(o) {
+		function addTplnodeCustomPositionGetters() {
 			var b = boxSpriteText;
 			
 			function midX() {
@@ -916,7 +916,7 @@ var tpl = (function () {
 			node.name = name;
 			node.links = thisLinks;
 			node.pixiEl = boxSpriteText;
-			addTplnodeCustomPositionGetters(opt);
+			addTplnodeCustomPositionGetters();
 		}
 		function bringToFront(arr, el) {
 			arr.splice( arr.indexOf(el), 1 );
@@ -946,6 +946,7 @@ var tpl = (function () {
 				+			'<td>'+ id +'</td>'
 				+		'</tr>'
 				+	'</table>';
+				
 				
 				popupManager.create(html, node.topLeft);
 				
@@ -1884,45 +1885,53 @@ var mediator = (function () {
 
 var popupManager = (function () {
 	var activeBox,
-		counter = 0,
-		bubbles = {};
+		cbX = {
+			min: 0,
+			max: 0
+		},
+		cbY = {
+			min: 0,
+			max: 0
+		};
 	
 	function create(v, pos) {
 		removeAll();
-		var html = u.getCommentsInside('#bubble-template')[0].nodeValue.trim(),
-			uid;
+		var div = u.getCommentsInside('#bubble-template')[0].nodeValue.trim(),
+			left, top;
 			
-		uid = 'bubble_'+(counter+=1);
-		bubbles[uid] = null;
 		
-		html = $(html);
-		html.attr('id', uid);
-		html.find('.bbl-content').html(v);
-		$('#popups').append(html);
+		div = $(div);
+		
+		div.find('.bbl-content').html(v);
+		$('#popups').append(div);
 		
 		if (pos) {
+			div.css({
+				left: 0,
+				top: 0
+			});
 			
-			html.css({
-				left: (pos.x - 40)  + 'px',
-				top: (pos.y - (html.height() + 40)) +'px'
+			left = (pos.x - 40)  + pixi.mainContainer.position.x + 'px';
+			top = (pos.y - (div.height() + 40)) + pixi.mainContainer.position.y + 'px';
+			
+			console.log(pos);
+			console.log(left, top);
+			div.css({
+				left: left,
+				top: top
 			});
 		}
 		
-		
-		activeBox = html;
+		// console.log(div.css('top'), div.css('left'));
 	}
-
-	function remove(bubbleId) {
-		$('#popups '+bubbleId).remove();
-	}
+	
 	function removeAll() {
 		$('#popups').empty();
 	}
 	
 	return {
-		get activeBox() { return activeBox; },
-		create: create,
-		remove: remove
+		get activeBox() { return $('#popups > .bubble'); },
+		create: create
 	};
 }());
 
