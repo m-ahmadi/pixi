@@ -55,14 +55,14 @@
     <div class="uk-modal-dialog">
         <button class="uk-modal-close-default" type="button" uk-close></button>
         <div class="uk-modal-header">
-            <h2 class="uk-modal-title">Perform Trace Route</h2>
+            <h2 class="uk-modal-title">Traceroute to a node.</h2>
         </div>
         <div class="uk-modal-body">
             <p class="uk-text-meta">Seperate the IP addresses (or domain names) with an enter (new-line character):</p>
 			<form>
-				<div class="uk-margin">
-					<textarea class="uk-textarea" id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
-cvas.ir</textarea>
+				<div class="uk-margin uk-form-horizontal">
+					<label>IP/Domain Name: <textarea class="uk-textarea" id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
+cvas.ir</textarea></label>
 				</div>
 				<div class="uk-margin">
 					<label class="ul-dark"><input class="uk-checkbox" type="checkbox" name="secure"> Secure-Scan</label>
@@ -71,27 +71,37 @@ cvas.ir</textarea>
 			</form>
 			
         </div>
-        <div class="uk-modal-footer uk-text-left">
-            <button class="uk-button uk-button-danger uk-modal-close uk-text-bold red lighten-1" type="button">Cancel</button>
-            <button id="traceroute-scan" class="uk-button uk-button-primary uk-text-bold light-green" type="button">Scan</button>
+        <div class="uk-modal-footer uk-text-right">
+            <button class="uk-button uk-button-danger uk-modal-close uk-text-bold red lighten-1" type="button">Cancel</button> <!-- red lighten-1-->
+            <button id="traceroute-scan" class="uk-button uk-button-primary uk-text-bold light-green" type="button">Scan</button> <!-- light-green-->
         </div>
     </div>
 </div>
 
-<div id="modal-discovery" uk-modal="center: true">
-    <div class="uk-modal-dialog">
-        <button class="uk-modal-close-default" type="button" uk-close></button>
-        <div class="uk-modal-header">
-            <h2 class="uk-modal-title">Modal Title</h2>
-        </div>
-        <div class="uk-modal-body">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        </div>
-        <div class="uk-modal-footer uk-text-right">
-            <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
-            <button class="uk-button uk-button-primary" type="button">Save</button>
-        </div>
-    </div>
+<div id="modal-discovery" uk-modal="center: true; esc-close: true; bg-close: false;">
+	<div class="uk-modal-dialog">
+		<button class="uk-modal-close-default" type="button" uk-close></button>
+		<div class="uk-modal-header">
+			<h2 class="uk-modal-title">Discover Available Nodes</h2>
+		</div>
+		<div class="uk-modal-body">
+			<form>
+				<div class="uk-margin">
+					<label class="ul-dark"><input class="uk-radio" type="radio" name="radio1" value=""/> IP with Start/End</label><br/>
+					<label class="ul-dark"><input class="uk-radio" type="radio" name="radio1" value=""/> IP and Subnet</label>
+				</div>
+				<div class="uk-margin uk-form-horizontal">
+					<input class="uk-input uk-form-width-medium" type="text"/>
+					<span class="uk-badge">-</span>
+					<input class="uk-input uk-form-width-medium" type="text"/>
+				</div>
+			</form>
+		</div>
+		<div class="uk-modal-footer uk-text-right">
+			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button">Cancel</button>
+			<button class="uk-button uk-button-primary uk-text-bold" type="button">Start</button>
+		</div>
+	</div>
 </div>
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="contents">

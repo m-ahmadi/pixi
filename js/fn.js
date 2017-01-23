@@ -949,7 +949,7 @@ var tpl = (function () {
 				var nodeId = node.id,
 					links = node.links;
 				
-				debugger;
+				
 				/*
 				var html = ''+
 					'<table class="uk-table">'
@@ -960,15 +960,6 @@ var tpl = (function () {
 				+		'<tr>'
 				+			'<td>'+ name +'</td>'
 				+			'<td>'+ id +'</td>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+		'</tr>'
 				+	'</table>';
 				popupManager.create(html, node.topLeft);
 				*/
@@ -1446,8 +1437,7 @@ var traceroute = (function () {
 		links = {},
 		msgCounter = 0,
 		noteMsgs = {},
-		scanBtn = {},
-		closeAnch = $("#modal-discovery .uk-modal-close-default");
+		scanBtn = {};
 	
 	// var v = prompt('change the address if you want:', path);
 	// if (v) { path = v;}
@@ -1476,25 +1466,15 @@ var traceroute = (function () {
 			nodes: diffNodes
 		};
 	}
-	function createSock(opt) {
-		if (opt) { 
-			path += '?portscanner=true';
-		}
-		ws = new WebSocket(path);
-		console.log(ws);
-	}
 	function abort() {
 		if ( !u.isEmptyObj(ws) ) {
 			ws.close(4999);
 		}
 	}
-	function addHandlers(cb) {
-		openCallback = cb;
-		
-		ws.onopen = onopen;
-		ws.onmessage = onmessage;
-		ws.onerror = onerror;
-		ws.onclose = onclose;
+	function closeModal() {
+		// $('#newSide').toggle('slide');
+		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
+		UIkit.modal('#modal-traceroute')[0].toggle();
 	}
 	function onopen(e) {
 		var cb = openCallback;
@@ -1504,7 +1484,7 @@ var traceroute = (function () {
 		noteMsgs.init.close();
 		
 		wuk.notify({
-			message : '<i class="fa fa-check-circle" aria-hidden="true"></i> Socket connected.',
+			message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Socket connected.',
 			status  : 'success',
 			timeout : 1000,
 			pos     : 'bottom-right'
@@ -1532,8 +1512,7 @@ var traceroute = (function () {
 			pixi.mainContainer.x = pixi.renderer.width / 2;
 			pixi.mainContainer.y = pixi.renderer.height / 2;
 			
-			$('#newSide').toggle('slide');
-			$("body").trigger( $.Event("keydown", { keyCode: 27 }) );
+			closeModal();
 		}
 		
 		
@@ -1541,7 +1520,7 @@ var traceroute = (function () {
 		if ( u.isStr(e.data) ) {
 			console.log("String message received\n");
 			noteMsgs.newData = wuk.notify({
-				message : '<i class="fa fa-check-circle" aria-hidden="true"></i> New socket message received.',
+				message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> New socket message received.',
 				status  : 'success',
 				timeout : 1000,
 				pos     : 'bottom-right'
@@ -1574,10 +1553,12 @@ var traceroute = (function () {
 	function onerror(e) {
 		console.log("WebSocket Error: " , e);
 		
+		closeModal();
+		
 		noteMsgs.init.close();
 		// noteMsgs.processing.close();
 		noteMsgs.error = wuk.notify({
-			message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Socket error.',
+			message : '<i class="fa fa-exclamation-triangle fa-lg" aria-hidden="true"></i> Socket error.',
 			status  : 'danger',
 			timeout : 2000,
 			pos     : 'bottom-right'
@@ -1590,11 +1571,26 @@ var traceroute = (function () {
 		// noteMsgs.processing.close();
 		noteMsgs.init.close();
 		noteMsgs.close = wuk.notify({
-			message : '<i class="fa fa-info" aria-hidden="true"></i> Socket closed.', // fa fa-check
+			message : '<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Socket closed.', // fa fa-check
 			status  : 'info',
 			timeout : 2000,
 			pos     : 'bottom-right'
 		});
+	}
+	function addHandlers(cb) {
+		openCallback = cb;
+		
+		ws.onopen = onopen;
+		ws.onmessage = onmessage;
+		ws.onerror = onerror;
+		ws.onclose = onclose;
+	}
+	function createSock(opt) {
+		if (opt) { 
+			path += '?portscanner=true';
+		}
+		ws = new WebSocket(path);
+		console.log(ws);
 	}
 	function trace(arr, opt) {
 		noteMsgs.init = wuk.notify({
@@ -1616,6 +1612,16 @@ var traceroute = (function () {
 	return {
 		abort: abort,
 		trace: trace
+		
+	};
+	
+}());
+
+var discovery = (function () {
+	
+	
+	return {
+		
 		
 	};
 	
@@ -1967,6 +1973,7 @@ return {
 	tpl: tpl,
 	mediator: mediator,
 	traceroute: traceroute,
+	discovery: discovery,
 	popupManager: popupManager
 };
 	

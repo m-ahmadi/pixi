@@ -51,6 +51,9 @@ canvas {
 	}
 }
 
+[uk-modal] {
+	z-index: 3;
+}
 
 .no-display {
 	display: none;
