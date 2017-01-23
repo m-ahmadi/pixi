@@ -927,28 +927,7 @@ var tpl = (function () {
 			boxSpriteText.setOnmousedown([node, p.links], function (e, node, tplLinks) {
 				var links = node.links;
 				
-				var html = ''+
-					'<table class="uk-table">'
-				+		'<tr>'
-				+			'<th>Node Name</th>'
-				+			'<th>Node Id</th>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+		'</tr>'
-				+	'</table>';
-				
-				
-				popupManager.create(html, node.topLeft);
+				popupManager.removeAll();
 				
 				bringToFront(
 				//                nodeContainer
@@ -969,6 +948,30 @@ var tpl = (function () {
 			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (e, node, tplLinks, tplNodes) {
 				var nodeId = node.id,
 					links = node.links;
+				
+				debugger;
+				/*
+				var html = ''+
+					'<table class="uk-table">'
+				+		'<tr>'
+				+			'<th>Node Name</th>'
+				+			'<th>Node Id</th>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+		'<tr>'
+				+			'<td>'+ name +'</td>'
+				+			'<td>'+ id +'</td>'
+				+		'</tr>'
+				+	'</table>';
+				popupManager.create(html, node.topLeft);
+				*/
 				
 				
 				if (links) {
@@ -1419,6 +1422,21 @@ var navigation = (function () {
 	return inst;
 }());
 
+var wuk = (function () {
+	
+	function notify(o) {
+		var v;
+		
+		v = UIkit.notification(o);
+		
+		return v;
+	}
+	
+	return {
+		notify: notify
+	};
+}());
+
 var traceroute = (function () {
 	var ws = {},
 		path = 'ws://'+ baseRoot +'/network/icmp/traceroute', // window.location.host
@@ -1428,7 +1446,8 @@ var traceroute = (function () {
 		links = {},
 		msgCounter = 0,
 		noteMsgs = {},
-		scanBtn = {}
+		scanBtn = {},
+		closeAnch = $("#modal-discovery .uk-modal-close-default");
 	
 	// var v = prompt('change the address if you want:', path);
 	// if (v) { path = v;}
@@ -1481,6 +1500,22 @@ var traceroute = (function () {
 		var cb = openCallback;
 		
 		console.log("Connection open...");
+		
+		noteMsgs.init.close();
+		
+		wuk.notify({
+			message : '<i class="fa fa-check-circle" aria-hidden="true"></i> Socket connected.',
+			status  : 'success',
+			timeout : 1000,
+			pos     : 'bottom-right'
+		});
+		
+		noteMsgs.processing = wuk.notify({
+			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Waiting for socket messages...',
+			status  : 'info',
+			timeout : 0,
+			pos     : 'bottom-right'
+		});
 			
 		// ws.send("Hello WebSocket!");
 		
@@ -1492,26 +1527,21 @@ var traceroute = (function () {
 		msgCounter += 1;
 			
 		if (msgCounter === 1) { // only for the first msg
-			noteMsgs.init.close();
+			
 			pixi.clearContainer("viewport");
 			pixi.mainContainer.x = pixi.renderer.width / 2;
 			pixi.mainContainer.y = pixi.renderer.height / 2;
-			UIkit.offcanvas.hide(false);
 			
-			noteMsgs.processing = UIkit.notify({
-				message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال دریافت اطلاعات...',
-				status  : 'info',
-				timeout : 0,
-				pos     : 'bottom-right'
-			});
+			$('#newSide').toggle('slide');
+			$("body").trigger( $.Event("keydown", { keyCode: 27 }) );
 		}
 		
 		
 		
 		if ( u.isStr(e.data) ) {
 			console.log("String message received\n");
-			noteMsgs.newData = UIkit.notify({
-				message : '<i class="fa fa-check-circle" aria-hidden="true"></i> دریافت اطلاعات جدید.',
+			noteMsgs.newData = wuk.notify({
+				message : '<i class="fa fa-check-circle" aria-hidden="true"></i> New socket message received.',
 				status  : 'success',
 				timeout : 1000,
 				pos     : 'bottom-right'
@@ -1546,8 +1576,8 @@ var traceroute = (function () {
 		
 		noteMsgs.init.close();
 		// noteMsgs.processing.close();
-		noteMsgs.error = UIkit.notify({
-			message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> خطا در برقراری ارتباط!',
+		noteMsgs.error = wuk.notify({
+			message : '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Socket error.',
 			status  : 'danger',
 			timeout : 2000,
 			pos     : 'bottom-right'
@@ -1559,21 +1589,21 @@ var traceroute = (function () {
 		
 		// noteMsgs.processing.close();
 		noteMsgs.init.close();
-		noteMsgs.close = UIkit.notify({
-			message : '<i class="fa fa-info" aria-hidden="true"></i> پایان دریافت.', // fa fa-check
+		noteMsgs.close = wuk.notify({
+			message : '<i class="fa fa-info" aria-hidden="true"></i> Socket closed.', // fa fa-check
 			status  : 'info',
 			timeout : 2000,
 			pos     : 'bottom-right'
 		});
 	}
 	function trace(arr, opt) {
-		noteMsgs.init = UIkit.notify({
-			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> در حال بررسی...',
+		noteMsgs.init = wuk.notify({
+			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Opening socket...',
 			status  : 'info',
 			timeout : 0,
 			pos     : 'top-center'
 		});
-		scanBtn = $('#scan');
+		scanBtn = $('#traceroute-scan');
 		scanBtn.attr('disabled', '');
 		
 		createSock(opt);
@@ -1927,6 +1957,7 @@ var popupManager = (function () {
 	
 	return {
 		get activeBox() { return $('#popups > .bubble'); },
+		removeAll: removeAll,
 		create: create
 	};
 }());

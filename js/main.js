@@ -1,7 +1,7 @@
 $(function () {
 	a.mediator.init();
 	
-	
+	$('#newSide').css({height: window.innerHeight});
 	
 	
 	
@@ -28,12 +28,7 @@ $('#clear').on('click', function (e) {
 	a.pixi.clearContainer('viewport');
 });
 
-$('#sidebar').on('show.uk.offcanvas', function () {
-	a.pixi.disableZoom(true);
-});
-$('#sidebar').on('hide.uk.offcanvas', function () {
-	a.pixi.disableZoom(false);
-});
+
 
 $('#sidebar-btn').on('click', function () {
 	this.closed = this.closed ? false : true;
@@ -51,10 +46,9 @@ $('#sidebar-btn').on('click', function () {
 		// sb.addClass('uk-animation-reverse');
 		
 	// }
-	
 });
 
-$('#scan').on('click', function (e) {
+$('#traceroute-scan').on('click', function (e) {
 	var txtarea, checkbox, txt, arr;
 	
 	e.preventDefault();
@@ -83,7 +77,8 @@ $('#popups').on('click', '.j-popup-close', function (e) {
 	e.preventDefault();
 	$(this).parent().remove();
 });
-	
-	
+
+
+
 
 });

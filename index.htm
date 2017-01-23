@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" style="overflow: hidden"> <!-- en en-US -->
+<html lang="en-US" style="overflow: hidden;"> <!-- en en-US -->
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
@@ -7,11 +7,15 @@
 	<link rel="stylesheet" type="text/css" href="css/byekan-fontface.css"/>
 	<link rel="stylesheet" type="text/css" href="css/font-awesome/font-awesome.css"/>
 	<!-- <link rel="stylesheet" type="text/css" href="css/speech-bubbles.css"/> -->
+	
+<!--
 	<link rel="stylesheet" type="text/css" href="css/uikit/uikit.gradient.css"/>
 	<link rel="stylesheet" type="text/css" href="css/uikit/form-advanced.gradient.css"/>
 	<link rel="stylesheet" type="text/css" href="css/uikit/form-select.gradient.css"/>
 	<link rel="stylesheet" type="text/css" href="css/uikit/notify.gradient.css"/>
-	<!-- <link rel="stylesheet" type="text/css" href="css/uikit/v3/uikit.min.css"/> -->
+-->
+	
+	<link rel="stylesheet" type="text/css" href="css/uikit/v3/uikit.css"/>
 	<link rel="stylesheet" type="text/css" href="css/folding-cube.css"/>
 	
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -19,58 +23,22 @@
 </head>
 
 <body>
-
 <header id="main-header">
-	<!-- <button id="sidebar-btn" class="uk-button uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"> -->
-		<!-- <i class="fa fa-bars" aria-hidden="true"></i> -->
+	<!-- <button id="sidebar-btn" class="uk-button uk-button-default uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"> -->
+		<!-- <i class="fa fa-bars" aria-hidden="true"></i> what -->
 	<!-- </button> -->
 	
-	<button id="sidebar-btn" class="uk-button">
+	<button id="sidebar-btn" class="uk-button uk-button-default">
 		<i class="fa fa-bars" aria-hidden="true"></i>
 	</button>
 	
-	<label class="uk-text-primary uk-text-bold uk-text-large">Topology Front</label>
+	<label class="uk-text-primary uk-text-bold uk-text-large">Topology</label>
 </header>
-
-
-<div id="newSide" class="no-display">
-	<ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon uk-contrast" data-uk-nav="multiple: true">
-		<li><a href="#">Item</a></li>
-		<li class=""><a href="#">Active</a></li>
-
-		<li class="uk-parent">
-			<a href="#">Parent</a>
-			<ul class="uk-nav-sub">
-				<li><a href="#">Sub item</a></li>
-				<li><a href="#">Sub item</a></li>
-			</ul>
-		</li>
-
-		<li class="uk-parent uk-active">
-			<a href="#"><i class="fa fa-wrench" aria-hidden="true"></i> Parent</a>
-			<ul class="uk-nav-sub">
-				<li><a href="#"><i class="fa fa-wrench" aria-hidden="true"></i> hasht</a></li>
-				<li><a href="#">lash</a></li>
-			</ul>
-		</li>
-
-		<li><a href="#">Item</a></li>
-
-		<li class="uk-nav-header">Header</li>
-		<li class="uk-parent">
-			<a href="#"><i class="uk-icon-star"></i> Parent</a>
-		</li>
-		<li><a href="#"><i class="uk-icon-twitter"></i> Item</a></li>
-		<li class="uk-nav-divider"></li>
-		<li><a href="#"><i class="uk-icon-rss"></i> Item</a></li>
-	</ul>
-</div>
-
 
 <div id="bubble-template">
 	<!--  
 	<div class="bubble">
-		<button class="uk-button uk-button-small j-popup-close">x</button>
+		<button class="uk-button uk-button-default uk-button-small j-popup-close">x</button>
 		<div class="bbl-content">
 			<p>salam olaghe aziz halet chetore</p>
 		</div>
@@ -78,116 +46,102 @@
 	-->
 </div>
 <div id="popups"></div>
-	
-</div>
-
-<div id="contents">
 
 
 
-<div id="sidebar" class="uk-offcanvas">
-	<div class="uk-offcanvas-bar">
-	
-		<ul class="uk-nav uk-parent-icon" data-uk-nav>
-			<li class="uk-parent">
-				<a href="#" class="uk-nav-header"><i class="fa fa-wrench fa-lg" aria-hidden="true"></i> Trace Route</a>
-				<ul class="uk-nav-sub">
-					<li><a href="#">T</a></li>
-					<li><a href="#">dolor</a></li>
-					<li><a href="#">dolor</a></li>
-				</ul>
-			
-			</li>
-			
-			<li class="uk-nav-divider"></li>
-			
-			<li class="uk-parent">
-				<a href="#" class="uk-nav-header"><i class="fa fa-wrench fa-lg" aria-hidden="true"></i> Discovery</a>
-				<ul class="uk-nav-sub">
-					<li><a href="#">T</a></li>
-					<li><a href="#">dolor</a></li>
-					<li><a href="#">dolor</a></li>
-				</ul>
-			</li>
-		</ul>
-		
-		<div class="uk-panel">
-			
-			
-			<h3 class="uk-panel-title">hello?</h3>
-			
-			<form class="uk-form">
-				<div class="uk-form-row">
-					<textarea id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
+
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    Modals    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+<div id="modal-traceroute" uk-modal="center: true; esc-close: true; bg-close: false;">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">Perform Trace Route</h2>
+        </div>
+        <div class="uk-modal-body">
+            <p class="uk-text-meta">Seperate the IP addresses (or domain names) with an enter (new-line character):</p>
+			<form>
+				<div class="uk-margin">
+					<textarea class="uk-textarea" id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
 cvas.ir</textarea>
 				</div>
-				<div class="uk-form-row">
-					<button id="scan" class="uk-button uk-text-bold">Scan</button>
-					<label class="uk-text-bold grey-text text-lighten-4">secure <input type="checkbox" name="secure"></label>
+				<div class="uk-margin">
+					<label class="ul-dark"><input class="uk-checkbox" type="checkbox" name="secure"> Secure-Scan</label>
 					<!-- <button id="abort" class="uk-button uk-button-danger uk-text-bold" disabled>Abort</button> -->
 				</div>
 			</form>
-		</div>
-		
-		
-		<table class="uk-table uk-table-hover uk-table-striped grey lighten-4">
-			<caption>...</caption>
-			<thead>
-				<tr class="light-blue grey-text text-lighten-5">
-					<th>View</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					
-				</tr>
-			</tfoot>
-			<tbody>
-				<tr>
-					<td>IP</td>
-					
-				</tr>
-				<tr>
-					<td>Hostname</td>
-				</tr>
-			</tbody>
-		</table>
-		
-		<button class="uk-button uk-button-success">Save Graphics</button>
+			
+        </div>
+        <div class="uk-modal-footer uk-text-left">
+            <button class="uk-button uk-button-danger uk-modal-close uk-text-bold red lighten-1" type="button">Cancel</button>
+            <button id="traceroute-scan" class="uk-button uk-button-primary uk-text-bold light-green" type="button">Scan</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-discovery" uk-modal="center: true">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">Modal Title</h2>
+        </div>
+        <div class="uk-modal-body">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div class="uk-modal-footer uk-text-right">
+            <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+            <button class="uk-button uk-button-primary" type="button">Save</button>
+        </div>
+    </div>
+</div>
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+<div id="contents">
+
+
+<div id="newSide" class="no-display">
+	<ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon uk-light" uk-nav="multiple: true">
+		<li class="uk-nav-header">Menu</li>
+		<li><a href="#modal-traceroute" class="uk-icon-link" uk-toggle><span uk-icon="icon: bolt; ratio: 1.5;"></span> Trace Route</a></li>
+		<li><a href="#modal-discovery" class="uk-icon-link" uk-toggle><span uk-icon="icon: server; ratio: 1.5;"></span> Discovery</a></li>
+		<li class="uk-parent">
+			<a href="#"><span class="uk-icon-link" uk-icon="icon: list; ratio: 1.5"></span> Performing Actions</a>
+			<ul class="uk-nav-sub">
+				<li><a href="#modal-traceroute" uk-toggle><span class="uk-icon-link" uk-icon="icon: bolt"></span> Trace Route</a></li>
+				<li><a href="#modal-discovery" uk-toggle><span class="uk-icon-link" uk-icon="icon: server"></span> Discovery</a></li>
+				
+			</ul>
+		</li>
+
+		<li class="uk-parent">
+			<a href="#"><span class="uk-icon-link" uk-icon="icon: settings; ratio: 1.5"></span> Settings</a>
+			<ul class="uk-nav-sub">
+				<li><a href="#"><span class="uk-icon-link" uk-icon="icon: user"></span> User</a></li>
+				<li><a href="#"><span class="uk-icon-link" uk-icon="icon: cog"></span> App</a></li>
+			</ul>
+		</li>
+
 	
-	</div>
+		<li><a href="#">Item</a></li>
+
+		<li class="uk-nav-header">Header</li>
+		<li class="uk-parent">
+			<a href="#"><span uk-icon="icon: star"></span> Blank</a>
+		</li>
+		<li><a href="#"><span uk-icon="icon: twitter"></span> Twitter</a></li>
+		<li class="uk-nav-divider"></li>
+		<li><a href="#"><span uk-icon="icon: rss"></span> RSS Feed</a></li>
+	
+	</ul>
 </div>
-
-<div class="sk-folding-cube no-display" id="preloader">
-	<div class="sk-cube1 sk-cube"></div>
-	<div class="sk-cube2 sk-cube"></div>
-	<div class="sk-cube4 sk-cube"></div>
-	<div class="sk-cube3 sk-cube"></div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <!-------------------------------------- Main Libs ----------------------------------------------->
 
 <script type="text/javascript" src="js/lib/jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="js/lib/uikit/v3/uikit.js"></script>
 <script type="text/javascript" src="js/lib/jquery/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/lib/jquery/jquery.mousewheel.js"></script>
-<script type="text/javascript" src="js/lib/uikit/uikit.js"></script>
-<script type="text/javascript" src="js/lib/uikit/notify.js"></script>
-<!-- <script type="text/javascript" src="js/lib/uikit/v3/uikit.js"></script> -->
-<!-- <script type="text/javascript" src="js/lib/uikit/v3/components/notification.js"></script> -->
+<!-- <script type="text/javascript" src="js/lib/uikit/uikit.js"></script> -->
+<!-- <script type="text/javascript" src="js/lib/uikit/notify.js"></script> -->
+
 <script type="text/javascript" src="js/lib/pixi/pixi.min.js"></script>
 <script type="text/javascript" src="js/lib/ani/Tween.js"></script>
 <script type="text/javascript" src="js/lib/ani/TweenLite.min.js"></script>
