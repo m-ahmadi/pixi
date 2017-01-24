@@ -2,7 +2,7 @@ $(function () {
 	a.mediator.init();
 	
 	$('#newSide').css({height: window.innerHeight});
-	
+	$('#newSide').toggle('slide');
 	
 	
 

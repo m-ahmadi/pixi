@@ -978,7 +978,7 @@ var tpl = (function () {
 							if (link.dest === nodeId) {
 								end = node.center;
 							}
-							
+							console.log(start, end);
 							link.pixiEl.changePoints(start, end);
 						}
 					});
@@ -1472,9 +1472,29 @@ var traceroute = (function () {
 		}
 	}
 	function closeModal() {
+		var u;
 		// $('#newSide').toggle('slide');
 		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
-		UIkit.modal('#modal-traceroute')[0].toggle();
+		
+		u = UIkit.modal('#modal-traceroute')[0];
+		if ( u.isActive() ) {
+			u.toggle('close');
+		}
+	}
+	function closeSidebar() {
+		var sb = $('#newSide')
+		
+		if ( sb.is(':visible') ) {
+			sb.toggle('slide');
+		}
+	}
+	function prepare() {
+		pixi.clearContainer("viewport");
+		pixi.mainContainer.x = pixi.renderer.width / 2;
+		pixi.mainContainer.y = pixi.renderer.height / 2;
+		
+		closeModal();
+		closeSidebar();
 	}
 	function onopen(e) {
 		var cb = openCallback;
@@ -1504,31 +1524,23 @@ var traceroute = (function () {
 		}
 	}
 	function onmessage(e) {
+		var data;
 		msgCounter += 1;
 			
-		if (msgCounter === 1) { // only for the first msg
-			
-			pixi.clearContainer("viewport");
-			pixi.mainContainer.x = pixi.renderer.width / 2;
-			pixi.mainContainer.y = pixi.renderer.height / 2;
-			
-			closeModal();
+		if (msgCounter === 1) { // first message
+			prepare();
 		}
-		
-		
 		
 		if ( u.isStr(e.data) ) {
 			console.log("String message received\n");
-			noteMsgs.newData = wuk.notify({
+			wuk.notify({
 				message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> New socket message received.',
 				status  : 'success',
 				timeout : 1000,
 				pos     : 'bottom-right'
 			});
 			
-			
-			
-			var data = JSON.parse(e.data);
+			data = JSON.parse(e.data);
 			console.log(data);
 			
 			data = filter(data);
@@ -1539,8 +1551,8 @@ var traceroute = (function () {
 			console.log(nodesLen, linksLen);
 			
 			coefficient = {
-				x: pixi.renderer.width / (300 + 80),
-				y: pixi.renderer.height / (300 + 80),
+				x: pixi.renderer.width / (300 + 80), // 600 80
+				y: pixi.renderer.height / (300 + 80), // 600 80
 			}
 			// console.log(coefficient);
 			
@@ -1557,7 +1569,7 @@ var traceroute = (function () {
 		
 		noteMsgs.init.close();
 		// noteMsgs.processing.close();
-		noteMsgs.error = wuk.notify({
+		wuk.notify({
 			message : '<i class="fa fa-exclamation-triangle fa-lg" aria-hidden="true"></i> Socket error.',
 			status  : 'danger',
 			timeout : 2000,
@@ -1568,17 +1580,18 @@ var traceroute = (function () {
 		console.log("Connection closed", e);
 		scanBtn.removeAttr('disabled');
 		
-		// noteMsgs.processing.close();
+		
 		noteMsgs.init.close();
-		noteMsgs.close = wuk.notify({
+		noteMsgs.processing.close();
+		wuk.notify({
 			message : '<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Socket closed.', // fa fa-check
 			status  : 'info',
 			timeout : 2000,
 			pos     : 'bottom-right'
 		});
 	}
-	function addHandlers(cb) {
-		openCallback = cb;
+	function addHandlers(fn) {
+		openCallback = fn;
 		
 		ws.onopen = onopen;
 		ws.onmessage = onmessage;
