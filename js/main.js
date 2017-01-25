@@ -71,7 +71,34 @@ $('#abort').on('click', function (e) {
 	a.traceroute.abort();
 });
 
-
+$('#discovery-start').on('click', function () {
+	var first, second, type;
+	
+	first = $('input[type="text"][name="first-input"]').val();
+	second = $('input[type="text"][name="second-input"]').val();
+	
+	first = first ? first.trim() : '';
+	second = second ? second.trim() : '';
+	
+	type = $('#modal-discovery input[type="radio"][name="radio1"]:checked').val();
+	a.discovery.discover( first, second, parseInt(type, 10) );
+	
+});
+$('#modal-discovery input[type="radio"][name="radio1"].uk-radio').on('click', function () {
+	var val = parseInt(this.value, 10),
+		first, second;
+		
+	first = $('input[type="text"][name="first-input"]');
+	second = $('input[type="text"][name="second-input"]');
+	
+	if (!val) {
+		first.val('192.168.1.1');
+		second.val('192.168.1.255');
+	} else {
+		first.val('192.168.1.1');
+		second.val('255.255.255.0');
+	}
+});
 
 $('#popups').on('click', '.j-popup-close', function (e) {
 	e.preventDefault();
