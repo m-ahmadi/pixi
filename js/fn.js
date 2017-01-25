@@ -950,7 +950,7 @@ var tpl = (function () {
 					links = node.links;
 				
 				
-				/*
+				
 				var html = ''+
 					'<table class="uk-table">'
 				+		'<tr>'
@@ -962,7 +962,7 @@ var tpl = (function () {
 				+			'<td>'+ id +'</td>'
 				+	'</table>';
 				popupManager.create(html, node.topLeft);
-				*/
+				
 				
 				
 				if (links) {
@@ -1415,6 +1415,16 @@ var navigation = (function () {
 
 var wuk = (function () {
 	
+	function disable(el) {
+		if ( !el.is(':disabled') ) {
+			el.attr('disabled', '');
+		}
+	}
+	function enable(el) {
+		if ( !el.is(':enabled') ) {
+			el.removeAttr('disabled');
+		}
+	}
 	function notify(o) {
 		var v;
 		
@@ -1424,7 +1434,9 @@ var wuk = (function () {
 	}
 	
 	return {
-		notify: notify
+		notify: notify,
+		disable: disable,
+		enable: enable
 	};
 }());
 
@@ -1437,7 +1449,8 @@ var traceroute = (function () {
 		links = {},
 		msgCounter = 0,
 		noteMsgs = {},
-		scanBtn = {};
+		scanBtn = {},
+		cancelBtn = {};
 	
 	// var v = prompt('change the address if you want:', path);
 	// if (v) { path = v;}
@@ -1476,7 +1489,7 @@ var traceroute = (function () {
 		// $('#newSide').toggle('slide');
 		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
 		
-		u = UIkit.modal('#modal-traceroute')[0];
+		u = UIkit.modal('#modal_traceroute')[0];
 		if ( u.isActive() ) {
 			u.toggle('close');
 		}
@@ -1578,7 +1591,7 @@ var traceroute = (function () {
 	}
 	function onclose(e) {
 		console.log("Connection closed", e);
-		scanBtn.removeAttr('disabled');
+		wuk.enable(scanBtn);
 		
 		
 		noteMsgs.init.close();
@@ -1616,8 +1629,9 @@ var traceroute = (function () {
 			timeout : 0,
 			pos     : 'top-center'
 		});
-		scanBtn = $('#traceroute-scan');
-		scanBtn.attr('disabled', '');
+		scanBtn = $('#traceroute_scan');
+		cancelBtn = $('#traceroute_scan');
+		wuk.disable(scanBtn);
 		
 		createSock(opt);
 		addHandlers(function () {
@@ -1637,12 +1651,20 @@ var discovery = (function () {
 		path = 'ws://'+ window.location.host +'/network/discovery',
 		coefficient = {};
 	
+	function isValidIp(v) {
+		var rgx = {
+			ip: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/, // regex cookbook
+			ip1: /^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$/         // stackoverflow
+		};
+		
+		return rgx.ip.test(v);
+	}
 	function closeModal() {
 		var u;
 		// $('#newSide').toggle('slide');
 		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
 		
-		u = UIkit.modal('#modal-discovery')[0];
+		u = UIkit.modal('#modal_discovery')[0];
 		if ( u.isActive() ) {
 			u.toggle('close');
 		}
@@ -1662,14 +1684,15 @@ var discovery = (function () {
 				Subnet: ""
 			};
 		
-		if (!opt) {
+		if (!opt) { // 0
 			d.StartRange = first;
 			d.EndRange = second;
-		} else {
+		} else { // 1
 			d.IP = first;
 			d.Subnet = second;
 		}
-		console.log( JSON.stringify(d) );
+		
+		path += opt ? '?type=1': '?type=0';
 		
 		ws = new WebSocket(path);
 
@@ -1707,6 +1730,7 @@ var discovery = (function () {
 	}
 	
 	return {
+		isValidIp: isValidIp,
 		discover: discover
 		
 	};
@@ -1783,13 +1807,18 @@ var mediator = (function () {
 		
 		console.log(p.bounds);
 		console.log(p.data);
-		ajax({
+		var xhr = ajax({
 			data: p.data
 		})
 		.done(function ( data ) { // {url: "js/d.txt"}
 			console.log(data);
 			t = data;
 			a.tpl.draw(data, "viewport");
+		})
+		.fail(function (a, b, c) {
+			wuk.notify({
+				
+			})
 		});
 	}
 	function panCallback(pos) {
@@ -2018,7 +2047,7 @@ var popupManager = (function () {
 	
 	function create(v, pos) {
 		removeAll();
-		var div = u.getCommentsInside('#bubble-template')[0].nodeValue.trim(),
+		var div = u.getCommentsInside('#bubble_template')[0].nodeValue.trim(),
 			left, top;
 			
 		
@@ -2057,6 +2086,7 @@ var popupManager = (function () {
 return {
 	pixi: pixi,
 	tpl: tpl,
+	wuk: wuk,
 	mediator: mediator,
 	traceroute: traceroute,
 	discovery: discovery,

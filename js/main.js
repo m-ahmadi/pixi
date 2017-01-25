@@ -3,8 +3,8 @@ $(function () {
 	
 	$('#newSide').css({height: window.innerHeight});
 	$('#newSide').toggle('slide');
-	
-	
+	doValidation( $('#disc_left_input') );
+	doValidation( $('#disc_right_input') );
 
 //var background = new PIXI.Container();
 //var tink = new Tink(PIXI, renderer.view);
@@ -30,7 +30,7 @@ $('#clear').on('click', function (e) {
 
 
 
-$('#sidebar-btn').on('click', function () {
+$('#sidebar_btn').on('click', function () {
 	this.closed = this.closed ? false : true;
 	var sb = $('#newSide');
 	
@@ -48,7 +48,7 @@ $('#sidebar-btn').on('click', function () {
 	// }
 });
 
-$('#traceroute-scan').on('click', function (e) {
+$('#traceroute_scan').on('click', function (e) {
 	var txtarea, checkbox, txt, arr;
 	
 	e.preventDefault();
@@ -71,7 +71,7 @@ $('#abort').on('click', function (e) {
 	a.traceroute.abort();
 });
 
-$('#discovery-start').on('click', function () {
+$('#discovery_start').on('click', function () {
 	var first, second, type;
 	
 	first = $('input[type="text"][name="first-input"]').val();
@@ -84,7 +84,7 @@ $('#discovery-start').on('click', function () {
 	a.discovery.discover( first, second, parseInt(type, 10) );
 	
 });
-$('#modal-discovery input[type="radio"][name="radio1"].uk-radio').on('click', function () {
+$('.j-discovery-radios').on('click', function () {
 	var val = parseInt(this.value, 10),
 		first, second;
 		
@@ -98,14 +98,38 @@ $('#modal-discovery input[type="radio"][name="radio1"].uk-radio').on('click', fu
 		first.val('192.168.1.1');
 		second.val('255.255.255.0');
 	}
+	doValidation( $('#disc_left_input') );
+	doValidation( $('#disc_right_input') );
 });
+$('#disc_left_input').on('keyup', function () {
+	doValidation( $(this) );
+});
+$('#disc_right_input').on('keyup', function () {
+	doValidation( $(this) );
+});
+function doValidation(inputEl) {
+	var el = inputEl,
+		val = el.val(),
+		res = false,
+		startBtn = $('#discovery_start');
+	
+	res = a.discovery.isValidIp(val);
+	
+	inputEl.removeClass('uk-form-success uk-form-danger');
+	if (res) {
+		el.addClass('uk-form-success');
+		a.wuk.enable( startBtn );
+	} else {
+		el.addClass('uk-form-danger');
+		a.wuk.disable( startBtn );
+	}
+}
+
 
 $('#popups').on('click', '.j-popup-close', function (e) {
 	e.preventDefault();
 	$(this).parent().remove();
 });
-
-
 
 
 });
