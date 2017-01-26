@@ -6,14 +6,15 @@ require.config({
 });
 
 require([
-	'mediator',
-	'page'
+	'wpix'
 	
-], function (mediator, page) {
+], function (wpix) {
+	console.log(wpix);
+	t = wpix;
 	
 	$(function () {
 		
-		page.onReady( mediator.init );
+		wpix.init();
 		
 	});
 

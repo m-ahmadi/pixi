@@ -4,7 +4,7 @@ var a = (function () {
 "use strict";
 
 
-var pixi = (function () {
+var wpix = (function () {
 	var inst = util.extend( newPubSub() ),
 		p = {};
 	
@@ -862,7 +862,7 @@ var tpl = (function () {
 			thisLinks = o.links || false;
 		}
 		function createBox() {
-			boxSpriteText = pixi.createBoxSpriteText({
+			boxSpriteText = wpix.createBoxSpriteText({
 				x: coefficient ? x*coefficient.x : x,
 				y: coefficient ? y*coefficient.y : y,
 				imgName: p.types[type],
@@ -899,15 +899,15 @@ var tpl = (function () {
 					get: function () { return b.x + b.width; }
 				},
 				//--------------------------------------------------------
-				"topLeft"  : {  get: function () { return pixi.coPoint( this.left  , this.top  ); }  },
-				"topRight" : {  get: function () { return pixi.coPoint( this.right , this.top  ); }  },
-				"bottLeft" : {  get: function () { return pixi.coPoint( this.left  , this.bott ); }  },
-				"bottRight": {  get: function () { return pixi.coPoint( this.right , this.bott ); }  },
-				"topMid"   : {  get: function () { return pixi.coPoint( midX()     , this.top  ); }  },
-				"bottMid"  : {  get: function () { return pixi.coPoint( midX()     , this.bott ); }  },
-				"leftMid"  : {  get: function () { return pixi.coPoint( this.left  , midY()    ); }  },
-				"rightMid" : {  get: function () { return pixi.coPoint( this.right , midY()    ); }  },
-				"center"   : {  get: function () { return pixi.coPoint( midX()     , midY()    ); }  }
+				"topLeft"  : {  get: function () { return wpix.coPoint( this.left  , this.top  ); }  },
+				"topRight" : {  get: function () { return wpix.coPoint( this.right , this.top  ); }  },
+				"bottLeft" : {  get: function () { return wpix.coPoint( this.left  , this.bott ); }  },
+				"bottRight": {  get: function () { return wpix.coPoint( this.right , this.bott ); }  },
+				"topMid"   : {  get: function () { return wpix.coPoint( midX()     , this.top  ); }  },
+				"bottMid"  : {  get: function () { return wpix.coPoint( midX()     , this.bott ); }  },
+				"leftMid"  : {  get: function () { return wpix.coPoint( this.left  , midY()    ); }  },
+				"rightMid" : {  get: function () { return wpix.coPoint( this.right , midY()    ); }  },
+				"center"   : {  get: function () { return wpix.coPoint( midX()     , midY()    ); }  }
 			});
 		}
 		function createTplNode() {
@@ -931,7 +931,7 @@ var tpl = (function () {
 				
 				bringToFront(
 				//                nodeContainer
-					pixi.viewport.children[1].children,
+					wpix.viewport.children[1].children,
 					boxSpriteText
 				);
 				
@@ -1006,7 +1006,7 @@ var tpl = (function () {
 		
 		p.nodes[ id ] = node;
 		
-		pixi.addChild(container, "nodeContainer", node.pixiEl);
+		wpix.addChild(container, "nodeContainer", node.pixiEl);
 		
 		ani.fadeIn(node.pixiEl);
 		
@@ -1035,14 +1035,14 @@ var tpl = (function () {
 			curveLevel = (nth-1)*2;
 			
 			if (nth === 1) {
-				pixiEl = pixi.create2pointLine({
+				pixiEl = wpix.create2pointLine({
 					start: start,
 					end: end,
 					color: 0xCCAA00 * status,
 					alpha: 0
 				});
 			} else if (nth > 1) {
-				pixiEl = pixi.create3pointLine({
+				pixiEl = wpix.create3pointLine({
 					start: start,
 					end: end,
 					color: 0xCCAA00 * status,
@@ -1056,7 +1056,7 @@ var tpl = (function () {
 			if ( u.isFn(setOndown) ) {
 				setOndown(undefined, function () {
 					//                     lineContainer
-					var arr = pixi.viewport.children[0].children,
+					var arr = wpix.viewport.children[0].children,
 						el = pixiEl;
 					
 					arr.splice( arr.indexOf(el), 1 );
@@ -1073,7 +1073,7 @@ var tpl = (function () {
 			p.links[ linkId ] = link;
 			
 			
-			pixi.addChild(container, "lineContainer", link.pixiEl);
+			wpix.addChild(container, "lineContainer", link.pixiEl);
 			
 			// animate(link.pixiEl);
 			ani.fadeIn(pixiEl);
@@ -1215,8 +1215,8 @@ var navigation = (function () {
 		//panel.position.set( panelPos.x, panelPos.y ); 
 		
 		p.rect = new PIXI.Graphics();
-		p.rectWidth = pixi.renderer.width / 10;
-		p.rectHeight = pixi.renderer.height / 3;
+		p.rectWidth = wpix.renderer.width / 10;
+		p.rectHeight = wpix.renderer.height / 3;
 		rect = p.rect;
 		rect.interactive = true;
 		rect.buttonMode = true;
@@ -1246,7 +1246,7 @@ var navigation = (function () {
 		
 		p.nav = new PIXI.Container();
 		p.navPos = new PIXI.Point(
-			pixi.renderer.width - (p.panelWidth + p.panelOffset),
+			wpix.renderer.width - (p.panelWidth + p.panelOffset),
 			50
 		);
 		nav = p.nav;
@@ -1257,7 +1257,7 @@ var navigation = (function () {
 		addDragDrop(panel, "panel");
 		addDragDrop(rect, "rect");
 		addDragDrop(dot, "dot");
-		pixi.addChild("stage", nav);
+		wpix.addChild("stage", nav);
 	}
 	function addDragDrop(el, name) {
 		if (name === "rect") {
@@ -1502,9 +1502,9 @@ var traceroute = (function () {
 		}
 	}
 	function prepare() {
-		pixi.clearContainer("viewport");
-		pixi.mainContainer.x = pixi.renderer.width / 2;
-		pixi.mainContainer.y = pixi.renderer.height / 2;
+		wpix.clearContainer("viewport");
+		wpix.mainContainer.x = wpix.renderer.width / 2;
+		wpix.mainContainer.y = wpix.renderer.height / 2;
 		
 		closeModal();
 		closeSidebar();
@@ -1564,8 +1564,8 @@ var traceroute = (function () {
 			console.log(nodesLen, linksLen);
 			
 			coefficient = {
-				x: pixi.renderer.width / (300 + 80), // 600 80
-				y: pixi.renderer.height / (300 + 80), // 600 80
+				x: wpix.renderer.width / (300 + 80), // 600 80
+				y: wpix.renderer.height / (300 + 80), // 600 80
 			}
 			// console.log(coefficient);
 			
@@ -1710,8 +1710,8 @@ var discovery = (function () {
 				
 				data = JSON.parse(data);
 				coefficient = {
-					x: pixi.renderer.width / (300 + 80), // 600 80
-					y: pixi.renderer.height / (300 + 80), // 600 80
+					x: wpix.renderer.width / (300 + 80), // 600 80
+					y: wpix.renderer.height / (300 + 80), // 600 80
 				}
 				tpl.draw(data, "viewport", undefined, coefficient);
 				
@@ -1771,7 +1771,7 @@ var mediator = (function () {
 			data: p.data
 		})
 		.done(function (data) {
-			pixi.clearContainer(container || "viewport");
+			wpix.clearContainer(container || "viewport");
 			tpl.draw(data, container || "viewport", p.bounds);
 		});
 	}
@@ -2005,21 +2005,21 @@ var mediator = (function () {
 	}
 	function addCustomEvents() {
 		
-		pixi.on("pan", panCallback);
-		pixi.on("zoom", zoomCallback);
+		wpix.on("pan", panCallback);
+		wpix.on("zoom", zoomCallback);
 		
 		
 		
 		navigation.on("zoom", function () {
 			console.log("zoom");
-			pixi.zoom();
+			wpix.zoom();
 		});
 		navigation.on("pan", function () {
-			pixi.pan.pan(1, 1);
+			wpix.pan.pan(1, 1);
 		});
 	}
 	function init() {
-		pixi.init(pixiCallback, p.GLOBAL_BOUNDS);
+		wpix.init(pixiCallback, p.GLOBAL_BOUNDS);
 		//core.init();
 		//navigation.init();
 		
@@ -2061,8 +2061,8 @@ var popupManager = (function () {
 				left: 0,
 				top: 0
 			});
-			left = (pos.x - 40)  + pixi.mainContainer.position.x + 'px';
-			top = (pos.y - (div.height() + 40)) + pixi.mainContainer.position.y + 'px';
+			left = (pos.x - 40)  + wpix.mainContainer.position.x + 'px';
+			top = (pos.y - (div.height() + 40)) + wpix.mainContainer.position.y + 'px';
 			div.css({
 				left: left,
 				top: top
@@ -2084,7 +2084,7 @@ var popupManager = (function () {
 }());
 
 return {
-	pixi: pixi,
+	wpix: wpix,
 	tpl: tpl,
 	wuk: wuk,
 	mediator: mediator,

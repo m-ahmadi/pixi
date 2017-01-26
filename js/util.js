@@ -1,23 +1,25 @@
-if (typeof Object.create !== 'function') {
-	Object.create = function (o) {
-		function F() {}
-		F.prototype = o;
-		return new F();
-	};
-}
-if (typeof Object.keys !== 'function') {
-	Object.keys = function (o) {
-		var keys = [],
-			k;
-		for (k in o) {
-			if ( o.hasOwnProperty(k) ) {
-				keys.push(k);
+define(function () {
+	
+	if (typeof Object.create !== 'function') {
+		Object.create = function (o) {
+			function F() {}
+			F.prototype = o;
+			return new F();
+		};
+	}
+	if (typeof Object.keys !== 'function') {
+		Object.keys = function (o) {
+			var keys = [],
+				k;
+			for (k in o) {
+				if ( o.hasOwnProperty(k) ) {
+					keys.push(k);
+				}
 			}
-		}
-		return keys;
-	};
-}
-var util = (function () {
+			return keys;
+		};
+	}
+	
 	function isObj(v) {
 		return (
 			v &&
@@ -198,6 +200,5 @@ var util = (function () {
 		extend: extend,
 		getCommentsInside: getCommentsInside,
 	};
-}());
 
-var u = util;
+});

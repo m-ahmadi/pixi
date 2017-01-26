@@ -2,6 +2,20 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+var basePath = "images/raw/edited/",
+	images = [
+		"computer", "gamepad", "hard-drive", "imac-blue",
+		"imac-grey", "imac-red", "ipad", "iphone", "macbook",
+		"macintosh", "monitor", "playstation", "smartphone",
+		"smart-tv", "smartwatch", "tv-screen", "video-card", "xbox"
+	];
+	images.forEach(function (i) {
+		var imgTrans = basePath+i+"-trans.png",
+			imgFill = basePath+i+"-fill.png";
+		PIXI.loader.add( imgTrans );
+		PIXI.loader.add( imgFill );
+	});
+PIXI.loader.load();
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 UIkit.offcanvas.hide(false);
 $('#sidebar').on('show.uk.offcanvas', function () {
