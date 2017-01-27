@@ -339,13 +339,16 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			checkLink( links[k], c, b );
 		});
 	}
-	function draw(data, container, bounds, coefficient) {
+	function draw(data, container, bounds, coefficient, flush) {
 		container = container ? container : "viewport";
 		bounds = bounds ? bounds : {};
 		coefficient = coefficient ? coefficient : false;
 		
-		p.nodes = {};
-		p.links = {};
+		if ( flush ) {
+			p.nodes = {};
+			p.links = {};
+		}
+		
 		drawNodes(data.nodes, container, coefficient);
 		drawLinks(data.links, container, bounds);
 	}

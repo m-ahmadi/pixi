@@ -127,8 +127,12 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 			}
 			// console.log(coefficient);
 			
-			tpl.draw(data, "viewport", undefined, coefficient);
 			
+			if (msgCounter === 1) {
+				tpl.draw(data, "viewport", undefined, coefficient, true);
+			} else {
+				tpl.draw(data, "viewport", undefined, coefficient);
+			}
 		} else {
 			console.log("Other message received\n", e.data);
 		}

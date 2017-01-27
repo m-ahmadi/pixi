@@ -8,7 +8,21 @@ define(['wpix', 'util'], function (wpix, u) {
 			min: 0,
 			max: 0
 		};
-	
+	wpix.on("zoom", function (e) {
+		
+		var pos = e.pos,
+			el = activeOne(),
+			d = el.data();
+		
+		
+		if (el) {
+			el.css({
+				/* left: (orgPos.x - 40)  + pos.x + 'px',
+				top: (orgPos.y - (el.height() + 40)) + pos.y + 'px' */
+			});
+		}
+		
+	 });
 	function create(v, pos) {
 		removeAll();
 		var div = u.getCommentsInside('#bubble_template')[0].nodeValue.trim(),
@@ -27,6 +41,12 @@ define(['wpix', 'util'], function (wpix, u) {
 			});
 			left = (pos.x - 40)  + wpix.mainContainer.position.x + 'px';
 			top = (pos.y - (div.height() + 40)) + wpix.mainContainer.position.y + 'px';
+			
+			div.data({
+				left: left,
+				top: top
+			});
+			
 			div.css({
 				left: left,
 				top: top
@@ -40,14 +60,12 @@ define(['wpix', 'util'], function (wpix, u) {
 	}
 	function hideActive() {
 		var el = activeOne();
-		
 		if ( !el.hasClass('no-display') ) {
 			el.addClass('no-display');
 		}
 	}
 	function showActive() {
 		var el = activeOne();
-		
 		if ( el.hasClass('no-display') ) {
 			el.removeClass('no-display');
 		}
