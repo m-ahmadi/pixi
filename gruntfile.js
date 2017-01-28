@@ -115,6 +115,7 @@ module.exports = function(grunt) {
 					'sass/**/*.scss',
 					'css/**/*.css',
 					'js/**/*.js',
+					'*.js',
 					'test/**/*'
 				]
 			}

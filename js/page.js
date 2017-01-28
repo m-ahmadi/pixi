@@ -1,4 +1,4 @@
-define(['wpix', 'wuk', 'discovery', 'traceroute'], function (wpix, wuk, discovery, traceroute) {
+define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, wuk, discovery, traceroute, mockTrace) {
 	
 	function doValidation(inputEl) {
 		var el = inputEl,
@@ -62,7 +62,8 @@ define(['wpix', 'wuk', 'discovery', 'traceroute'], function (wpix, wuk, discover
 				arr = txt.split("\n");
 				//console.log(arr, checkbox);
 				
-				traceroute.trace(arr, checkbox);
+				// traceroute.trace(arr, checkbox);
+				mockTrace.trace();
 			}
 			$('#abort').removeAttr('disabled');
 		});

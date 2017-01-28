@@ -1,6 +1,42 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+wuk.notify({
+	message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Socket connected.',
+	status  : 'success',
+	timeout : 1000,
+	pos     : 'bottom-right'
+});
+noteMsgs.processing = wuk.notify({
+	message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Waiting for socket messages...',
+	status  : 'info',
+	timeout : 0,
+	pos     : 'bottom-right'
+});
+wuk.notify({
+	message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> New socket message received.',
+	status  : 'success',
+	timeout : 1000,
+	pos     : 'bottom-right'
+});
+wuk.notify({
+	message : '<i class="fa fa-exclamation-triangle fa-lg" aria-hidden="true"></i> Socket error.',
+	status  : 'danger',
+	timeout : 2000,
+	pos     : 'bottom-right'
+});
+wuk.notify({
+	message : '<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Socket closed.', // fa fa-check
+	status  : 'info',
+	timeout : 2000,
+	pos     : 'bottom-right'
+});
+noteMsgs.init = wuk.notify({
+	message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Opening socket...',
+	status  : 'info',
+	timeout : 0,
+	pos     : 'top-center'
+});
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 var basePath = "images/raw/edited/",
 	images = [

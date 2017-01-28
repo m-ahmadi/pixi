@@ -27,6 +27,7 @@
     "grunt-jslint": "^1.1.14",
     "grunt-webpack": "^2.0.0-beta.6",
     "jshint-stylish": "^2.2.1",
+    "socket.io": "^1.7.2",
     "tsify": "^3.0.0",
     "typescript": "^2.1.5",
     "watchify": "^3.8.0",

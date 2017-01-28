@@ -100,8 +100,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 					wpix.viewport.children[1].children,
 					boxSpriteText
 				);
-				
-				if ( links ) {
+				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId];
 						if (link) {
@@ -144,7 +143,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 							if (link.dest === nodeId) {
 								end = node.center;
 							}
-							console.log(start, end);
+							
 							link.pixiEl.changePoints(start, end);
 						}
 					});
@@ -344,14 +343,16 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 		bounds = bounds ? bounds : {};
 		coefficient = coefficient ? coefficient : false;
 		
-		if ( flush ) {
+		/* if ( flush ) {
 			p.nodes = {};
 			p.links = {};
-		}
+		} */
 		
 		drawNodes(data.nodes, container, coefficient);
 		drawLinks(data.links, container, bounds);
 	}
+	
+	window.draw = draw;
 	
 	return {
 		get nodes() { return p.nodes },

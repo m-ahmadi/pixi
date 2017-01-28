@@ -1,5 +1,6 @@
-define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {	
-	var ws = {},
+define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
+	var note = wuk.note,
+		ws = {},
 		path = 'ws://'+ baseRoot +'/network/icmp/traceroute', // window.location.host
 		openCallback,
 		coefficient = {},
@@ -74,19 +75,11 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 		
 		noteMsgs.init.close();
 		
-		wuk.notify({
-			message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Socket connected.',
-			status  : 'success',
-			timeout : 1000,
-			pos     : 'bottom-right'
-		});
+		note.success('Socket connected.');
 		
-		noteMsgs.processing = wuk.notify({
-			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Waiting for socket messages...',
-			status  : 'info',
-			timeout : 0,
-			pos     : 'bottom-right'
-		});
+		noteMsgs.processing = note.process('Waiting for socket messages...', 0);
+		
+		
 			
 		// ws.send("Hello WebSocket!");
 		
@@ -104,12 +97,9 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 		
 		if ( u.isStr(e.data) ) {
 			console.log("String message received\n");
-			wuk.notify({
-				message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> New socket message received.',
-				status  : 'success',
-				timeout : 1000,
-				pos     : 'bottom-right'
-			});
+			note.success('New socket message received.');
+			
+			
 			
 			data = JSON.parse(e.data);
 			console.log(data);
@@ -129,6 +119,7 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 			
 			
 			if (msgCounter === 1) {
+				console.log('fud');
 				tpl.draw(data, "viewport", undefined, coefficient, true);
 			} else {
 				tpl.draw(data, "viewport", undefined, coefficient);
@@ -144,12 +135,9 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 		
 		noteMsgs.init.close();
 		// noteMsgs.processing.close();
-		wuk.notify({
-			message : '<i class="fa fa-exclamation-triangle fa-lg" aria-hidden="true"></i> Socket error.',
-			status  : 'danger',
-			timeout : 2000,
-			pos     : 'bottom-right'
-		});
+		
+		note.error('Socket error.');
+		
 	}
 	function onclose(e) {
 		console.log("Connection closed", e);
@@ -158,16 +146,13 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 		
 		noteMsgs.init.close();
 		
-		var note = noteMsgs.processing;
-		if (note) {
-			note.close();
+		var process = noteMsgs.processing;
+		if (process) {
+			process.close();
 		}
-		wuk.notify({
-			message : '<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Socket closed.', // fa fa-check
-			status  : 'info',
-			timeout : 2000,
-			pos     : 'bottom-right'
-		});
+		
+		note.info('Socket closed.', 2000);
+
 	}
 	function addHandlers(fn) {
 		openCallback = fn;
@@ -185,12 +170,8 @@ define(['wpix', 'tpl', 'wuk', 'util'], function (wpix, tpl, wuk, u) {
 		console.log(ws);
 	}
 	function trace(arr, opt) {
-		noteMsgs.init = wuk.notify({
-			message : '<i class="fa fa-refresh fa-spin fa-lg fa-fw"></i> Opening socket...',
-			status  : 'info',
-			timeout : 0,
-			pos     : 'top-center'
-		});
+		noteMsgs.init = wuk.note.process('Opening socket...', false, 'top-center');
+		
 		scanBtn = $('#traceroute_scan');
 		cancelBtn = $('#traceroute_scan');
 		wuk.disable(scanBtn);

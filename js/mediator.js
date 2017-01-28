@@ -91,9 +91,7 @@ define(['wpix', 'tpl', 'navigation', 'popupManager', 'ajax', 'wuk', 'util'], fun
 			tpl.draw(data, "viewport");
 		})
 		.fail(function (a, b, c) {
-			wuk.notify({
-				
-			})
+			wuk.note.error('Request for initial draw has failed.')
 		});
 	}
 	function panCallback(pos) {
