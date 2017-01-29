@@ -1,4 +1,4 @@
-define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
+define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 	var inst = u.extend( newPubSub() ),
 		p = {};
 	
@@ -53,7 +53,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 		mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
 		pan.add( mainContainer );
 			
-		$(document).on("mousewheel", function (e) {
+		$("canvas").on("mousewheel", function (e) {
 			var zoomIn, mcPos, prevPos;
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
@@ -70,6 +70,13 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 					pos: mcPos
 				});
 			}
+		});
+		
+		$("canvas").on("mouseout", function () {
+			p.events = false;
+		});
+		$("canvas").on("mouseover", function () {
+			p.events = true;
 		});
 		createContainers();
 		stage.addChild( mainContainer );
@@ -194,26 +201,26 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			
 			
 			// var opened = popupManager.activeBox,
-				// pTop = opened ? parseInt( opened.css('top'), 10) : undefined,
-				// pLeft = opened ? parseInt( opened.css('left'), 10) : undefined;
+				// pTop = opened ? parseInt( opened.css("top"), 10) : undefined,
+				// pLeft = opened ? parseInt( opened.css("left"), 10) : undefined;
 			
 			if (mcX <= bX1    &&    mcX >= bX2) {
 				// if (opened) {
-					// opened.css('left', pLeft += dx);
+					// opened.css("left", pLeft += dx);
 				// }
 				p.mainContainer.position.x += dx;
-				inst.emit('inboundPanX', dx);
+				inst.emit("inboundPanX", dx);
 			} else {
 				p.mainContainer.position.x = mcX > 0 ? bX1 : mcX < 0 ? bX2 : undefined;
 			}
 			
 			if (mcY <= bY1    &&    mcY >= bY2) {
 				// if (opened) {
-					// opened.css('top', pTop += dy);
+					// opened.css("top", pTop += dy);
 				// }
 				
 				p.mainContainer.position.y += dy;
-				inst.emit('inboundPanY', dy);
+				inst.emit("inboundPanY", dy);
 			} else {
 				p.mainContainer.position.y = mcY > 0 ? bY1 : mcY < 0 ? bY2 : undefined;
 			}
@@ -303,15 +310,17 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			}
 		}
 		function hover() {
+			// console.log("hover");
 			tmpLineWidth = lineWidth;
 			lineWidth *= 4;
-			p = calcPoints();
-			line.clear();
-			draw();
-			toggleDirties();
+			redraw();
 		}
 		function unhover() {
+			// console.log("unhover");
 			lineWidth = tmpLineWidth;
+			redraw();
+		}
+		function redraw() {
 			p = calcPoints();
 			line.clear();
 			draw();
@@ -332,21 +341,10 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			}
 		}
 		function over() {
-			/* tmpLineWidth = lineWidth;
-			lineWidth *= 4;
-			p = calcPoints();
-			line.clear();
-			draw();
-			toggleDirties(); */
-			hover();
+			// hover();
 		}
 		function out() {
-			/* lineWidth = tmpLineWidth;
-			p = calcPoints();
-			line.clear();
-			draw();
-			toggleDirties(); */
-			unhover();
+			// unhover();
 		}
 		function addEvents() {
 			line
@@ -675,8 +673,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
-			if (!p.events) { return; };
-			if ( u.isFn(onmouseup) ) {
+			if ( u.isFn(onmouseup) && p.events ) {
 				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
 			}
 		}

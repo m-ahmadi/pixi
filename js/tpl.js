@@ -152,7 +152,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			});
 			
 			boxSpriteText.setOnmousemove(undefined, function (e) {
-				/* var pos = e.data.global,
+				var pos = e.data.global,
 					bubble = popupManager.activeBox,
 					pTop = bubble ? parseInt( bubble.css('top'), 10) : undefined,
 					pLeft = bubble ? parseInt( bubble.css('left'), 10) : undefined;
@@ -160,11 +160,11 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				if (bubble) {
 					bubble.css('left', (pos.x - 40)+'px');
 					bubble.css('top', (pos.y - (bubble.height() + 40)) +'px');
-				} */
+				}
 			});
 			
 			boxSpriteText.setOnmouseover([node, p.links], function (e, node, tplLinks) {
-				/* var links = node.links;
+				var links = node.links;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId];
@@ -172,10 +172,10 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 							link.pixiEl.hover();
 						}
 					});
-				} */
+				}
 			});
 			boxSpriteText.setOnmouseout([node, p.links], function (e, node, tplLinks) {
-				/* var links = node.links;
+				var links = node.links;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId];
@@ -183,7 +183,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 							link.pixiEl.unhover();
 						}
 					});
-				} */
+				}
 			});
 		}
 		

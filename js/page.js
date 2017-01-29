@@ -21,7 +21,7 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 		typeof fn === 'function' ? fn() : undefined;
 		
 		$('#newSide').css({height: window.innerHeight});
-		$('#newSide').toggle('slide');
+		// $('#newSide').toggle('slide');
 		doValidation( $('#disc_left_input') );
 		doValidation( $('#disc_right_input') );
 		$('#clear').on('click', function (e) {
@@ -111,6 +111,7 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 			e.preventDefault();
 			$(this).parent().remove();
 		});
+		
 	}
 	
 	return {
