@@ -5,11 +5,8 @@ require.config({
 	
 });
 
-require([
-	'mediator',
-	'page'
+require(['mediator', 'page'], function (mediator, page) {
 	
-], function (mediator, page) {
 	
 	$(function () {
 		

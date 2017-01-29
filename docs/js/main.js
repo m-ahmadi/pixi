@@ -68,7 +68,7 @@ return {
 $(function () {
 	"use strict";
 	var url, cat;
-	
+	sessionStorage.clear();
 	a.title = $('title');
 	a.titleTxt = a.title.text();
 	

@@ -50,7 +50,7 @@ function generate(socket) {
 		
 		src = nodes[d.srcId];
 		dest = nodes[d.destId],
-		// console.log(src, dest);
+		
 		link.id = id,
 		link.src = { id: src.id, x: src.x, y: src.y };
 		link.dest = { id: dest.id, x: dest.x, y: dest.y };
@@ -63,9 +63,6 @@ function generate(socket) {
 		var lnk = links[k],
 			srcNode = nodes[lnk.src.id],
 			destNode = nodes[lnk.dest.id];
-		console.log(nodes);
-		console.log('kity\n');
-		console.log(lnk.src.id, lnk.dest.id);
 		
 		srcNode.links.push(lnk.id);
 		destNode.links.push(lnk.id);

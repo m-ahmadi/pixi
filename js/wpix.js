@@ -13,7 +13,8 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 	p.ySec2 = {};
 	
 	p.textures = {};
-	p.zoomDisabled = false;
+	p.zoom = true;
+	p.events = true;
 	
 	function init(callback, panBounds, background) {
 		var renderer, renW, renH, renReso, stage, mainContainer;
@@ -45,7 +46,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 		mainContainer = p.mainContainer;
 		
 		// document.body.appendChild( p.renderer.view );
-		$("#contents").append( renderer.view );
+		$("#canvas_container").append( renderer.view );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		//p.stage.buttonMode = true;
 		mainContainer.interactive = true;
@@ -57,7 +58,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			// e.deltaX, e.deltaY, e.deltaFactor
 			// zoom(e.pageX, e.pageY, e.deltaY > 0);
 			// zoom(e);
-			if (!p.zoomDisabled) {
+			if (p.zoom) {
 				zoomIn = e.deltaY > 0,
 				mcPos = p.mainContainer.position,
 				prevPos = {x: mcPos.x, y: mcPos.y};
@@ -88,9 +89,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 		inst.emit("init");
 	}
 	
-	function disableZoom(v) {
-		p.zoomDisabled = v;
-	}
+	
 	function createContainers() {
 		var viewport, xSec1, xSec2, ySec1, ySec2,
 			main = p.mainContainer;
@@ -224,7 +223,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			
 			inst.emit("pan", p.mainContainer.position);
 		}
-		function up() {
+		function up(e) {
 			isDragging= false;
 		}
 		function pan(x, y) {
@@ -303,6 +302,21 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 				color = c;
 			}
 		}
+		function hover() {
+			tmpLineWidth = lineWidth;
+			lineWidth *= 4;
+			p = calcPoints();
+			line.clear();
+			draw();
+			toggleDirties();
+		}
+		function unhover() {
+			lineWidth = tmpLineWidth;
+			p = calcPoints();
+			line.clear();
+			draw();
+			toggleDirties();
+		}
 		function down(e) {
 			e.stopPropagation();
 			this.alpha = 0.5;
@@ -318,19 +332,21 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			}
 		}
 		function over() {
-			tmpLineWidth = lineWidth;
+			/* tmpLineWidth = lineWidth;
 			lineWidth *= 4;
 			p = calcPoints();
 			line.clear();
 			draw();
-			toggleDirties();
+			toggleDirties(); */
+			hover();
 		}
 		function out() {
-			lineWidth = tmpLineWidth;
+			/* lineWidth = tmpLineWidth;
 			p = calcPoints();
 			line.clear();
 			draw();
-			toggleDirties();
+			toggleDirties(); */
+			unhover();
 		}
 		function addEvents() {
 			line
@@ -454,6 +470,8 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 		};
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
+		line.hover = hover;
+		line.unhover = unhover;
 		Object.defineProperty(line, "points", {
 			get: function () { return {start: start, end: end}; }
 		});
@@ -618,6 +636,8 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			onmouseup, onmouseupParam,
 			onmousedown, onmousedownParam,
 			onmousemove, onmousemoveParam,
+			onmouseover, onmouseoverParam,
+			onmouseout, onmouseoutParam,
 			counter = 0;
 		
 		function setThings() {
@@ -655,6 +675,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
+			if (!p.events) { return; };
 			if ( u.isFn(onmouseup) ) {
 				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
 			}
@@ -670,6 +691,16 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 				}
 			}
 		}
+		function over(e) {
+			if ( u.isFn(onmouseover) ) {
+				onmouseover.apply(this, onmouseoverParam ? [e].concat(onmouseoverParam) : [e]);
+			}
+		}
+		function out(e) {
+			if ( u.isFn(onmouseout) ) {
+				onmouseout.apply(this, onmouseout ? [e].concat(onmouseoutParam) : [e]);
+			}
+		}
 		function addEvents(el) {
 			el
 				.on("mousedown", down) 
@@ -679,7 +710,9 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 				.on("touchend", up)
 				.on("touchendoutside", up)
 				.on("mousemove", move)
-				.on("touchmove", move);
+				.on("touchmove", move)
+				.on("mouseover", over)
+				.on("mouseout", out);
 		}
 		function makeSprite() {
 			// sprite = new PIXI.Sprite.fromImage( spriteImg );
@@ -735,6 +768,14 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 			onmousemoveParam = param;
 			onmousemove = fn;
 		};
+		box.setOnmouseover = function (param, fn) {
+			onmouseoverParam = param;
+			onmouseover = fn;
+		};
+		box.setOnmouseout = function (param, fn) {
+			onmouseoutParam = param;
+			onmouseout = fn;
+		};
 		box.changeTint = function (n) {
 			if (n) {
 				sprite.tint = n;
@@ -759,6 +800,14 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 		},
 		"textures": {
 			get: function () { return p.textures; }
+		},
+		"zoom": {
+			get: function () { return p.zoom; },
+			set: function (v) { p.zoom = v; }
+		},
+		"events": {
+			get: function () { return p.events; },
+			set: function (v) { p.events = v; }
 		}
 	});
 	
@@ -769,8 +818,7 @@ define(['util', 'pubsub'], function (u, newPubSub, popupManager) {
 	inst.createBoxSpriteText = createBoxSpriteText;
 	inst.clearContainer = clearContainer;
 	inst.addChild = addChild;
-	inst.disableZoom = disableZoom;
 	
+	window.wpix = inst;
 	return inst;
-
 });

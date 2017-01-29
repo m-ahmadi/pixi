@@ -8,11 +8,12 @@ $ cd topology-front
 $ npm install
 </code></pre>
 
-<p>After the installation has completed, you can build the project by one these three ways:<br/>
+<p>After the installation has completed, you can build the project by one of these four ways:<br/>
 <ul>
 	<li>Build by running an npm script.</li>
-	<li>Build by running the webpack CLI.</li>
+	<li>Build by running the Webpack CLI.</li>
 	<li>Build by running grunt.</li>
+	<li>Build by running the TypeScript compiler through browserify and tsify.</li>
 </ul>
 </p>
 
@@ -22,7 +23,7 @@ $ npm run build
 </code></pre>
 
 
-<p>Using webpack CLI:</p>
+<p>Using Webpack CLI:</p>
 <pre><code class="lang-bash">
 $ webpack js/src/main.js js/bundle.js
 </code></pre>
@@ -31,3 +32,19 @@ $ webpack js/src/main.js js/bundle.js
 <pre><code class="lang-bash">
 $ grunt
 </code></pre>
+
+<p>TypeScript build with watch:</p>
+<pre><code class="lang-batch">
+$ watchify -p tsify -e js/src/main.ts -o js/bundle.js -v
+</code></pre>
+
+<label>TypeScript build without watch:</label>
+<pre><code class="lang-batch">
+$ browserify -p tsify -e js/src/main.ts -o js/bundle.js
+</code></pre>
+
+<h4>Using RequireJS:</h4>
+<p>
+App main entry: <code>js/main</code><br />
+Excluded folder (ignore this folder): <code>js/src</code>
+</p>

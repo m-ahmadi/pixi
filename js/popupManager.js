@@ -22,7 +22,7 @@ define(['wpix', 'util'], function (wpix, u) {
 			});
 		}
 		
-	 });
+	});
 	function create(v, pos) {
 		removeAll();
 		var div = u.getCommentsInside('#bubble_template')[0].nodeValue.trim(),

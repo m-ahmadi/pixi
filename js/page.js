@@ -62,8 +62,8 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 				arr = txt.split("\n");
 				//console.log(arr, checkbox);
 				
-				// traceroute.trace(arr, checkbox);
-				mockTrace.trace();
+				traceroute.trace(arr, checkbox);
+				// mockTrace.trace();
 			}
 			$('#abort').removeAttr('disabled');
 		});

@@ -25,18 +25,8 @@
 <p>See <a href="https://github.com/m-ahmadi/util.git" target="_blank">util on github</a> for more information.</p>
 
 <pre><code class="language-javascript">
-function newEmpoloye(jobTitle, id) {
-	var inst = {},
-		idCounter = 0;
-	
-	inst.jobTitle  = jobTitle || 'uknown_title';
-	inst.employeId = id       || 'employe_'+(idCounter+=1);
-	
-	return inst;
-}
-
 function newPerson(name, age) {
-	var inst = {};
+	var inst = {}; // the instance (this)
 	
 	inst.name = name || 'no_name';
 	inst.age  = age  || false;
@@ -44,19 +34,30 @@ function newPerson(name, age) {
 	return inst;
 }
 
-var person = newPerson('ali', 26);,
-	employee = newEmpoloye('product_manager'),
+function newEmpoloye(name, age, jobTitle, id) {
+	var inst = {}, // the instance (this)
+		person = newPerson(name, age),
+		idCounter = 0;
+	
+	util.extend( person, inst );
+	
+	inst.jobTitle  = jobTitle || 'uknown_title';
+	inst.employeId = id       || 'employe_'+(idCounter+=1);
+	
+	return inst;
+}
 
-util.extend(person, employe);
-/*
-	employee.name     // 'ali'
-	employee.age      // 26
-	employee.jobTitle // 'product_manager'
-	employe.id        // 'employe_1'
+var employee = newEmpoloyee('ali', 26, 'product_manager')
+
+employee.name      // 'ali'
+employee.age       // 26
+employee.jobTitle  // 'product_manager'
+employee .id       // 'employe_1'
 	
-	You can think of it this way:
-	class Employee extends Person {
-	
+// You can think of it this way:
+class Employee extends Person {
+	constructor(name, age, jobTitle, id) {
+		// new Person(name, age);
 	}
-*/
+}
 </code></pre>

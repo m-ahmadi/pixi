@@ -277,8 +277,10 @@ define(['wpix', 'tpl', 'navigation', 'popupManager', 'ajax', 'wuk', 'util'], fun
 		console.log(x, y);
 		
 	}
-	function addCustomEvents() {
+	function popup(e, d) {
 		
+	}
+	function addCustomEvents() {
 		// wpix.on("pan", panCallback);
 		// wpix.on("zoom", zoomCallback);
 		wpix.on('inboundPanX', function (dx) {
@@ -287,13 +289,13 @@ define(['wpix', 'tpl', 'navigation', 'popupManager', 'ajax', 'wuk', 'util'], fun
 		wpix.on('inboundPanY', function (dy) {
 			movePopup(undefined, dy);
 		});
-		
-		// wpix.on('panMouseDown', function () {
-			// popupManager.hideActive();
-		// });
-		// wpix.on('panMouseUp', function () {
-			// popupManager.showActive();
-		// });
+		wpix.on('zoom', popup);
+		/* wpix.on('panMouseDown', function () {
+			popupManager.hideActive();
+		});
+		wpix.on('panMouseUp', function () {
+			popupManager.showActive();
+		}); */
 		
 		
 		navigation.on("zoom", function () {
