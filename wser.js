@@ -3,7 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = 2000;
 var u = require('./u');
-var MAX_DRAWING_ITERATIONS = 10;
+var MAX_DRAWING_ITERATIONS = 30;
 
 app.get('/', function (req, res) {
 	// 
