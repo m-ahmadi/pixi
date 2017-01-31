@@ -32,7 +32,7 @@ function generateAll() {
 		node.name ='node_'+id;
 		node.x = util.randInt(minX, maxX);
 		node.y = util.randInt(minY, maxY);
-		node.type = util.randInt(0, 17);
+		node.type = util.randInt(0, 9);
 		node.status = util.randInt(0, 5);
 		node.links = [];
 		

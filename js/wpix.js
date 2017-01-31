@@ -85,9 +85,11 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		renderer.render( mainContainer );
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-		PIXI.loader.add( "images/atlas-0.json" );
+		// PIXI.loader.add( "images/atlas-0.json" );
+		PIXI.loader.add( "images/n/atlas128.json" );
 		PIXI.loader.load(function () {
-			p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
+			// p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
+			p.textures = PIXI.loader.resources["images/n/atlas128.json"].textures;
 			if ( u.isFn(callback) ) {
 				callback(renW, renH);
 			}
@@ -640,8 +642,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		
 		function setThings() {
 			imgFill     = conf.imgFill      || false;
-			imgBasePath = conf.imgBasePath  || "images/raw/edited/"; // images/
-			imgName     = conf.imgName      || "tv-screen"; // tv-screen computer
+		//	imgBasePath = conf.imgBasePath  || "images/raw/edited/"; // images/
+			imgName     = conf.imgName      || "0"; // "tv-screen"; // tv-screen computer
 			imgExt      = conf.imgExt       || ".png";
 			spriteScale = conf.spriteScale  || 0.2;
 			spriteTint  = conf.spriteTint   || false;
@@ -654,7 +656,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			boxAlpha    = conf.boxAlpha;
 			boxAlpha    = u.isNum(boxAlpha) ? boxAlpha : 1;
 		//	spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
-			spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
+		//	spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
+			spriteImg   = conf.spriteImg    || imgName + imgExt;
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -720,7 +723,21 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			sprite.alpha = 1;
 			sprite.scale.set( spriteScale );
 			if (spriteTint) {
-				sprite.tint = 0xFFCC00 * spriteTint;
+				if (spriteTint === 0) {
+					sprite.tint = 0x00FF00; // Green
+				} else if (spriteTint === 1) {
+					sprite.tint = 0x00FFFF; // Cyan
+				} else if (spriteTint === 2) {
+					sprite.tint = 0xFF9800; // Orange
+				} else if (spriteTint === 3) {
+					sprite.tint = 0x00FF00; // Yellow
+				} else if (spriteTint === 4) {
+					sprite.tint = 0x673AB7; // Purple
+				} else if (spriteTint === 5) {
+					sprite.tint = 0xFF0000; // Red
+				}
+				
+				// sprite.tint = 0xFFCC00 * spriteTint;
 			}
 		}
 		function makeText() {

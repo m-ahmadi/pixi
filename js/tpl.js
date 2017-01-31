@@ -4,11 +4,15 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 	p.nodes = {};
 	p.links = {};
 	p.idCounter = 0;
-	p.types = [
+	/* p.types = [
 		"tv-screen", "macintosh", "imac-blue", "smart-tv", "imac-red",
 		"imac-grey", "monitor", "ipad", "iphone", "macbook",
 		"computer", "gamepad", "playstation", "hard-drive",
 		"smartphone", "smartwatch", "video-card", "xbox"
+	]; */
+	p.types = [
+		"1", "2", "3", "4", "5",
+		"6", "7", "8", "9"
 	];
 	
 	function createNode(o, container, coefficient) {
@@ -32,7 +36,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				x: coefficient ? x*coefficient.x : x,
 				y: coefficient ? y*coefficient.y : y,
 				imgName: p.types[type],
-				spriteScale: 0.1,
+				spriteScale: 0.3,
 				spriteTint: type,
 				textContent: name,
 				boxAlpha: 0,
@@ -226,14 +230,20 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				pixiEl = wpix.create2pointLine({
 					start: start,
 					end: end,
-					color: 0xCCAA00 * status,
+				//	color: 0xCCAA00 * status,
+					color: status === 0 ? 0x00FF00 :
+							status === 1 ? 0x00FFFF :
+							status === 2 ? 0xFF9800 :
+							status === 3 ? 0x00FF00 :
+							status === 4 ? 0x673AB7 :
+							status === 5 ? 0xFF0000 : undefined,
 					alpha: 0
 				});
 			} else if (nth > 1) {
 				pixiEl = wpix.create3pointLine({
 					start: start,
 					end: end,
-					color: 0xCCAA00 * status,
+				//	color: 0xCCAA00 * status,
 					curveLevel: curveLevel,
 					curveSide: toggle ? false : true
 				});

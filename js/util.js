@@ -1,5 +1,4 @@
-define(function () {
-	
+var util = (function () {
 	if (typeof Object.create !== 'function') {
 		Object.create = function (o) {
 			function F() {}
@@ -201,4 +200,10 @@ define(function () {
 		getCommentsInside: getCommentsInside,
 	};
 
-});
+}());
+
+if (typeof define === 'function') {
+	define(util);
+} else if (typeof module !== 'undefined') {
+	module.exports = util;
+}
