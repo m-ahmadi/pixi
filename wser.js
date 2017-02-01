@@ -31,7 +31,7 @@ function generate(socket) {
 		node.y = u.randInt(0, 920);
 		node.id = id;
 		node.name = id;
-		node.type = u.randInt(0, 16);
+		node.type = u.randInt(0, 9);
 		node.status = u.randInt(0, 5);
 		node.links = [];
 		

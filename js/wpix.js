@@ -724,7 +724,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			sprite.scale.set( spriteScale );
 			if (spriteTint) {
 				if (spriteTint === 0) {
-					sprite.tint = 0x00FF00; // Green
+					sprite.tint = 0x4CAF50; // Green
 				} else if (spriteTint === 1) {
 					sprite.tint = 0x00FFFF; // Cyan
 				} else if (spriteTint === 2) {
@@ -739,6 +739,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				
 				// sprite.tint = 0xFFCC00 * spriteTint;
 			}
+			sprite.position.x = 0.5;
+			sprite.position.y = 0.5;
 		}
 		function makeText() {
 			text = new PIXI.Text( textContent, {
@@ -795,6 +797,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				sprite.tint = n;
 			}
 		};
+		box.sprite = sprite;
 		
 		return box;
 	}

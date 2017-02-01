@@ -1,4 +1,5 @@
 define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, wuk, discovery, traceroute, mockTrace) {
+	var inst = {};
 	
 	function doValidation(inputEl) {
 		var el = inputEl,
@@ -16,6 +17,9 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 			el.addClass('uk-form-danger');
 			wuk.disable( startBtn );
 		}
+	}
+	function isAnyModalActive() {
+		$('div[id^="modal_"]');
 	}
 	function onReady(fn) {
 		typeof fn === 'function' ? fn() : undefined;
@@ -111,14 +115,30 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 			e.preventDefault();
 			$(this).parent().remove();
 		});
-		
+		$(document).on('keydown', function (e) {
+			var sb;
+			if (e.keyCode === 27) {
+				if ( !wuk.isAnyModalActive() ) {
+					sb = $('#newSide');
+					if ( !sb.is(':animated') ) {
+						sb.toggle('slide');
+					}
+				}
+			}
+		});
+		$('a[href^="#modal_"]').on('click', function (e) {
+			wuk.modalState(true, e.target.hash.substr(1));
+		});
+		$('div[id^="modal_"]').on('hide', function (e) {
+			wuk.modalState(false, e.target.id);
+		});
 	}
 	
-	return {
-		onReady: onReady
-		
-	}
 	
+	
+	inst.onReady = onReady;
+	
+	return inst;
 });
 
 //var background = new PIXI.Container();

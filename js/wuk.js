@@ -1,4 +1,11 @@
 define(['util'], function (u) {
+	var inst = {},
+		modals = {};
+	
+	function getModal(str) {
+		return UIkit.modal(str)[0];
+	}
+	
 	
 	function disable(el) {
 		if ( !el.is(':disabled') ) {
@@ -10,7 +17,35 @@ define(['util'], function (u) {
 			el.removeAttr('disabled');
 		}
 	}
-	
+	function closeModal(s) {
+		u = getModal(s);
+		if ( u.isActive() ) {
+			u.hide();
+		}
+	}
+	function openModal(s) {
+		u = getModal(s);
+		if ( !u.isActive() ) {
+			u.show();
+		}
+	}
+	function modalState(state, id) {
+		if (state === true) {
+			modals[id] = true;
+		} else if (!state) {
+			modals[id] = false;
+		}
+	}
+	function isAnyModalActive() {
+		var result = false;
+		Object.keys(modals).forEach(function (k) {
+			if ( modals[k] === true ) {
+				result = true;
+			}
+		});
+		return result;
+		// return u.isEmptyObj(modals) ? false : true;
+	}
 	
 	var note = (function () {
 		var icons = {
@@ -72,9 +107,6 @@ define(['util'], function (u) {
 		function process(msg, timeout, pos) {
 			return create('process', msg, timeout, pos);
 		}
-		
-		
-		
 		return {
 			info: info,
 			success: success,
@@ -84,10 +116,16 @@ define(['util'], function (u) {
 		};
 	}());
 	
-	return {
-		note: note,
-		disable: disable,
-		enable: enable
-	};
-
+	
+	inst.note = note;
+	inst.disable = disable;
+	inst.enable = enable;
+	inst.closeModal = closeModal;
+	inst.openModal = openModal;
+	inst.isAnyModalActive = isAnyModalActive;
+	inst.modalState = modalState;
+	
+	window.mmm = modals;
+	window.wuk = inst;
+	return inst;
 });

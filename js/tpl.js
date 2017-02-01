@@ -47,26 +47,29 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			});
 		}
 		function addTplnodeCustomPositionGetters() {
-			var b = boxSpriteText;
+			var b = boxSpriteText,
+				s = b.sprite;
 			
 			function midX() {
-				return b.x + (b.width / 2);
+				// return b.x + (b.width / 2);
+				return b.x + (s.width / 2);
 			}
 			function midY() {
-				return b.y + (b.height / 2);
+				// return b.y + (b.height / 2);
+				return b.y + (s.height / 2);
 			}
 			Object.defineProperties(node, {
 				"top": {
 					get: function () { return b.y; }
 				},
 				"bott": {
-					get: function () { return b.y + b.height; }
+					get: function () { return b.y + s.height; } // b.height
 				},
 				"left": {
 					get: function () { return b.x; }
 				},
 				"right": {
-					get: function () { return b.x + b.width; }
+					get: function () { return b.x + s.width; } // b.width
 				},
 				//--------------------------------------------------------
 				"topLeft"  : {  get: function () { return wpix.coPoint( this.left  , this.top  ); }  },
@@ -93,7 +96,6 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			arr.push(el);
 		}
 		function addHandler() {
-			
 			boxSpriteText.setOnmousedown([node, p.links], function (e, node, tplLinks) {
 				var links = node.links;
 				
@@ -113,7 +115,6 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 					});
 				}
 			});
-			
 			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (e, node, tplLinks, tplNodes) {
 				var nodeId = node.id,
 					links = node.links;
@@ -147,14 +148,12 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 							if (link.dest === nodeId) {
 								end = node.center;
 							}
-							
 							link.pixiEl.changePoints(start, end);
 						}
 					});
 				}
 				
 			});
-			
 			boxSpriteText.setOnmousemove(undefined, function (e) {
 				var pos = e.data.global,
 					bubble = popupManager.activeBox,
@@ -166,14 +165,17 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 					bubble.css('top', (pos.y - (bubble.height() + 40)) +'px');
 				}
 			});
-			
 			boxSpriteText.setOnmouseover([node, p.links], function (e, node, tplLinks) {
 				var links = node.links;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
-						var link = tplLinks[linkId];
+						var link = tplLinks[linkId],
+							hover;
 						if (link) {
-							link.pixiEl.hover();
+							hover = link.pixiEl.hover;
+							if ( u.isFn(hover) ) {
+								hover();
+							}
 						}
 					});
 				}
@@ -182,9 +184,13 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				var links = node.links;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
-						var link = tplLinks[linkId];
+						var link = tplLinks[linkId],
+							unhover;
 						if (link) {
-							link.pixiEl.unhover();
+							unhover = link.pixiEl.unhover;
+							if ( u.isFn(unhover) ) {
+								unhover();
+							}
 						}
 					});
 				}
@@ -231,12 +237,12 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 					start: start,
 					end: end,
 				//	color: 0xCCAA00 * status,
-					color: status === 0 ? 0x00FF00 :
-							status === 1 ? 0x00FFFF :
-							status === 2 ? 0xFF9800 :
-							status === 3 ? 0x00FF00 :
-							status === 4 ? 0x673AB7 :
-							status === 5 ? 0xFF0000 : undefined,
+					color:  status === 0 ? 0x33691e : // green
+							status === 1 ? 0x00695c : // cyan
+							status === 2 ? 0xffd600 : // yellow
+							status === 3 ? 0xe65100 : // orange
+							status === 4 ? 0xff1744 : // pink
+							status === 5 ? 0xb71c1c : undefined, // red
 					alpha: 0
 				});
 			} else if (nth > 1) {
