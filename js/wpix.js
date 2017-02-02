@@ -16,6 +16,10 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 	p.zoom = true;
 	p.events = true;
 	
+	p.zoomLevel = 0;
+	p.MAX_ZOOM_OUT = -12;
+	p.MAX_ZOOM_IN = 8;
+	
 	function init(callback, panBounds, background) {
 		var renderer, renW, renH, renReso, stage, mainContainer;
 		
@@ -47,29 +51,52 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		
 		// document.body.appendChild( p.renderer.view );
 		$("#canvas_container").append( renderer.view );
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		
 		//p.stage.buttonMode = true;
 		mainContainer.interactive = true;
 		mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
 		pan.add( mainContainer );
 			
 		$("canvas").on("mousewheel", function (e) {
-			var zoomIn, mcPos, prevPos;
-			// e.deltaX, e.deltaY, e.deltaFactor
-			// zoom(e.pageX, e.pageY, e.deltaY > 0);
-			// zoom(e);
-			if (p.zoom) {
-				zoomIn = e.deltaY > 0,
-				mcPos = p.mainContainer.position,
-				prevPos = {x: mcPos.x, y: mcPos.y};
+			var zoomIn,
+				deltaY = e.deltaY,
+				mcPos, prevPos,
+				zoomLevel;
 				
-				zoom(e.pageX, e.pageY, zoomIn);
+			p.zoomLevel += deltaY;
+			zoomLevel = p.zoomLevel;
+			
+			/* e.deltaX, e.deltaY, e.deltaFactor
+			zoom(e.pageX, e.pageY, e.deltaY > 0);
+			zoom(e); */
+			
+			
+			/* if (p.zoom) {
+				zoomIn = deltaY > 0;
 				
-				inst.emit("zoom", {
-					zoomIn: zoomIn,
-					pos: mcPos
-				});
-			}
+				if (zoomLevel > p.MAX_ZOOM_OUT  &&  zoomLevel < p.MAX_ZOOM_IN) {
+					mcPos = p.mainContainer.position;
+					prevPos = {x: mcPos.x, y: mcPos.y};
+					
+					zoom(e.pageX, e.pageY, zoomIn);
+					
+					inst.emit("zoom", {
+						zoomIn: zoomIn,
+						pos: mcPos
+					});
+				} else {
+					if (zoomIn) {
+						p.zoomLevel = p.MAX_ZOOM_IN;
+					} else {
+						p.zoomLevel = p.MAX_ZOOM_OUT;
+					}
+				}
+			} */
+			zoomIn = deltaY > 0;
+			zoom(e.pageX, e.pageY, zoomIn);
+		});
+		$('canvas').on('contextmenu', function (e) {
+			e.preventDefault();
 		});
 		
 		$("canvas").on("mouseout", function () {
@@ -80,21 +107,18 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		});
 		createContainers();
 		stage.addChild( mainContainer );
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-		requestAnimationFrame( animate );
-		renderer.render( mainContainer );
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+		
 		// PIXI.loader.add( "images/atlas-0.json" );
-		PIXI.loader.add( "images/n/atlas128.json" );
+		PIXI.loader.add( "images/n/atlas64.json" );
 		PIXI.loader.load(function () {
 			// p.textures = PIXI.loader.resources["images/atlas-0.json"].textures;
-			p.textures = PIXI.loader.resources["images/n/atlas128.json"].textures;
+			p.textures = PIXI.loader.resources["images/n/atlas64.json"].textures;
 			if ( u.isFn(callback) ) {
 				callback(renW, renH);
 			}
 		});
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		requestAnimationFrame( animate );
+		renderer.render( mainContainer );
 		inst.emit("init");
 	}
 	
@@ -159,7 +183,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 	}
 	function zoom(x, y, zoomIn) {
 		var direction = (zoomIn) ? 1 : -1,
-			factor = (1 + direction * 0.1),
+			factor = (1 + direction * 0.05),
 			local_pt = new PIXI.Point(),
 			point = new PIXI.Point(x, y),
 			mainContainer = p.mainContainer;
@@ -333,13 +357,14 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			this.alpha = 0.5;
 			
 			if ( u.isFn(onmousedown) ) {
-				onmousedown.apply(undefined, onmousedownParam);
+				onmousedown.apply(this, onmousedownParam ? [e].concat(onmousedownParam) : [e]);
 			}
 		}
 		function up() {
 			this.alpha = 1;
+			
 			if ( u.isFn(onmouseup) ) {
-				onmousedown.apply(undefined, onmouseupParam);
+				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
 			}
 		}
 		function over() {
@@ -428,6 +453,13 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			draw();
 			toggleDirties();
 		}
+		function bringToFront(container) {
+			var el = line,
+				arr = el.parent.children;
+			
+			arr.splice( arr.indexOf(el), 1 );
+			arr.push(el);
+		}
 		function draw() {
 			line.beginFill( color );
 			line.moveTo( p.sLeft.x, p.sLeft.y );
@@ -470,6 +502,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		};
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
+		line.bringToFront = bringToFront;
 		line.hover = hover;
 		line.unhover = unhover;
 		Object.defineProperty(line, "points", {
@@ -483,7 +516,9 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		var line,
 			start, end, ctrl,
 			color, width,
-			curveLevel, curveSide;
+			curveLevel, curveSide,
+			onmousedown, onmousedownParam,
+			onmouseup, onmouseupParam;
 		
 		function setThings() {
 			start      = conf.start      || {x: 50 , y: 50};
@@ -618,6 +653,18 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		}
 		draw();
 		
+		line.setOnmousedown = function (param, fn) {
+			onmousedownParam = param;
+			onmousedown = fn;
+		};
+		line.setOnmouseup = function (param, fn) {
+			onmouseupParam = param;
+			onmouseup = fn;
+		};
+		line.setOnmousemove = function (param, fn) {
+			onmousemoveParam = param;
+			onmousemove = fn;
+		};
 		line.changeColor = changeColor;
 		line.changePoints = changePoints;
 		
@@ -658,6 +705,13 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		//	spriteImg   = conf.spriteImg    || imgBasePath + imgName + (imgFill ? "-fill":"-trans") + imgExt;
 		//	spriteImg   = conf.spriteImg    || imgName + (imgFill ? "-fill" : "-trans") + imgExt;
 			spriteImg   = conf.spriteImg    || imgName + imgExt;
+		}
+		function bringToFront() {
+			var el = box
+				arr = el.parent.children;
+				
+			arr.splice( arr.indexOf(el), 1 );
+			arr.push(el);
 		}
 		function down(e) {
 			e.stopPropagation();
@@ -797,6 +851,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				sprite.tint = n;
 			}
 		};
+		box.bringToFront = bringToFront;
 		box.sprite = sprite;
 		
 		return box;

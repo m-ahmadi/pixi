@@ -24,6 +24,7 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 	function onReady(fn) {
 		typeof fn === 'function' ? fn() : undefined;
 		
+		
 		$('#newSide').css({height: window.innerHeight});
 		// $('#newSide').toggle('slide');
 		doValidation( $('#disc_left_input') );

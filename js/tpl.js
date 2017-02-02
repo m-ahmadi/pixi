@@ -36,7 +36,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				x: coefficient ? x*coefficient.x : x,
 				y: coefficient ? y*coefficient.y : y,
 				imgName: p.types[type],
-				spriteScale: 0.3,
+				spriteScale: 0.5,
 				spriteTint: type,
 				textContent: name,
 				boxAlpha: 0,
@@ -91,21 +91,14 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			node.pixiEl = boxSpriteText;
 			addTplnodeCustomPositionGetters();
 		}
-		function bringToFront(arr, el) {
-			arr.splice( arr.indexOf(el), 1 );
-			arr.push(el);
-		}
 		function addHandler() {
 			boxSpriteText.setOnmousedown([node, p.links], function (e, node, tplLinks) {
 				var links = node.links;
 				
 				popupManager.removeAll();
 				
-				bringToFront(
-				//                nodeContainer
-					wpix.viewport.children[1].children,
-					boxSpriteText
-				);
+				this.bringToFront();
+				
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId];
@@ -166,22 +159,30 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				}
 			});
 			boxSpriteText.setOnmouseover([node, p.links], function (e, node, tplLinks) {
-				var links = node.links;
+				var links = node.links,
+					el = this;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId],
-							hover;
+							pixiEl, hover;
+						
 						if (link) {
-							hover = link.pixiEl.hover;
+							pixiEl = link.pixiEl;
+							hover = pixiEl.hover;
 							if ( u.isFn(hover) ) {
-								hover();
+								pixiEl.bringToFront();
+								if ( !el.dragging ) {
+									hover();
+								}
+								
 							}
 						}
 					});
 				}
 			});
 			boxSpriteText.setOnmouseout([node, p.links], function (e, node, tplLinks) {
-				var links = node.links;
+				var links = node.links,
+					el = this;
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId],
@@ -189,7 +190,9 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 						if (link) {
 							unhover = link.pixiEl.unhover;
 							if ( u.isFn(unhover) ) {
-								unhover();
+								if ( !el.dragging ) {
+									unhover();
+								}
 							}
 						}
 					});
@@ -255,18 +258,10 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				});
 			}
 			
-			
-			var setOndown = pixiEl.setOnmousedown;
-			if ( u.isFn(setOndown) ) {
-				setOndown(undefined, function () {
-					//                     lineContainer
-					var arr = wpix.viewport.children[0].children,
-						el = pixiEl;
-					
-					arr.splice( arr.indexOf(el), 1 );
-					arr.push(el);
-				});
-			}
+			pixiEl.setOnmousedown(undefined, function () {
+				//                      viewport.lineContainer
+				this.bringToFront( wpix.viewport.children[0].children );
+			});
 			
 			
 			link.pixiEl = pixiEl;
@@ -279,12 +274,12 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			
 			wpix.addChild(container, "lineContainer", link.pixiEl);
 			
-			// animate(link.pixiEl);
 			wani.fadeIn(pixiEl);
 		}
 		
 		return create;
 	}());
+	
 	function checkNode(node, container) {
 		createNode( node, container );
 	}
