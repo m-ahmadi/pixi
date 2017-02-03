@@ -23,6 +23,7 @@
 </head>
 
 <body>
+
 <header id="main_header">
 	<!-- <button id="sidebar-btn" class="uk-button uk-button-default uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"> -->
 		<!-- <i class="fa fa-bars" aria-hidden="true"></i> what -->
@@ -45,6 +46,16 @@
 	</div>
 	-->
 </div>
+<div id="contextmenu">
+	<ul class="uk-list">
+		<li><a class=""><span uk-icon="icon: social; ratio: 0.8;"></span> Highlight Links</a></li>
+		<li><a class=""><span uk-icon="icon: thumbnails; ratio: 0.8;"></span> Highlight Nodes</a></li>
+		<li><a class=""><span uk-icon="icon: info; ratio: 0.8;"></span> Show Information</a></li>
+		<li><a class=""><span uk-icon="icon: git-branch; ratio: 0.8;"></span> Do Something Else</a></li>
+		<li><a class=""><span uk-icon="icon: cog; ratio: 0.8;"></span> Settings</a></li>
+	</ul>
+</div>
+
 <div id="popups"></div>
 
 
@@ -110,7 +121,7 @@ cvas.ir</textarea></label>
 <div id="newSide" class="no-display">
 	<ul class="uk-nav uk-nav-default uk-nav-parent-icon uk-light" uk-nav="multiple: true">
 		<li class="uk-nav-header uk-light">Menu</li>
-		<li><a href="#modal_traceroute" uk-toggle><span class="uk-icon" uk-icon="icon: bolt; ratio: 1.5;"></span> Trace Route</a></li>
+		<li><a href="#modal_traceroute" uk-toggle><span uk-icon="icon: bolt; ratio: 1.5;"></span> Trace Route</a></li>
 		<li><a href="#modal_discovery" uk-toggle><span uk-icon="icon: server; ratio: 1.5;"></span> Discovery</a></li>
 		<li class="uk-nav-divider"></li>
 		<li class="uk-parent">

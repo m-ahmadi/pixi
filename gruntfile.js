@@ -123,12 +123,12 @@ module.exports = function(grunt) {
 	});
 	
 	// grunt.loadNpmTasks('grunt-webpack');
-	grunt.loadNpmTasks('grunt-jslint');
-	grunt.loadNpmTasks('grunt-browserify');
+//	grunt.loadNpmTasks('grunt-jslint');
+//	grunt.loadNpmTasks('grunt-browserify');
 	
 	grunt.loadNpmTasks('grunt-contrib-sass');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-concat');
+//	grunt.loadNpmTasks('grunt-contrib-jshint');
+//	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	
 	grunt.registerTask('default', ['watch']);

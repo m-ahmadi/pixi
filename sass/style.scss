@@ -58,3 +58,38 @@ canvas {
 .no-display {
 	display: none;
 }
+
+
+#contextmenu {
+	$ctx-bg: #f7f7f7;
+	position: absolute;
+	background: $ctx-bg;
+	box-shadow: inset 0px 0px 0px 1px #ABABAB;
+	-webkit-box-shadow: inset 0px 0px 0px 1px #ABABAB;
+	-moz-box-shadow: inset 0px 0px 0px 1px #ABABAB;
+	-o-box-shadow: inset 0px 0px 0px 1px #ABABAB;
+	
+	li {
+		border: 1px solid $ctx-bg;
+		padding: 2px 5px;
+		margin: 0;
+		
+		&:hover {
+			background: #E8EEF6;
+			border: 1px solid #AECFF7;
+			cursor: pointer;
+		}
+	}
+	a {
+		text-decoration: none;
+		color: black;
+	}
+	ul {
+		margin: 0;
+	}
+	span {
+		border-right: 1px solid #b7b7b7;
+		padding-right: 4px;
+		margin-right: 4px;
+	}
+}

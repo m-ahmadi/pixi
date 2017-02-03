@@ -24,8 +24,16 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 	function onReady(fn) {
 		typeof fn === 'function' ? fn() : undefined;
 		
+		var sidebar = $('#newSide');
 		
-		$('#newSide').css({height: window.innerHeight});
+		sidebar.css({height: window.innerHeight});
+		$(window).on('resize', function () {
+			var width = window.innerWidth,
+				height = window.innerHeight;
+			
+			wpix.renderer.resize(width, height);
+			sidebar.css({height: height});
+		});
 		// $('#newSide').toggle('slide');
 		doValidation( $('#disc_left_input') );
 		doValidation( $('#disc_right_input') );
