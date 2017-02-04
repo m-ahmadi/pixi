@@ -95,16 +95,13 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			zoomIn = deltaY > 0;
 			zoom(e.pageX, e.pageY, zoomIn);
 		});
-		$('canvas').on('contextmenu', function (e) {
-			e.preventDefault();
-		});
-		
 		$("canvas").on("mouseout", function () {
 			p.events = false;
 		});
 		$("canvas").on("mouseover", function () {
 			p.events = true;
 		});
+		
 		createContainers();
 		stage.addChild( mainContainer );
 		
@@ -121,7 +118,6 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		renderer.render( mainContainer );
 		inst.emit("init");
 	}
-	
 	
 	function createContainers() {
 		var viewport, xSec1, xSec2, ySec1, ySec2,
@@ -258,11 +254,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		}
 		function up(e) {
 			isDragging= false;
-			console.log(e, 'hasan');
-			t = e;
-			
-			console.log(e.data.originalEvent.button);
-			inst.emit('stageClick', e.data.global);
+			inst.emit("stageClick", e.data.global);
 		}
 		function pan(x, y) {
 			if ( x  &&  y ) {
@@ -561,6 +553,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			arr.push(el);
 		}
 		function down(e) {
+			alert();
 			e.stopPropagation();
 			this.data = e.data;
 			this.alpha = 0.5;
@@ -574,7 +567,6 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			}
 		}
 		function up(e) {
-			console.log(e.data.originalEvent.button);
 			e.stopPropagation();
 			this.alpha = 1;
 			this.dragging = false;

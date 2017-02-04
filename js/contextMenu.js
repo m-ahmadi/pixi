@@ -1,4 +1,4 @@
-define(['wpix', 'whb', 'util'], function (wpix, whb, u) {
+define(['whb', 'util'], function (whb, u) {
 	var inst = {},
 		tmpl = whb.tmpl;
 	

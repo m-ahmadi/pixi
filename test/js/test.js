@@ -1,82 +1,47 @@
-PIXI.utils.skipHello();
-var renderer = PIXI.autoDetectRenderer(
-	window.innerWidth,
-	window.innerHeight,
-	{
-		backgroundColor : 0x1099bb
-	}
-);
+// PIXI.utils.skipHello();
+var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {backgroundColor : 0x1099bb});
 document.body.appendChild(renderer.view);
 
 var stage = new PIXI.Container();
 stage.interactive = true;
+stage.hitArea = new PIXI.Rectangle( 0, 0, 100000, 100000 );
 
-var g, box;
-
-g = new PIXI.Sprite.fromImage('../images/n/256/1.png');
+var s = new PIXI.Sprite.fromImage('../images/computer.png');
+s.interactive = true;
+s.scale.set(0.2);
+s.x = 300;
+var g = new PIXI.Graphics();
 g.interactive = true;
-g.buttonMode = true;
-g.scale.set(1);
+g.beginFill();
+g.drawRect(0, 0, 100, 100);
+g.endFill();
 
+addEvt(stage);
+addEvt(g);
+addEvt(s);
+stage.addChild(s);
+stage.addChild(g);
 
-box = new PIXI.Container();
-box.interactive = true;
-box.buttonMode = true;
-
-box.addChild(g);
-addDragDrop(box);
-stage.addChild(box);
-
-
-
-
-var t;
 animate();
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
 }
 function down(e) {
-	console.log(e.data);
-	this.data = e.data;
-	this.alpha = 0.5;
-	this.dragging = true;
-	this.dragPoint = e.data.getLocalPosition(this.parent);
-	this.dragPoint.x -= this.position.x;
-	this.dragPoint.y -= this.position.y;
-	
-	//bringToFront(this);
+	console.log(e);
 }
-function move(e) {
-	if (this.dragging) {
-		var newPosition = this.data.getLocalPosition(this.parent);
-		this.position.x = newPosition.x - this.dragPoint.x;
-		this.position.y = newPosition.y - this.dragPoint.y;
-	}
+function up(e) {
+	console.log(e);
 }
-function up() {
-	this.alpha = 1;
-	this.dragging = false;
-	this.data = null;
-}
-function addDragDrop(el) {
+function addEvt(el) {
 	el
 		.on('mousedown', down)
 		.on('touchstart', down)
 		.on('mouseup', up)
 		.on('mouseupoutside', up)
 		.on('touchend', up)
-		.on('touchendoutside', up)
-		.on('mousemove', move)
-		.on('touchmove', move);
+		.on('touchendoutside', up);
 }
-function bringToFront(el) {
-	// reorder children for z-index
-	var arr = stage.children;
-	arr.splice( arr.indexOf(el), 1 );
-	arr.push(el);
-}
-
 $(function () {
 	
 });
