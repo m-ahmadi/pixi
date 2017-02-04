@@ -1,4 +1,4 @@
-define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, wuk, discovery, traceroute, mockTrace) {
+define(['wpix', 'wuk', 'whb', 'discovery', 'traceroute', 'mockTrace'], function (wpix, wuk, whb, discovery, traceroute, mockTrace) {
 	var inst = {};
 	
 	function doValidation(inputEl) {
@@ -18,11 +18,9 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 			wuk.disable( startBtn );
 		}
 	}
-	function isAnyModalActive() {
-		$('div[id^="modal_"]');
-	}
 	function onReady(fn) {
 		typeof fn === 'function' ? fn() : undefined;
+		whb.compileAll();
 		
 		var sidebar = $('#newSide');
 		
@@ -135,8 +133,11 @@ define(['wpix', 'wuk', 'discovery', 'traceroute', 'mockTrace'], function (wpix, 
 				}
 			}
 		});
-		$('a[href^="#modal_"]').on('click', function (e) {
+		/* $('a[href^="#modal_"]').on('click', function (e) {
 			wuk.modalState(true, e.target.hash.substr(1));
+		}); */
+		$('div[id^="modal_"]').on('beforeshow', function (e) {
+			wuk.modalState(true, e.target.id);
 		});
 		$('div[id^="modal_"]').on('hide', function (e) {
 			wuk.modalState(false, e.target.id);

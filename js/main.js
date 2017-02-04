@@ -5,8 +5,7 @@ require.config({
 	
 });
 
-require(['mediator', 'page'], function (mediator, page) {
-	
+require(['mediator', 'page', 'contextMenu'], function (mediator, page) {
 	
 	$(function () {
 		

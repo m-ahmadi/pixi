@@ -36,7 +36,8 @@ function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
 }
-function dragStart(e) {
+function down(e) {
+	console.log(e.data);
 	this.data = e.data;
 	this.alpha = 0.5;
 	this.dragging = true;
@@ -46,28 +47,28 @@ function dragStart(e) {
 	
 	//bringToFront(this);
 }
-function dragMove(e) {
+function move(e) {
 	if (this.dragging) {
 		var newPosition = this.data.getLocalPosition(this.parent);
 		this.position.x = newPosition.x - this.dragPoint.x;
 		this.position.y = newPosition.y - this.dragPoint.y;
 	}
 }
-function dragEnd() {
+function up() {
 	this.alpha = 1;
 	this.dragging = false;
 	this.data = null;
 }
 function addDragDrop(el) {
 	el
-		.on('mousedown', dragStart)
-		.on('touchstart', dragStart)
-		.on('mouseup', dragEnd)
-		.on('mouseupoutside', dragEnd)
-		.on('touchend', dragEnd)
-		.on('touchendoutside', dragEnd)
-		.on('mousemove', dragMove)
-		.on('touchmove', dragMove);
+		.on('mousedown', down)
+		.on('touchstart', down)
+		.on('mouseup', up)
+		.on('mouseupoutside', up)
+		.on('touchend', up)
+		.on('touchendoutside', up)
+		.on('mousemove', move)
+		.on('touchmove', move);
 }
 function bringToFront(el) {
 	// reorder children for z-index

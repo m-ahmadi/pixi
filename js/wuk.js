@@ -6,7 +6,6 @@ define(['util'], function (u) {
 		return UIkit.modal(str)[0];
 	}
 	
-	
 	function disable(el) {
 		if ( !el.is(':disabled') ) {
 			el.attr('disabled', '');
@@ -46,7 +45,6 @@ define(['util'], function (u) {
 		return result;
 		// return u.isEmptyObj(modals) ? false : true;
 	}
-	
 	var note = (function () {
 		var icons = {
 			INFO:    '<i class="fa  fa-info-circle           fa-lg"  aria-hidden="true"></i>',

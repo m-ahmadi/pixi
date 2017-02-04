@@ -258,6 +258,11 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		}
 		function up(e) {
 			isDragging= false;
+			console.log(e, 'hasan');
+			t = e;
+			
+			console.log(e.data.originalEvent.button);
+			inst.emit('stageClick', e.data.global);
 		}
 		function pan(x, y) {
 			if ( x  &&  y ) {
@@ -335,13 +340,14 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				color = c;
 			}
 		}
-		function hover() {
+		function increaseWidth(factor) {
+			factor = u.isNum(factor) && factor ? factor : 4;
 			// console.log("hover");
 			tmpLineWidth = lineWidth;
-			lineWidth *= 4;
+			lineWidth *= factor;
 			redraw();
 		}
-		function unhover() {
+		function defaultWidth() {
 			// console.log("unhover");
 			lineWidth = tmpLineWidth;
 			redraw();
@@ -360,7 +366,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				onmousedown.apply(this, onmousedownParam ? [e].concat(onmousedownParam) : [e]);
 			}
 		}
-		function up() {
+		function up(e) {
+			e.stopPropagation();
 			this.alpha = 1;
 			
 			if ( u.isFn(onmouseup) ) {
@@ -503,172 +510,12 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
 		line.bringToFront = bringToFront;
-		line.hover = hover;
-		line.unhover = unhover;
+		line.increaseWidth = increaseWidth;
+		line.defaultWidth = defaultWidth;
 		Object.defineProperty(line, "points", {
 			get: function () { return {start: start, end: end}; }
 		});
 		
-		return line;
-	}
-	function create3pointLine(conf) {
-		conf = conf ? conf : {};
-		var line,
-			start, end, ctrl,
-			color, width,
-			curveLevel, curveSide,
-			onmousedown, onmousedownParam,
-			onmouseup, onmouseupParam;
-		
-		function setThings() {
-			start      = conf.start      || {x: 50 , y: 50};
-			end        = conf.end        || {x: 600, y: 200};
-			color      = conf.color      || 0x000000;
-			width      = conf.width      || 2;
-			curveLevel = conf.curveLevel || 0;
-			curveSide  = conf.curveSide  || false; // true top, false down
-			ctrl       = calcBetween(start, end);
-		}
-		function setStart(s) {
-			if (s) {
-				start = s;
-			}
-		}
-		function setEnd(e) {
-			if (e) {
-				end = e;
-			}
-		}
-		function setWidth(w) {
-			if (w) {
-				width = w;
-			}
-		}
-		function setColor(c) {
-			if (c) {
-				color = c;
-			}
-		}
-		function calcBetween(s, e) {
-			var sX = s.x,
-				sY = s.y,
-				eX = e.x,
-				eY = e.y,
-				diffX, diffY,
-				hX, hY;
-				
-			if (sX > eX) {
-				diffX = sX - eX;
-				hX = sX - (diffX / 2);
-			} else if (sX < eX) {
-				diffX = eX - sX;
-				hX = sX + (diffX / 2);
-			} else if (sX === eX) {
-				hX = sX || eX;
-			}
-			
-			if (sY > eY) {
-				diffY = sY - eY;
-				hY = sY - (diffY / 2);
-			} else if (sY < eY) {
-				diffY = eY + sY;
-				hY = sY + (diffY / 2);
-			} else if (sY === eY) {
-				hY = sY || eY;
-			}
-
-			//debugger;
-			return {
-				x: hX,
-				y: hY
-			};
-		}
-		function changeColor(c) {
-			setColor(c);
-			line.clear();
-			draw();
-			toggleDirties();
-		}
-		function toggleDirties() {
-			var dirty = line.dirty,
-				clearDirty = line.clearDirty;
-			
-			dirty = (dirty) ? false : true;
-			clearDirty = (clearDirty) ? false : true;
-		}
-		function incCurve() {
-			var sX = start.x,
-				sY = start.y,
-				eX = end.x,
-				eY = end.y,
-				incX = 0,
-				incY = 0,
-				unit = 5;
-			
-			if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
-					(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
-				incX = curveSide ? unit : -unit;
-				incY = curveSide ? -unit : unit;
-			} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
-					(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
-				incX = curveSide ? -unit : unit;
-				incY = curveSide ? -unit : unit;
-			} else if ( sX === eX  &&
-					(sY > eY  ||  sY < eY) ) { // vertical
-				incX = curveSide ? -unit : unit;
-			} else if ( sY === eY  &&
-					(sX < eX  ||  sX > eX) ) { // horizontal
-				incY = curveSide ? -unit : unit;
-			}
-			
-			ctrl.x += incX * curveLevel;
-			ctrl.y += incY * curveLevel;
-		}
-		function changePoints(s, e) {
-			setStart(s);
-			setEnd(e);
-			ctrl = calcBetween(start, end);
-			line.clear();
-			if (curveLevel) {
-				incCurve();
-			}
-			draw();
-			toggleDirties();
-		}
-		function draw() {
-			line.lineStyle(width, color, 1);
-			line.moveTo(start.x, start.y);
-			line.quadraticCurveTo(ctrl.x, ctrl.y, end.x, end.y);
-		}
-		function create() {
-			line = new PIXI.Graphics();
-			line.interactive = true;
-			line.buttonMode = true;
-		}
-		
-		setThings();
-		create();
-		if (curveLevel) {
-			incCurve();
-		}
-		draw();
-		
-		line.setOnmousedown = function (param, fn) {
-			onmousedownParam = param;
-			onmousedown = fn;
-		};
-		line.setOnmouseup = function (param, fn) {
-			onmouseupParam = param;
-			onmouseup = fn;
-		};
-		line.setOnmousemove = function (param, fn) {
-			onmousemoveParam = param;
-			onmousemove = fn;
-		};
-		line.changeColor = changeColor;
-		line.changePoints = changePoints;
-		
-		//p.mainContainer.addChild(line);
 		return line;
 	}
 	function createBoxSpriteText(conf) {
@@ -727,6 +574,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			}
 		}
 		function up(e) {
+			console.log(e.data.originalEvent.button);
+			e.stopPropagation();
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
@@ -886,7 +735,6 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 	inst.init = init;
 	inst.coPoint = coPoint;
 	inst.create2pointLine = create2pointLine;
-	inst.create3pointLine = create3pointLine;
 	inst.createBoxSpriteText = createBoxSpriteText;
 	inst.clearContainer = clearContainer;
 	inst.addChild = addChild;

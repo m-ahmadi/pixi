@@ -1,5 +1,6 @@
-define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupManager) {
-	var p = {};
+define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, wani, u, popupManager, contextMenu) {
+	var inst = {},
+		p = {};
 	
 	p.nodes = {};
 	p.links = {};
@@ -39,11 +40,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				spriteScale: 0.5,
 				spriteTint: type,
 				textContent: name,
-				boxAlpha: 0,
-				onmouseup: function () {
-					
-				},
-				onmouseupParam: undefined
+				boxAlpha: 0
 			});
 		}
 		function addTplnodeCustomPositionGetters() {
@@ -112,21 +109,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				var nodeId = node.id,
 					links = node.links;
 				
-				
-				
-				var html = ''+
-					'<table class="uk-table">'
-				+		'<tr>'
-				+			'<th>Node Name</th>'
-				+			'<th>Node Id</th>'
-				+		'</tr>'
-				+		'<tr>'
-				+			'<td>'+ name +'</td>'
-				+			'<td>'+ id +'</td>'
-				+	'</table>';
-				popupManager.create(html, node.topLeft);
-				
-				
+				popupManager.create({name: name, id: id}, node.topLeft);
 				
 				if (links) {
 					links.forEach(function (linkId) {
@@ -148,7 +131,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				
 			});
 			boxSpriteText.setOnmousemove(undefined, function (e) {
-				var pos = e.data.global,
+				/* var pos = e.data.global,
 					bubble = popupManager.activeBox,
 					pTop = bubble ? parseInt( bubble.css('top'), 10) : undefined,
 					pLeft = bubble ? parseInt( bubble.css('left'), 10) : undefined;
@@ -156,7 +139,7 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				if (bubble) {
 					bubble.css('left', (pos.x - 40)+'px');
 					bubble.css('top', (pos.y - (bubble.height() + 40)) +'px');
-				}
+				} */
 			});
 			boxSpriteText.setOnmouseover([node, p.links], function (e, node, tplLinks) {
 				var links = node.links,
@@ -164,17 +147,13 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId],
-							pixiEl, hover;
-						
+							pixiEl, increaseWidth;
 						if (link) {
 							pixiEl = link.pixiEl;
-							hover = pixiEl.hover;
-							if ( u.isFn(hover) ) {
-								pixiEl.bringToFront();
-								if ( !el.dragging ) {
-									hover();
-								}
-								
+							increaseWidth = pixiEl.increaseWidth;	
+							pixiEl.bringToFront();
+							if ( !el.dragging ) {
+								increaseWidth();
 							}
 						}
 					});
@@ -186,12 +165,12 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 				if ( links.length ) {
 					links.forEach(function (linkId) {
 						var link = tplLinks[linkId],
-							unhover;
+							defaultWidth;
 						if (link) {
-							unhover = link.pixiEl.unhover;
-							if ( u.isFn(unhover) ) {
+							defaultWidth = link.pixiEl.defaultWidth;
+							if ( u.isFn(defaultWidth) ) {
 								if ( !el.dragging ) {
-									unhover();
+									defaultWidth();
 								}
 							}
 						}
@@ -235,29 +214,21 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 			nth = path[srcdest] || path[destsrc];
 			curveLevel = (nth-1)*2;
 			
-			if (nth === 1) {
-				pixiEl = wpix.create2pointLine({
-					start: start,
-					end: end,
-				//	color: 0xCCAA00 * status,
-					color:  status === 0 ? 0x33691e : // green
-							status === 1 ? 0x00695c : // cyan
-							status === 2 ? 0xffd600 : // yellow
-							status === 3 ? 0xe65100 : // orange
-							status === 4 ? 0xff1744 : // pink
-							status === 5 ? 0xb71c1c : undefined, // red
-					alpha: 0
-				});
-			} else if (nth > 1) {
-				pixiEl = wpix.create3pointLine({
-					start: start,
-					end: end,
-				//	color: 0xCCAA00 * status,
-					curveLevel: curveLevel,
-					curveSide: toggle ? false : true
-				});
-			}
+			// nth === 1  one link
+			// nth > 1    more than one link
 			
+			pixiEl = wpix.create2pointLine({
+				start: start,
+				end: end,
+				color:  status === 0 ? 0x33691e : // green
+						status === 1 ? 0x00695c : // cyan
+						status === 2 ? 0xffd600 : // yellow
+						status === 3 ? 0xe65100 : // orange
+						status === 4 ? 0xff1744 : // pink
+						status === 5 ? 0xb71c1c : undefined, // red
+				alpha: 0
+			});
+				
 			pixiEl.setOnmousedown(undefined, function () {
 				//                      viewport.lineContainer
 				this.bringToFront( wpix.viewport.children[0].children );
@@ -386,13 +357,19 @@ define(['wpix', 'wani', 'util', 'popupManager'], function (wpix, wani, u, popupM
 		drawLinks(data.links, container, bounds);
 	}
 	
-	window.draw = draw;
 	
-	return {
-		get nodes() { return p.nodes },
-		get links() { return p.links },
-		checkLink: checkLink,
-		draw: draw
-	};
-
+	
+	Object.defineProperties(inst, {
+		"nodes": {
+			get: function () { return p.nodes; }
+		},
+		"links": {
+			get: function () { return p.links; }
+		}
+	});
+	inst.checkLink = checkLink;
+	inst.draw = draw;
+	
+	window.tpl = inst;
+	return inst;
 });

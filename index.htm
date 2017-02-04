@@ -35,32 +35,71 @@
 	
 	<label class="uk-text-primary uk-text-bold uk-text-large">Topology</label>
 </header>
+<div id="popups"></div>
+<div id="contextmenu"></div>
+
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    Templates    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+<div id="templates">
 
 <div id="bubble_template">
-	<!--  
+	<!--
 	<div class="bubble">
 		<button class="uk-button uk-button-default uk-button-small j-popup-close">x</button>
 		<div class="bbl-content">
-			<p>salam olaghe aziz halet chetore</p>
+			<table class="uk-table">
+				<tr>
+					<th>Node Name</th>
+					<th>Node Id</th>
+				</tr>
+				<tr>
+					<td>{{ name }}</td>
+					<td>{{ id }}</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 	-->
 </div>
-<div id="contextmenu">
-	<ul class="uk-list">
-		<li><a class=""><span uk-icon="icon: social; ratio: 0.8;"></span> Highlight Links</a></li>
-		<li><a class=""><span uk-icon="icon: thumbnails; ratio: 0.8;"></span> Highlight Nodes</a></li>
-		<li><a class=""><span uk-icon="icon: info; ratio: 0.8;"></span> Show Information</a></li>
-		<li><a class=""><span uk-icon="icon: git-branch; ratio: 0.8;"></span> Do Something Else</a></li>
-		<li><a class=""><span uk-icon="icon: cog; ratio: 0.8;"></span> Settings</a></li>
-	</ul>
+<div id="ctxempty_template">
+	<!--
+	<div class="ctxmenu_wrap">
+		<ul class="uk-list">
+			<li><a href="#modal_traceroute" uk-toggle><span uk-icon="icon: bolt; ratio: 0.8;"></span> Traceroute</a></li>
+			<li><a href="#modal_discovery" uk-toggle><span uk-icon="icon: server; ratio: 0.8;"></span> Discovery</a></li>
+			<li><a class=""><span uk-icon="icon: cog; ratio: 0.8;"></span> Settings</a></li>
+		</ul>
+	</div>
+	-->
+</div>
+<div id="ctxnode_template">
+	<!--
+	<div class="ctxmenu_wrap" style="left: 200px">
+		<ul class="uk-list">
+			<li><a class=""><span uk-icon="icon: social; ratio: 0.8;"></span> Highlight Links</a></li>
+			<li><a class=""><span uk-icon="icon: thumbnails; ratio: 0.8;"></span> Highlight Nodes</a></li>
+			<li><a class=""><span uk-icon="icon: world; ratio: 0.8;"></span> Highlight Nodes and Links</a></li>
+			<li><a class=""><span uk-icon="icon: close; ratio: 0.8;"></span> Clear All Highlights</a></li>
+			<li><a class=""><span uk-icon="icon: info; ratio: 0.8;"></span> Info</a></li>
+			<li><a class=""><span uk-icon="icon: calendar; ratio: 0.8;"></span> Properties</a></li>
+		</ul>
+	</div>
+	-->
+</div>
+<div id="ctxlink_template">
+	<!--
+	<div class="ctxmenu_wrap" style="left: 500px">
+		<ul class="uk-list">
+			<li><a class=""><span uk-icon="icon: push; ratio: 0.8;"></span> Highlight Source</a></li>
+			<li><a class=""><span uk-icon="icon: pull; ratio: 0.8;"></span> Highlight Destination</a></li>
+			<li><a class=""><span uk-icon="icon: close; ratio: 0.8;"></span> Clear All Highlights</a></li>
+			<li><a class=""><span uk-icon="icon: info; ratio: 0.8;"></span> Info</a></li>
+			<li><a class=""><span uk-icon="icon: calendar; ratio: 0.8;"></span> Properties</a></li>
+		</ul>
+	</div>
+	-->
 </div>
 
-<div id="popups"></div>
-
-
-
-
+</div>
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    Modals    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="modal_traceroute" uk-modal="center: true; esc-close: true; bg-close: false;">
     <div class="uk-modal-dialog">
@@ -117,7 +156,6 @@ cvas.ir</textarea></label>
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="contents">
 
-
 <div id="newSide" class="no-display">
 	<ul class="uk-nav uk-nav-default uk-nav-parent-icon uk-light" uk-nav="multiple: true">
 		<li class="uk-nav-header uk-light">Menu</li>
@@ -172,6 +210,7 @@ cvas.ir</textarea></label>
 <script type="text/javascript" src="js/lib/ani/Tween.js"></script>
 <script type="text/javascript" src="js/lib/ani/TweenLite.min.js"></script>
 <script type="text/javascript" src="js/lib/socket.io.min.js"></script>
+<script type="text/javascript" src="js/lib/handlebars.min.js"></script>
 
 <!-------------------------------------- Application Code ---------------------------------------->
 

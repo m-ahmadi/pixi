@@ -172,7 +172,7 @@ var util = (function () {
 		return result;
 	}
 	function getCommentsInside(selector) {
-		return $(selector).contents().filter( function () { return this.nodeType == 8; } );
+		return $(selector).contents().filter( function () { return this.nodeType === 8; } );
 	}
 	function getFirstCommentInside(selector) {
 		return getCommentsInside(selector)[0].nodeValue.trim();

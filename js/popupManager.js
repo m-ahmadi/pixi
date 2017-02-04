@@ -1,4 +1,4 @@
-define(['wpix', 'util'], function (wpix, u) {
+define(['wpix', 'util', 'whb'], function (wpix, u, whb) {
 	var activeBox,
 		cbX = {
 			min: 0,
@@ -23,15 +23,12 @@ define(['wpix', 'util'], function (wpix, u) {
 		}
 		
 	});
-	function create(v, pos) {
+	function create(data, pos) {
 		removeAll();
-		var div = u.getFirstCommentInside('#bubble_template'),
+		var div = whb.tmpl.bubble(data),
 			left, top;
-			
 		
 		div = $(div);
-		
-		div.find('.bbl-content').html(v);
 		$('#popups').append(div);
 		
 		if (pos) {

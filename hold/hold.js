@@ -1,5 +1,189 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// wpix
+function create3pointLine(conf) {
+	conf = conf ? conf : {};
+	var line,
+		start, end, ctrl,
+		color, width,
+		curveLevel, curveSide,
+		onmousedown, onmousedownParam,
+		onmouseup, onmouseupParam;
+	
+	function setThings() {
+		start      = conf.start      || {x: 50 , y: 50};
+		end        = conf.end        || {x: 600, y: 200};
+		color      = conf.color      || 0x000000;
+		width      = conf.width      || 2;
+		curveLevel = conf.curveLevel || 0;
+		curveSide  = conf.curveSide  || false; // true top, false down
+		ctrl       = calcBetween(start, end);
+	}
+	function setStart(s) {
+		if (s) {
+			start = s;
+		}
+	}
+	function setEnd(e) {
+		if (e) {
+			end = e;
+		}
+	}
+	function setWidth(w) {
+		if (w) {
+			width = w;
+		}
+	}
+	function setColor(c) {
+		if (c) {
+			color = c;
+		}
+	}
+	function calcBetween(s, e) {
+		var sX = s.x,
+			sY = s.y,
+			eX = e.x,
+			eY = e.y,
+			diffX, diffY,
+			hX, hY;
+			
+		if (sX > eX) {
+			diffX = sX - eX;
+			hX = sX - (diffX / 2);
+		} else if (sX < eX) {
+			diffX = eX - sX;
+			hX = sX + (diffX / 2);
+		} else if (sX === eX) {
+			hX = sX || eX;
+		}
+		
+		if (sY > eY) {
+			diffY = sY - eY;
+			hY = sY - (diffY / 2);
+		} else if (sY < eY) {
+			diffY = eY + sY;
+			hY = sY + (diffY / 2);
+		} else if (sY === eY) {
+			hY = sY || eY;
+		}
+
+		//debugger;
+		return {
+			x: hX,
+			y: hY
+		};
+	}
+	function changeColor(c) {
+		setColor(c);
+		line.clear();
+		draw();
+		toggleDirties();
+	}
+	function toggleDirties() {
+		var dirty = line.dirty,
+			clearDirty = line.clearDirty;
+		
+		dirty = (dirty) ? false : true;
+		clearDirty = (clearDirty) ? false : true;
+	}
+	function incCurve() {
+		var sX = start.x,
+			sY = start.y,
+			eX = end.x,
+			eY = end.y,
+			incX = 0,
+			incY = 0,
+			unit = 5;
+		
+		if ( (sX < eX  &&  sY < eY)  || // topLeft to bottRight
+				(sX > eX  &&  sY > eY) ) { // bottRight to topLeft
+			incX = curveSide ? unit : -unit;
+			incY = curveSide ? -unit : unit;
+		} else if ( (sX > eX  &&  sY < eY) || // topRight to bottLeft
+				(sX < eX  &&  sY > eY) ) { // bottLeft to topRight
+			incX = curveSide ? -unit : unit;
+			incY = curveSide ? -unit : unit;
+		} else if ( sX === eX  &&
+				(sY > eY  ||  sY < eY) ) { // vertical
+			incX = curveSide ? -unit : unit;
+		} else if ( sY === eY  &&
+				(sX < eX  ||  sX > eX) ) { // horizontal
+			incY = curveSide ? -unit : unit;
+		}
+		
+		ctrl.x += incX * curveLevel;
+		ctrl.y += incY * curveLevel;
+	}
+	function changePoints(s, e) {
+		setStart(s);
+		setEnd(e);
+		ctrl = calcBetween(start, end);
+		line.clear();
+		if (curveLevel) {
+			incCurve();
+		}
+		draw();
+		toggleDirties();
+	}
+	function draw() {
+		line.lineStyle(width, color, 1);
+		line.moveTo(start.x, start.y);
+		line.quadraticCurveTo(ctrl.x, ctrl.y, end.x, end.y);
+	}
+	function create() {
+		line = new PIXI.Graphics();
+		line.interactive = true;
+		line.buttonMode = true;
+	}
+	
+	setThings();
+	create();
+	if (curveLevel) {
+		incCurve();
+	}
+	draw();
+	
+	line.setOnmousedown = function (param, fn) {
+		onmousedownParam = param;
+		onmousedown = fn;
+	};
+	line.setOnmouseup = function (param, fn) {
+		onmouseupParam = param;
+		onmouseup = fn;
+	};
+	line.setOnmousemove = function (param, fn) {
+		onmousemoveParam = param;
+		onmousemove = fn;
+	};
+	line.changeColor = changeColor;
+	line.changePoints = changePoints;
+	
+	//p.mainContainer.addChild(line);
+	return line;
+}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// tpl.createLink
+if (nth === 1) {
+	pixiEl = wpix.create2pointLine({
+		start: start,
+		end: end,
+	//	color: 0xCCAA00 * status,
+		color:  status === 0 ? 0x33691e : // green
+				status === 1 ? 0x00695c : // cyan
+				status === 2 ? 0xffd600 : // yellow
+				status === 3 ? 0xe65100 : // orange
+				status === 4 ? 0xff1744 : // pink
+				status === 5 ? 0xb71c1c : undefined, // red
+		alpha: 0
+	});
+} else if (nth > 1) {
+	pixiEl = wpix.create3pointLine({
+		start: start,
+		end: end,
+	//	color: 0xCCAA00 * status,
+		curveLevel: curveLevel,
+		curveSide: toggle ? false : true
+	});
+}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 wuk.notify({
 	message : '<i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Socket connected.',
