@@ -142,6 +142,9 @@ define(['wpix', 'wuk', 'whb', 'discovery', 'traceroute', 'mockTrace'], function 
 		$('div[id^="modal_"]').on('hide', function (e) {
 			wuk.modalState(false, e.target.id);
 		});
+		$('#contextmenu').on('contextmenu', function (e) {
+			e.preventDefault(); // ctxmenu_wrap
+		});
 	}
 	
 	

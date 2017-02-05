@@ -89,7 +89,7 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 			addTplnodeCustomPositionGetters();
 		}
 		function addHandler() {
-			boxSpriteText.setOnmousedown([node, p.links], function (e, node, tplLinks) {
+			boxSpriteText.setHandler('mousedown', function (e, node, tplLinks) {
 				var links = node.links;
 				
 				popupManager.removeAll();
@@ -104,8 +104,8 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 						}
 					});
 				}
-			});
-			boxSpriteText.setOnmouseup([node, p.links, p.nodes], function (e, node, tplLinks, tplNodes) {
+			}, [node, p.links]);
+			boxSpriteText.setHandler('mouseup', function (e, node, tplLinks, tplNodes) {
 				var nodeId = node.id,
 					links = node.links;
 				
@@ -129,8 +129,8 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 					});
 				}
 				
-			});
-			boxSpriteText.setOnmousemove(undefined, function (e) {
+			}, [node, p.links, p.nodes]);
+			boxSpriteText.setHandler('mousemove', function (e) {
 				/* var pos = e.data.global,
 					bubble = popupManager.activeBox,
 					pTop = bubble ? parseInt( bubble.css('top'), 10) : undefined,
@@ -141,7 +141,7 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 					bubble.css('top', (pos.y - (bubble.height() + 40)) +'px');
 				} */
 			});
-			boxSpriteText.setOnmouseover([node, p.links], function (e, node, tplLinks) {
+			boxSpriteText.setHandler('mouseover', function (e, node, tplLinks) {
 				var links = node.links,
 					el = this;
 				if ( links.length ) {
@@ -158,8 +158,8 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 						}
 					});
 				}
-			});
-			boxSpriteText.setOnmouseout([node, p.links], function (e, node, tplLinks) {
+			}, [node, p.links]);
+			boxSpriteText.setHandler('mouseout', function (e, node, tplLinks) {
 				var links = node.links,
 					el = this;
 				if ( links.length ) {
@@ -176,6 +176,10 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 						}
 					});
 				}
+			}, [node, p.links]);
+			
+			boxSpriteText.setHandler('rightup', function (e) {
+				// contextMenu.show(e.data.global, 'node');
 			});
 		}
 		
@@ -229,11 +233,10 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 				alpha: 0
 			});
 				
-			pixiEl.setOnmousedown(undefined, function () {
+			pixiEl.setHandler('mousedown', function () {
 				//                      viewport.lineContainer
 				this.bringToFront( wpix.viewport.children[0].children );
 			});
-			
 			
 			link.pixiEl = pixiEl;
 			link.id = linkId;

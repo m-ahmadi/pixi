@@ -56,50 +56,18 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		mainContainer.interactive = true;
 		mainContainer.hitArea = new PIXI.Rectangle( -100000, -100000, renW / renReso * 100000, renH / renReso *100000 );
 		pan.add( mainContainer );
-			
-		$("canvas").on("mousewheel", function (e) {
-			var zoomIn,
-				deltaY = e.deltaY,
-				mcPos, prevPos,
-				zoomLevel;
-				
-			p.zoomLevel += deltaY;
-			zoomLevel = p.zoomLevel;
-			
-			/* e.deltaX, e.deltaY, e.deltaFactor
-			zoom(e.pageX, e.pageY, e.deltaY > 0);
-			zoom(e); */
-			
-			
-			/* if (p.zoom) {
-				zoomIn = deltaY > 0;
-				
-				if (zoomLevel > p.MAX_ZOOM_OUT  &&  zoomLevel < p.MAX_ZOOM_IN) {
-					mcPos = p.mainContainer.position;
-					prevPos = {x: mcPos.x, y: mcPos.y};
-					
-					zoom(e.pageX, e.pageY, zoomIn);
-					
-					inst.emit("zoom", {
-						zoomIn: zoomIn,
-						pos: mcPos
-					});
-				} else {
-					if (zoomIn) {
-						p.zoomLevel = p.MAX_ZOOM_IN;
-					} else {
-						p.zoomLevel = p.MAX_ZOOM_OUT;
-					}
-				}
-			} */
-			zoomIn = deltaY > 0;
-			zoom(e.pageX, e.pageY, zoomIn);
-		});
-		$("canvas").on("mouseout", function () {
-			p.events = false;
-		});
-		$("canvas").on("mouseover", function () {
-			p.events = true;
+		
+		$("canvas").on({
+			"mousewheel": mousewheel,
+			"mouseout": function () {
+				p.events = false;
+			},
+			"mouseover": function () {
+				p.events = true;
+			},
+			"contextmenu": function (e) {
+				e.preventDefault();
+			}
 		});
 		
 		createContainers();
@@ -119,6 +87,44 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		inst.emit("init");
 	}
 	
+	function mousewheel(e) {
+		var zoomIn,
+			deltaY = e.deltaY,
+			mcPos, prevPos,
+			zoomLevel;
+			
+		p.zoomLevel += deltaY;
+		zoomLevel = p.zoomLevel;
+		
+		/* e.deltaX, e.deltaY, e.deltaFactor
+		zoom(e.pageX, e.pageY, e.deltaY > 0);
+		zoom(e); */
+		
+		
+		/* if (p.zoom) {
+			zoomIn = deltaY > 0;
+			
+			if (zoomLevel > p.MAX_ZOOM_OUT  &&  zoomLevel < p.MAX_ZOOM_IN) {
+				mcPos = p.mainContainer.position;
+				prevPos = {x: mcPos.x, y: mcPos.y};
+				
+				zoom(e.pageX, e.pageY, zoomIn);
+				
+				inst.emit("zoom", {
+					zoomIn: zoomIn,
+					pos: mcPos
+				});
+			} else {
+				if (zoomIn) {
+					p.zoomLevel = p.MAX_ZOOM_IN;
+				} else {
+					p.zoomLevel = p.MAX_ZOOM_OUT;
+				}
+			}
+		} */
+		zoomIn = deltaY > 0;
+		zoom(e.pageX, e.pageY, zoomIn);
+	}
 	function createContainers() {
 		var viewport, xSec1, xSec2, ySec1, ySec2,
 			main = p.mainContainer;
@@ -300,8 +306,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			lineWidth, tmpLineWidth,
 			alpha, color,
 			p,
-			onmousedown, onmousedownParam,
-			onmouseup, onmouseupParam;
+			handlers = {};
 		
 		function setThings() {
 			start     =  conf.start     ||  {x: 0, y: 0};
@@ -354,23 +359,30 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			e.stopPropagation();
 			this.alpha = 0.5;
 			
-			if ( u.isFn(onmousedown) ) {
-				onmousedown.apply(this, onmousedownParam ? [e].concat(onmousedownParam) : [e]);
-			}
+			execute("mousedown", e, this);
 		}
 		function up(e) {
 			e.stopPropagation();
 			this.alpha = 1;
 			
-			if ( u.isFn(onmouseup) ) {
-				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
-			}
+			execute("mouseup", e, this);
 		}
 		function over() {
 			// hover();
 		}
 		function out() {
 			// unhover();
+		}
+		function rightup(e) {
+			execute("rightup", e, this);
+		}
+		function execute(str, e, ctx) {
+			var handler = handlers[str] || {}, 
+				fn = handler.fn,
+				param = handler.param;
+			if ( u.isFn(fn) ) {
+				fn.apply(ctx, param ? [e].concat(param) : [e]);
+			}
 		}
 		function addEvents() {
 			line
@@ -383,7 +395,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			//	.on("mousemove", move)
 			//	.on("touchmove", move)
 				.on("mouseover", over)
-				.on("mouseout", out);
+				.on("mouseout", out)
+				.on("rightup", rightup);
 		}
 		function toggleDirties() {
 			var dirty = line.dirty,
@@ -487,17 +500,11 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		create();
 		line.alpha = alpha;
 		
-		line.setOnmousedown = function (param, fn) {
-			onmousedownParam = param;
-			onmousedown = fn;
-		};
-		line.setOnmouseup = function (param, fn) {
-			onmouseupParam = param;
-			onmouseup = fn;
-		};
-		line.setOnmousemove = function (param, fn) {
-			onmousemoveParam = param;
-			onmousemove = fn;
+		line.setHandler = function (evt, fn, param) {
+			handlers[evt] = {
+				fn: fn,
+				param: param
+			};
 		};
 		line.changePoints = changePoints;
 		line.changeColor = changeColor;
@@ -519,11 +526,7 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			spriteImg, spriteScale, spriteTint,
 			textContent, textFont, textSize, textColor,
 			boxX, boxY, boxAlpha,
-			onmouseup, onmouseupParam,
-			onmousedown, onmousedownParam,
-			onmousemove, onmousemoveParam,
-			onmouseover, onmouseoverParam,
-			onmouseout, onmouseoutParam,
+			handlers = {},
 			counter = 0;
 		
 		function setThings() {
@@ -553,7 +556,6 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			arr.push(el);
 		}
 		function down(e) {
-			alert();
 			e.stopPropagation();
 			this.data = e.data;
 			this.alpha = 0.5;
@@ -562,18 +564,15 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			this.dragPoint.x -= this.position.x;
 			this.dragPoint.y -= this.position.y;
 			
-			if ( u.isFn(onmousedown) ) {
-				onmousedown.apply(this, onmousedownParam ? [e].concat(onmousedownParam) : [e]);
-			}
+			execute("mousedown", e, this);
 		}
 		function up(e) {
 			e.stopPropagation();
 			this.alpha = 1;
 			this.dragging = false;
 			this.data = null;
-			if ( u.isFn(onmouseup) && p.events ) {
-				onmouseup.apply(this, onmouseupParam ? [e].concat(onmouseupParam) : [e]);
-			}
+			
+			execute("mouseup", e);
 		}
 		function move(e) {
 			if ( this.dragging ) {
@@ -581,19 +580,24 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				this.position.x = newPosition.x - this.dragPoint.x;
 				this.position.y = newPosition.y - this.dragPoint.y;
 				
-				if ( u.isFn(onmousemove) ) {
-					onmousemove.apply(this, onmousemoveParam ? [e].concat(onmousemoveParam) : [e]);
-				}
+				execute("mousemove", e, this);
 			}
 		}
 		function over(e) {
-			if ( u.isFn(onmouseover) ) {
-				onmouseover.apply(this, onmouseoverParam ? [e].concat(onmouseoverParam) : [e]);
-			}
+			execute("mouseover", e, this);
 		}
 		function out(e) {
-			if ( u.isFn(onmouseout) ) {
-				onmouseout.apply(this, onmouseout ? [e].concat(onmouseoutParam) : [e]);
+			execute("mouseout", e, this);
+		}
+		function rightup(e) {
+			execute("rightup", e, this);
+		}
+		function execute(str, e, ctx) {
+			var handler = handlers[str] || {},
+				fn = handler.fn,
+				param = handler.param;
+			if ( u.isFn(fn) ) {
+				fn.apply(ctx, param ? [e].concat(param) : [e]);
 			}
 		}
 		function addEvents(el) {
@@ -607,7 +611,8 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 				.on("mousemove", move)
 				.on("touchmove", move)
 				.on("mouseover", over)
-				.on("mouseout", out);
+				.on("mouseout", out)
+				.on('rightup', rightup);
 		}
 		function makeSprite() {
 			// sprite = new PIXI.Sprite.fromImage( spriteImg );
@@ -667,25 +672,11 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 		makeText();
 		makeBox();
 		
-		box.setOnmouseup = function (param, fn) {
-			onmouseupParam = param;
-			onmouseup = fn;
-		};
-		box.setOnmousedown = function (param, fn) {
-			onmousedownParam = param;
-			onmousedown = fn;
-		};
-		box.setOnmousemove = function (param, fn) {
-			onmousemoveParam = param;
-			onmousemove = fn;
-		};
-		box.setOnmouseover = function (param, fn) {
-			onmouseoverParam = param;
-			onmouseover = fn;
-		};
-		box.setOnmouseout = function (param, fn) {
-			onmouseoutParam = param;
-			onmouseout = fn;
+		box.setHandler = function (evt, fn, param) {
+			handlers[evt] = {
+				fn: fn,
+				param: param
+			};
 		};
 		box.changeTint = function (n) {
 			if (n) {
