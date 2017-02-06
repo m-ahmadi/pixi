@@ -1,4 +1,7 @@
+var libs = require('./js/libs');
+
 module.exports = function(grunt) {
+	
 	
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -44,26 +47,17 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		/*
+		
 		concat: {
 			options: {
 			  separator: '\n',
 			},
 			dist: {
-				src: [
-					'public/js/app/base.js',
-					'public/js/app/patterns/namespace.js',
-					'public/js/app/patterns/pubsub.js',
-					'public/js/app/util.js',
-					'public/js/app/ajax.js',
-					'public/js/app/modals/rate-modal.js',
-					'public/js/app/modals/last.js',
-					'public/js/app/main/product.js'
-				],
-				dest: 'public/js/app.js',
+				src: libs.list,
+				dest: libs.dest,
 			}
 		},
-		*/
+		
 		
 		/*
 		browserify: {
@@ -128,8 +122,9 @@ module.exports = function(grunt) {
 	
 	grunt.loadNpmTasks('grunt-contrib-sass');
 //	grunt.loadNpmTasks('grunt-contrib-jshint');
-//	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	
+	grunt.registerTask('libs', ['concat']);
 	grunt.registerTask('default', ['watch']);
 };
