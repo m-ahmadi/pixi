@@ -88,7 +88,7 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 			node.pixiEl = boxSpriteText;
 			addTplnodeCustomPositionGetters();
 		}
-		function addHandler() {
+		function addHandlers() {
 			boxSpriteText.setHandler('mousedown', function (e, node, tplLinks) {
 				var links = node.links;
 				
@@ -177,7 +177,6 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 					});
 				}
 			}, [node, p.links]);
-			
 			boxSpriteText.setHandler('rightup', function (e) {
 				// contextMenu.show(e.data.global, 'node');
 			});
@@ -186,7 +185,7 @@ define(['wpix', 'wani', 'util', 'popupManager', 'contextMenu'], function (wpix, 
 		setThings();
 		createBox();
 		createTplNode();
-		addHandler();
+		addHandlers();
 		
 		p.nodes[ id ] = node;
 		

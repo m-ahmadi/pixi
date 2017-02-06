@@ -584,10 +584,16 @@ define(["util", "pubsub"], function (u, newPubSub, popupManager) {
 			}
 		}
 		function over(e) {
-			execute("mouseover", e, this);
+			console.log('over', this.dragging);
+			if(!this.dragging) {
+				execute("mouseover", e, this);
+			}
 		}
 		function out(e) {
-			execute("mouseout", e, this);
+			console.log('out', this.dragging);
+			if(!this.dragging) {
+				execute("mouseout", e, this);
+			}
 		}
 		function rightup(e) {
 			execute("rightup", e, this);
