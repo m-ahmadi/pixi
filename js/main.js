@@ -1,16 +1,17 @@
-var baseRoot = '192.168.10.13:3000', t;
+var baseRoot = "192.168.10.13:3000", t;
 
 require.config({
-	baseUrl: 'js/'
-	
+	baseUrl: "js/",
+	paths: {
+        "core": "core",
+		"map": "map"
+    }
 });
 
-require(['mediator', 'page', 'contextMenu'], function (mediator, page) {
+require(["core/mediator"], function (core) {
 	
 	$(function () {
-		
-		page.onReady( mediator.init );
-		
+		core.init();
 	});
 
 });
