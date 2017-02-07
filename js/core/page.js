@@ -18,8 +18,9 @@ define(['map/mediator', './wuk', './whb', './discovery', './traceroute', './mock
 			wuk.disable( startBtn );
 		}
 	}
-	function addEvt(fn) {
-		typeof fn === 'function' ? fn('pixiMap', "#map_container") : undefined;
+	function addEvt(fn, par) {
+		/* typeof fn === 'function' ? fn('pixiMap', "#map_container") : undefined; */
+		fn.apply(undefined, par);
 		whb.compileAll();
 		
 		var sidebar = $('#newSide');
@@ -29,8 +30,9 @@ define(['map/mediator', './wuk', './whb', './discovery', './traceroute', './mock
 			var width = window.innerWidth,
 				height = window.innerHeight;
 			
-		//	wpix.renderer.resize(width, height);
-			map.resize(width, height);
+			
+			// map.resize(width, height);
+			
 			sidebar.css({height: height});
 		});
 		// $('#newSide').toggle('slide');

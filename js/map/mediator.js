@@ -33,7 +33,7 @@ define(['./pixiMap/mediator', './visMap/mediator', 'core/util'], function (pixiM
 			map.draw(a, b, c, d, e);
 			
 		} else if (mapType === 'visMap') {
-			// map.draw();
+			map.draw(a);
 		}
 	};
 	inst.init = init;

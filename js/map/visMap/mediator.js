@@ -1,8 +1,26 @@
-define(['core/util'], function (u) {
+define(['core/util', 'core/ajax'], function (u, ajax) {
 	var inst = {},
-		network = {},
+		network, options, container,
 		nodeTypes = ["diamonds", "dotsWithLabel", "mints", "icons", "source"];
 	
+	options = {
+		autoResize: true,
+		height: '100%',
+		width: '100%',
+		locale: 'en',
+	//	locales: locales,
+	//	 clickToUse: false,
+	//	configure: {},
+	//	edges: {},
+	//	nodes: {},
+	//	groups: {},
+		layout: {
+			improvedLayout: false
+		}
+	//	interaction: {},
+	//	manipulation: {},
+	//	physics: {}
+	};
 	
 	function convertData(data) {
 		var nodes = data.nodes,
@@ -24,27 +42,46 @@ define(['core/util'], function (u) {
 		Object.keys(links).forEach(function (k) {
 			var link = links[k];
 			
-			newLinks.push({
-				from: link.src,
-				to: link.dest
+			newEdges.push({
+				from: link.src.id,
+				to: link.dest.id
 			});
 		});
 		
+		newData.nodes = newNodes;
+		newData.edges = newEdges;
 		return newData;
 	}
 	function draw(data) {
-		data = convertData(data);
+		data = convertData(data); console.log('convert is finished.');
 		network.setData(data);
 	}
-	function init() {
-		var container = $('#map_container');
-		container.css({width: window.innerWidth, height: window.innerHeight});
-		network = new vis.Network(container[0]);
+	function init(elementId) {
+		container = $(elementId);
+		container.height(window.innerHeight);
+		
+		network = new vis.Network(container[0], {}, options);
+		
+		ajax({
+			data: {
+				x1: -1000,
+				x2: 1000,
+				y1: -1000,
+				y2: 1000
+			}
+		})
+		.done(function (data) {
+			console.log(data);
+			t = data;
+			draw(data);
+		});
 	}
 	
 	inst.convertData = convertData;
 	inst.draw = draw;
+	inst.init = init;
 	
+	window.vismap = inst;
 	return inst;
 });
 

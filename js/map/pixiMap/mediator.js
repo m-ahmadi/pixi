@@ -1,4 +1,4 @@
-define(['./wpix', './tpl', './navigation', './popupManager', 'map/dataLoader', 'core/wuk', 'core/util', 'core/ajax'], function (wpix, tpl, navigation, popupManager, dataLoader, wuk, u, ajax) {
+define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/util', 'core/ajax'], function (wpix, tpl, navigation, popupManager, wuk, u, ajax) {
 	var inst = {},
 		p = {};
 	
@@ -308,7 +308,7 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'map/dataLoader', '
 			wpix.pan.pan(1, 1);
 		});
 	}
-	function init(div) {
+	function init() {
 		wpix.init({
 			containerDiv: div,
 			callback: pixiCallback,
