@@ -1,7 +1,7 @@
-define(['core/util', 'core/ajax'], function (u, ajax) {
+define(['core/util', 'core/ajax', './groupsOpt'], function (u, ajax, groupsOpt) {
 	var inst = {},
 		network, options, container,
-		nodeTypes = ["diamonds", "dotsWithLabel", "mints", "icons", "source"];
+		nodeTypes = ["type1", "type2", "type3", "type4", "type5"];
 	
 	options = {
 		autoResize: true,
@@ -9,17 +9,38 @@ define(['core/util', 'core/ajax'], function (u, ajax) {
 		width: '100%',
 		locale: 'en',
 	//	locales: locales,
-	//	 clickToUse: false,
-	//	configure: {},
-	//	edges: {},
-	//	nodes: {},
-	//	groups: {},
+		clickToUse: false,
+		configure: {
+			enabled: false
+		},
+		edges: {
+			width: 1,
+			smooth: {
+				type: 'continuous'
+			}
+		},
+		nodes: {
+			borderWidth: 2,
+			shape: 'dot',
+			scaling: {
+				min: 10,
+				max: 30
+			},
+			font: {
+				size: 12,
+				face: 'Tahoma'
+			}
+		},
+		groups: groupsOpt,
 		layout: {
 			improvedLayout: false
-		}
-	//	interaction: {},
+		},
+		interaction: {
+			hideEdgesOnDrag: true,
+			tooltipDelay: 200
+		},
 	//	manipulation: {},
-	//	physics: {}
+		physics: false
 	};
 	
 	function convertData(data) {
@@ -35,7 +56,9 @@ define(['core/util', 'core/ajax'], function (u, ajax) {
 			newNodes.push({
 				id: node.id,
 				label: node.name,
-				group: nodeTypes[node.type]
+				group: nodeTypes[node.type],
+				x: node.x,
+				y: node.y
 			});
 			
 		});
@@ -64,10 +87,10 @@ define(['core/util', 'core/ajax'], function (u, ajax) {
 		
 		ajax({
 			data: {
-				x1: -1000,
-				x2: 1000,
-				y1: -1000,
-				y2: 1000
+				x1: 0,
+				x2: window.innerWidth,
+				y1: 0,
+				y2: window.innerHeight
 			}
 		})
 		.done(function (data) {
