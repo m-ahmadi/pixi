@@ -1,7 +1,8 @@
-define(['core/util', 'core/ajax', './groupsOpt'], function (u, ajax, groupsOpt) {
+define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 	var inst = {},
 		network, options, container,
-		nodeTypes = ["type1", "type2", "type3", "type4", "type5"];
+		nodeTypes = ["type1", "type2", "type3", "type4", "type5"],
+		tmpl = whb.tmpl;
 	
 	options = {
 		autoResize: true,
@@ -22,27 +23,89 @@ define(['core/util', 'core/ajax', './groupsOpt'], function (u, ajax, groupsOpt) 
 		nodes: {
 			borderWidth: 2,
 			shape: 'dot',
-			scaling: {
-				min: 10,
-				max: 30
-			},
+			
 			font: {
 				size: 12,
 				face: 'Tahoma'
 			}
 		},
-		groups: groupsOpt,
+	/* '#33691e' // green
+	'#00695c' // cyan
+	'#ffd600' // yellow
+	'#e65100' // orange
+	'#ff1744' // pink
+	'#b71c1c' // red
+	
+	'diamond'
+	'dot'
+	'star'
+	'triangle'
+	'triangleDown'
+	'square'
+	*/
+		groups: {
+			type1: {
+				shape: 'icon',
+				icon: {
+					face: 'FontAwesome',
+					code: '\uf0c0', // group
+					size: 50,
+					color: '#57169a'
+				}
+			},
+			type2: {
+				shape: 'icon',
+				icon: {
+					face: 'FontAwesome',
+					code: '\uf007', // users
+					size: 50,
+					color: '#3f51b5'
+				}
+			},
+			type3: {
+				shape: 'dot',
+				color: '#e91e63'
+			},
+			type4: {
+				shape: 'diamond',
+				color: '#fb7e81'
+			},
+			type5: {
+				shape: 'star',
+				color: '#FFEB3B'
+			},
+			type6: {
+				shape: 'triangle',
+				color: '#ffff00'
+			},
+			type7: {
+				shape: 'dot',
+				color: '#33691e'
+			},
+			type8: {
+				shape: 'square',
+				color: '#ffd600'
+			},
+			type9: {
+				shape: 'triangleDown',
+				color: '#ff1744'
+			}
+			
+		},
 		layout: {
 			improvedLayout: false
 		},
 		interaction: {
-			hideEdgesOnDrag: true,
+			hideEdgesOnDrag: false,
 			tooltipDelay: 200
 		},
 	//	manipulation: {},
-		physics: false
+		physics: true
 	};
 	
+	
+						
+						
 	function convertData(data) {
 		var nodes = data.nodes,
 			links = data.links,
@@ -58,7 +121,8 @@ define(['core/util', 'core/ajax', './groupsOpt'], function (u, ajax, groupsOpt) 
 				label: node.name,
 				group: nodeTypes[node.type],
 				x: node.x,
-				y: node.y
+				y: node.y,
+				title: tmpl.nodepopup({name: node.name, id: node.id})
 			});
 			
 		});
@@ -84,7 +148,7 @@ define(['core/util', 'core/ajax', './groupsOpt'], function (u, ajax, groupsOpt) 
 		container.height(window.innerHeight);
 		
 		network = new vis.Network(container[0], {}, options);
-		
+		window.network = network;
 		ajax({
 			data: {
 				x1: 0,
