@@ -65,8 +65,8 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) { // wp
 		wpix.mainContainer.x = wpix.renderer.width / 2;
 		wpix.mainContainer.y = wpix.renderer.height / 2; */
 		
-		map.clear();
-		map.setPosition(map.width/2, map.height/2);
+		// map.clear();
+		// map.setPosition(map.width/2, map.height/2);
 		
 		closeModal();
 		closeSidebar();

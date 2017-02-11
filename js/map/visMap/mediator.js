@@ -1,10 +1,16 @@
 define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 	var inst = {},
-		network, options, container,
-		nodeTypes = ["type1", "type2", "type3", "type4", "type5"],
+		p = {},
 		tmpl = whb.tmpl;
 	
-	options = {
+	p.network = {};
+	p.options = {};
+	p.container = {};
+	p.nodes = {};
+	p.edges = {};
+	p.nodeTypes = ["type1", "type2", "type3", "type4", "type5"];
+	
+	p.options = {
 		autoResize: true,
 		height: '100%',
 		width: '100%',
@@ -29,20 +35,6 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 				face: 'Tahoma'
 			}
 		},
-	/* '#33691e' // green
-	'#00695c' // cyan
-	'#ffd600' // yellow
-	'#e65100' // orange
-	'#ff1744' // pink
-	'#b71c1c' // red
-	
-	'diamond'
-	'dot'
-	'star'
-	'triangle'
-	'triangleDown'
-	'square'
-	*/
 		groups: {
 			type1: {
 				shape: 'icon',
@@ -100,38 +92,38 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 			tooltipDelay: 200
 		},
 	//	manipulation: {},
-		physics: true
+		physics: true // true false
 	};
 	
-	
-						
-						
 	function convertData(data) {
-		var nodes = data.nodes,
-			links = data.links,
+		var oldNodes = data.nodes,
+			oldLinks = data.links,
 			newData = {},
 			newNodes = [],
 			newEdges = [];
 		
-		Object.keys(nodes).forEach(function (k) {
-			var node = nodes[k];
+		Object.keys(oldNodes).forEach(function (k) {
+			var node = oldNodes[k];
 			
-			newNodes.push({
+			p.nodes.add({
 				id: node.id,
 				label: node.name,
-				group: nodeTypes[node.type],
+				group: p.nodeTypes[node.type],
 				x: node.x,
 				y: node.y,
 				title: tmpl.nodepopup({name: node.name, id: node.id})
 			});
 			
 		});
-		Object.keys(links).forEach(function (k) {
-			var link = links[k];
+		Object.keys(oldLinks).forEach(function (k) {
+			var link = oldLinks[k];
 			
-			newEdges.push({
+			p.edges.add({
 				from: link.src.id,
 				to: link.dest.id
+				
+				/* from:  link.source_id,
+				to: link.destination_id */
 			});
 		});
 		
@@ -140,21 +132,32 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 		return newData;
 	}
 	function draw(data) {
-		data = convertData(data); console.log('convert is finished.');
-		network.setData(data);
+		data = convertData(data);
+		// p.nodes.update(data.nodes);
+		// p.edges.update(data.edges);
+		console.log('convert is finished.');
+		// p.network.setData({nodes: data.nodes, edges: data.edges});
 	}
 	function init(elementId) {
-		container = $(elementId);
-		container.height(window.innerHeight);
+		var width = window.innerWidth,
+			height = window.innerHeight,
+			hW = width / 2;
+			hH = height / 2;
 		
-		network = new vis.Network(container[0], {}, options);
-		window.network = network;
+		p.container = $(elementId);
+		p.container.height(window.innerHeight);
+		
+		p.nodes = new vis.DataSet();
+		p.edges = new vis.DataSet();
+		p.network = new vis.Network(p.container[0], {nodes: p.nodes, edges: p.edges}, p.options);
+		
+		window.network = p.network;
 		ajax({
 			data: {
-				x1: 0,
-				x2: window.innerWidth,
-				y1: 0,
-				y2: window.innerHeight
+				x1: -hW,
+				x2: hW,// window.innerWidth,
+				y1: -hH,
+				y2: hH // window.innerHeight
 			}
 		})
 		.done(function (data) {

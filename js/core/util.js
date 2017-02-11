@@ -165,7 +165,7 @@ var util = (function () {
 		}
 		
 		if ( last && isObj(last) ) {
-			Object.keys(last).forEach(function(key) {
+			Object.keys(last).forEach(function (key) {
 				result[key] = last[key];
 			});
 		}
@@ -206,7 +206,7 @@ var util = (function () {
 
 }());
 
-if (typeof define === 'function') {
+if (typeof define === 'function' && define.amd) {
 	define(util);
 } else if (typeof module !== 'undefined') {
 	module.exports = util;

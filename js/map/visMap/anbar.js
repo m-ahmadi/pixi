@@ -1,3 +1,18 @@
+	/* '#33691e' // green
+	'#00695c' // cyan
+	'#ffd600' // yellow
+	'#e65100' // orange
+	'#ff1744' // pink
+	'#b71c1c' // red
+	
+	'diamond'
+	'dot'
+	'star'
+	'triangle'
+	'triangleDown'
+	'square'
+	*/
+	
 // fontawesome
 '\uf0c0', // group
 '\uf007', // users
