@@ -74,8 +74,8 @@ define(['map/mediator', './wuk', './whb', './discovery', './traceroute', './mock
 				arr = txt.split("\n");
 				//console.log(arr, checkbox);
 				
-			//	traceroute.trace(arr, checkbox);
-				mockTrace.trace();
+				traceroute.trace(arr, checkbox);
+			//	mockTrace.trace();
 			}
 			$('#abort').removeAttr('disabled');
 		});

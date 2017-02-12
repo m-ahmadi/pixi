@@ -26,6 +26,9 @@ define([ /*'./pixiMap/mediator', */ './visMap/mediator', 'core/util'], function 
 		},
 		"setPosition": {
 			get: function () { return map.setPosition; }
+		},
+		"clear": {
+			get: function () { return map.clear; }
 		}
 	});
 	inst.draw = function (a, b, c, d, e) {
