@@ -94,7 +94,8 @@ module.exports = function(grunt) {
 					'css/**/*.css',
 					'js/**/*.js',
 					'gruntfile.js',
-					'test/**/*'
+					'test/**/*',
+					'khpc/**/*'
 				],
 				tasks: ['sass'], // 'webpack', 'jslint', 'browserify', 'jshint', 'concat'
 				options: {
@@ -110,7 +111,8 @@ module.exports = function(grunt) {
 					'css/**/*.css',
 					'js/**/*.js',
 					'*.js',
-					'test/**/*'
+					'test/**/*',
+					'khpc/**/*'
 				]
 			}
 		}

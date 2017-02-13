@@ -1,12 +1,12 @@
 requirejs.config({
 	baseUrl: "js/",
 	paths: {
-		lib: "lib"
+		jquery: "lib/jquery.min"
 	}
 	
 });
 
-require(['lib/jquery', 'mediator'], function ($, core) {
+require(['jquery', 'mediator'], function ($, core) {
 	$(function () {
 		core.init();
 	});
