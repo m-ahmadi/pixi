@@ -1,4 +1,4 @@
-define(['lib/jquery'], function ($) {
+define([], function () {
 	var inst = {};
 	
 	function init() {

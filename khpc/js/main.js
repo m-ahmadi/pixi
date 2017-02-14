@@ -1,13 +1,12 @@
 requirejs.config({
-	baseUrl: "js/",
-	paths: {
-		jquery: "lib/jquery.min"
-	}
+	baseUrl: "js/"
 	
 });
 
-require(['jquery', 'mediator'], function ($, core) {
+require(['mediator', 'chart'], function (core, chart) {
 	$(function () {
 		core.init();
+		chart.create();
+		
 	});
 });
