@@ -92,7 +92,7 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 			tooltipDelay: 200
 		},
 	//	manipulation: {},
-		physics: false // true false
+		physics: true // true false
 	};
 	
 	function convertData(data) {
