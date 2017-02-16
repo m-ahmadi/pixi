@@ -308,7 +308,7 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 			wpix.pan.pan(1, 1);
 		});
 	}
-	function init() {
+	function init(div) {
 		wpix.init({
 			containerDiv: div,
 			callback: pixiCallback,
@@ -319,7 +319,6 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 		
 		addCustomEvents();
 	}
-	
 	
 	inst.data = p.data;
 	inst.bounds = p.bounds;

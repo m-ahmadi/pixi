@@ -1,20 +1,20 @@
-define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
+define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	var inst = {},
-		p = {},
+		g = {},
 		tmpl = whb.tmpl;
 	
-	p.network = {};
-	p.options = {};
-	p.container = {};
-	p.nodes = {};
-	p.edges = {};
-	p.nodeTypes = ["type1", "type2", "type3", "type4", "type5"];
+	g.network = {};
+	g.options = {};
+	g.container = {};
+	g.nodes = new vis.DataSet();
+	g.edges = new vis.DataSet();
+	g.nodeTypes = ["type1", "type2", "type3", "type4", "type5", "type6", "type7", "type8", "type9",];
 	
-	p.options = {
+	g.options = {
 		autoResize: true,
-		height: '100%',
-		width: '100%',
-		locale: 'en',
+		height: "100%",
+		width: "100%",
+		locale: "en",
 	//	locales: locales,
 		clickToUse: false,
 		configure: {
@@ -23,64 +23,73 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 		edges: {
 			width: 1,
 			smooth: {
-				type: 'dynamic' // 'continuous', 'discrete', 'diagonalCross', 'straightCross', 'horizontal', 'vertical', 'curvedCW', 'curvedCCW', 'cubicBezier'
+				type: "continuous" // "dynamic", "continuous", "discrete", "diagonalCross", "straightCross", "horizontal", "vertical", "curvedCW", "curvedCCW", "cubicBezier"
 			}
 		},
 		nodes: {
-			borderWidth: 2,
-			shape: 'dot',
-			
+			borderWidth: 1,
+			shape: "dot",
+			color: "#4CAF50",
+			size: 15,
 			font: {
 				size: 12,
-				face: 'Tahoma'
+				face: "Tahoma"
 			}
 		},
 		groups: {
-			type1: {
-				shape: 'icon',
+			/* type1: {
+				shape: "icon",
 				icon: {
-					face: 'FontAwesome',
-					code: '\uf0c0', // group
+					face: "FontAwesome",
+					code: "\uf0c0", // group
 					size: 50,
-					color: '#57169a'
+					color: "#57169a"
 				}
 			},
 			type2: {
-				shape: 'icon',
+				shape: "icon",
 				icon: {
-					face: 'FontAwesome',
-					code: '\uf007', // users
+					face: "FontAwesome",
+					code: "\uf007", // users
 					size: 50,
-					color: '#3f51b5'
+					color: "#3f51b5"
 				}
+			}, */
+			type1: {
+				shape: "dot",
+				color: "red"
+			},
+			type2: {
+				shape: "dot",
+				color: "blue"
 			},
 			type3: {
-				shape: 'dot',
-				color: '#e91e63'
+				shape: "dot",
+				color: "#e91e63"
 			},
 			type4: {
-				shape: 'diamond',
-				color: '#fb7e81'
+				shape: "diamond",
+				color: "#fb7e81"
 			},
 			type5: {
-				shape: 'star',
-				color: '#FFEB3B'
+				shape: "star",
+				color: "#FFEB3B"
 			},
 			type6: {
-				shape: 'triangle',
-				color: '#ffff00'
+				shape: "triangle",
+				color: "#ffff00"
 			},
 			type7: {
-				shape: 'dot',
-				color: '#33691e'
+				shape: "dot",
+				color: "#33691e"
 			},
 			type8: {
-				shape: 'square',
-				color: '#ffd600'
+				shape: "square",
+				color: "#ffd600"
 			},
 			type9: {
-				shape: 'triangleDown',
-				color: '#ff1744'
+				shape: "triangleDown",
+				color: "#ff1744"
 			}
 			
 		},
@@ -88,11 +97,11 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 			improvedLayout: false
 		},
 		interaction: {
-			hideEdgesOnDrag: false,
+			hideEdgesOnDrag: true,
 			tooltipDelay: 200
 		},
 	//	manipulation: {},
-		physics: true // true false
+		physics: false // true false
 	};
 	
 	function convertData(data) {
@@ -105,10 +114,10 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 		Object.keys(oldNodes).forEach(function (k) {
 			var node = oldNodes[k];
 			
-			p.nodes.add({
+			g.nodes.add({
 				id: node.id,
-				label: node.name,
-				group: p.nodeTypes[node.type],
+				label: node.name || node.management_ip,
+				group: g.nodeTypes[node.type],
 				x: node.x,
 				y: node.y,
 				title: tmpl.nodepopup({name: node.name, id: node.id})
@@ -120,7 +129,7 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 				src = link.src,
 				dest = link.dest;
 			
-			p.edges.add({
+			g.edges.add({
 				/* from: link.src.id,
 				to: link.dest.id */
 				
@@ -135,10 +144,10 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 	}
 	function draw(data) {
 		data = convertData(data);
-		// p.nodes.update(data.nodes);
-		// p.edges.update(data.edges);
-		console.log('convert is finished.');
-		// p.network.setData({nodes: data.nodes, edges: data.edges});
+		// g.nodes.update(data.nodes);
+		// g.edges.update(data.edges);
+		console.log("convert is finished.");
+		// g.network.setData({nodes: data.nodes, edges: data.edges});
 	}
 	function init(elementId) {
 		var width = window.innerWidth,
@@ -146,14 +155,12 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 			hW = width / 2;
 			hH = height / 2;
 		
-		p.container = $(elementId);
-		p.container.height(window.innerHeight);
+		g.container = $(elementId);
+		g.container.height(window.innerHeight);
 		
-		p.nodes = new vis.DataSet();
-		p.edges = new vis.DataSet();
-		p.network = new vis.Network(p.container[0], {nodes: p.nodes, edges: p.edges}, p.options);
-		
-		window.network = p.network;
+		g.network = new vis.Network(g.container[0], {nodes: g.nodes, edges: g.edges}, g.options);
+		g.network.on("click", neighbourhoodHighlight);
+		window.network = g.network;
 		ajax({
 			data: {
 				x1: -hW,
@@ -169,13 +176,101 @@ define(['core/util', 'core/ajax', 'core/whb'], function (u, ajax, whb) {
 		});
 	}
 	
+	
+	var highlightActive = false;
+	var allNodes;
+	function neighbourhoodHighlight(e) {
+		console.log(e);
+		var newtork = g.network,
+			nodes = g.nodes,
+			i, j,
+			selectedNode, degrees;
+		
+		allNodes = nodes.get({
+			returnType: "Object"
+		});
+	
+		// if something is selected:
+		if (e.nodes.length > 0) {
+			highlightActive = true;
+			selectedNode = e.nodes[0];
+			degrees = 2;
+
+			// mark all nodes as hard to read.
+			Object.keys(allNodes).forEach(function (k) {
+				var node = allNodes[k];
+				node.color = "rgba(200, 200, 200, 0.5)";
+				if (node.hiddenLabel === undefined) {
+					node.hiddenLabel = node.label;
+					node.label = undefined;
+				}
+			});
+			
+		
+			var connectedNodes = network.getConnectedNodes(selectedNode);
+			var allConnectedNodes = [];
+
+			// get the second degree nodes
+			for (i = 1; i < degrees; i++) {
+				for (j = 0; j < connectedNodes.length; j++) {
+					allConnectedNodes = allConnectedNodes.concat(network.getConnectedNodes(connectedNodes[j]));
+				}
+			}
+
+			// all second degree nodes get a different color and their label back
+			for (i = 0; i < allConnectedNodes.length; i++) {
+				allNodes[allConnectedNodes[i]].color = 'rgba(150,150,150,0.75)';
+				if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+					allNodes[allConnectedNodes[i]].label = allNodes[allConnectedNodes[i]].hiddenLabel;
+					allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+				}
+			}
+
+			// all first degree nodes get their own color and their label back
+			for (i = 0; i < connectedNodes.length; i++) {
+				allNodes[connectedNodes[i]].color = undefined;
+				if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+					allNodes[connectedNodes[i]].label = allNodes[connectedNodes[i]].hiddenLabel;
+					allNodes[connectedNodes[i]].hiddenLabel = undefined;
+				}
+			}
+
+			// the main node gets its own color and its label back.
+			allNodes[selectedNode].color = undefined;
+			if (allNodes[selectedNode].hiddenLabel !== undefined) {
+				allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+				allNodes[selectedNode].hiddenLabel = undefined;
+			}
+		} else if (highlightActive === true) {
+			// reset all nodes
+			for (var nodeId in allNodes) {
+				allNodes[nodeId].color = undefined;
+				if (allNodes[nodeId].hiddenLabel !== undefined) {
+					allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+					allNodes[nodeId].hiddenLabel = undefined;
+				}
+			}
+			highlightActive = false
+		}
+
+		// transform the object into an array
+		var updateArray = [];
+		for (nodeId in allNodes) {
+			if (allNodes.hasOwnProperty(nodeId)) {
+				updateArray.push(allNodes[nodeId]);
+			}
+		}
+		nodes.update(updateArray);
+	}
+
 	inst.convertData = convertData;
 	inst.draw = draw;
 	inst.init = init;
 	inst.clear = function () {
-		p.nodes.clear();
-		p.edges.clear();
-	}
+		g.nodes.clear();
+		g.edges.clear();
+	};
+	inst.g = g;
 	
 	window.vismap = inst;
 	return inst;

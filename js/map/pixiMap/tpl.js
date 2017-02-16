@@ -350,16 +350,18 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 		bounds = bounds ? bounds : {};
 		coefficient = coefficient ? coefficient : false;
 		
-		/* if ( flush ) {
-			p.nodes = {};
-			p.links = {};
-		} */
+		if (flush) {
+			clear();
+		}
 		
 		drawNodes(data.nodes, container, coefficient);
 		drawLinks(data.links, container, bounds);
 	}
-	
-	
+	function clear() {
+		wpix.clearContainer("viewport");
+		p.nodes = {};
+		p.links = {};
+	}
 	
 	Object.defineProperties(inst, {
 		"nodes": {
@@ -371,6 +373,7 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 	});
 	inst.checkLink = checkLink;
 	inst.draw = draw;
+	inst.clear = clear;
 	
 	window.tpl = inst;
 	return inst;
