@@ -9,6 +9,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	g.nodes = new vis.DataSet();
 	g.edges = new vis.DataSet();
 	g.nodeTypes = ["type1", "type2", "type3", "type4", "type5", "type6", "type7", "type8", "type9",];
+	g.dataConvertor = {};
 	
 	g.options = {
 		autoResize: true,
@@ -104,6 +105,19 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		physics: false // true false
 	};
 	
+	function createWorker() {
+		if (window.Worker) {
+			g.dataConvertor = new Worker("js/workers/dataConvertor.js");
+			
+			g.dataConvertor.onmessage = function (e) {
+				var data = e.data;
+				g.nodes.update(data.nodes);
+				g.edges.update(data.edges);
+			};
+		} else {
+			console.warn("Your browser doesn't support web workers.");
+		}
+	}
 	function convertData(data) {
 		var oldNodes = data.nodes,
 			oldLinks = data.links,
@@ -143,7 +157,10 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		return newData;
 	}
 	function draw(data) {
-		data = convertData(data);
+		// data = convertData(data);
+		data.nodeTypes = g.nodeTypes;
+		g.dataConvertor.postMessage(data);
+		
 		// g.nodes.update(data.nodes);
 		// g.edges.update(data.edges);
 		console.log("convert is finished.");
@@ -174,13 +191,13 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			t = data;
 			draw(data);
 		});
+		createWorker();
 	}
 	
 	
 	var highlightActive = false;
 	var allNodes;
 	function neighbourhoodHighlight(e) {
-		console.log(e);
 		var newtork = g.network,
 			nodes = g.nodes,
 			i, j,
@@ -208,12 +225,13 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			
 		
 			var connectedNodes = network.getConnectedNodes(selectedNode);
+			console.log(connectedNodes);
 			var allConnectedNodes = [];
 
 			// get the second degree nodes
 			for (i = 1; i < degrees; i++) {
 				for (j = 0; j < connectedNodes.length; j++) {
-					allConnectedNodes = allConnectedNodes.concat(network.getConnectedNodes(connectedNodes[j]));
+					allConnectedNodes = allConnectedNodes.concat(  network.getConnectedNodes( connectedNodes[j] )  );
 				}
 			}
 
@@ -272,6 +290,6 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	};
 	inst.g = g;
 	
-	window.vismap = inst;
+	window.visMap = g;
 	return inst;
 });

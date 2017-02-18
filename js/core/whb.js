@@ -1,13 +1,13 @@
-define(['./util'], function (u) {
+define(["./util"], function (u) {
 	var inst = {},
 		tmpl = {},
 		get = u.getFirstCommentInside;
 	
 	function compileAll() {
-		$('#templates > *').each(function (i, el) {
+		$("#templates > *").each(function (i, el) {
 			var id = el.id,
-				key = id.split('_')[0],
-				src = get('#'+id);
+				key = id.split("_")[0],
+				src = get("#"+id);
 			tmpl[key] = Handlebars.compile(src);
 		});
 	}
