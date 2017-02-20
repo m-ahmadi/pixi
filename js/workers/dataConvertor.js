@@ -21,11 +21,19 @@ self.onmessage = function (e) {
 	Object.keys(oldLinks).forEach(function (k) {
 		var link = oldLinks[k],
 			src = link.src,
-			dest = link.dest;
+			dest = link.dest,
+			status = link.status;
 		
 		newEdges.push({
+			id: link.id,
 			from: isObj(src) ? src.id : src || link.source_id,
 			to: isObj(dest) ? dest.id : dest || link.destination_id,
+			color:	status === 0 ? "#33691e" : // green
+					status === 1 ? "#00695c" : // cyan
+					status === 2 ? "#fd600"  : // yellow
+					status === 3 ? "#e65100" : // orange
+					status === 4 ? "#ff1744" : // pink
+					status === 5 ? "#b71c1c" : undefined, // red
 		});
 	});
 	

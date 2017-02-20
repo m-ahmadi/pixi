@@ -25,7 +25,21 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			width: 1,
 			smooth: {
 				type: "continuous" // "dynamic", "continuous", "discrete", "diagonalCross", "straightCross", "horizontal", "vertical", "curvedCW", "curvedCCW", "cubicBezier"
-			}
+			},
+			arrows: {
+				to: {
+					enabled: true,
+					scaleFactor: 0.6,
+					type: "arrow"
+				},
+				from: {
+					enabled: true,
+					scaleFactor: 0.2,
+					type: "circle"
+				},
+				
+			},
+			arrowStrikethrough: true // default true
 		},
 		nodes: {
 			borderWidth: 1,
@@ -110,6 +124,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			g.dataConvertor = new Worker("js/workers/dataConvertor.js");
 			
 			g.dataConvertor.onmessage = function (e) {
+				console.log("convert is finished.");
 				var data = e.data;
 				g.nodes.update(data.nodes);
 				g.edges.update(data.edges);
@@ -163,7 +178,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		
 		// g.nodes.update(data.nodes);
 		// g.edges.update(data.edges);
-		console.log("convert is finished.");
+		
 		// g.network.setData({nodes: data.nodes, edges: data.edges});
 	}
 	function init(elementId) {
@@ -176,7 +191,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		g.container.height(window.innerHeight);
 		
 		g.network = new vis.Network(g.container[0], {nodes: g.nodes, edges: g.edges}, g.options);
-		g.network.on("click", neighbourhoodHighlight);
+		g.network.on("click", highlight);
 		window.network = g.network;
 		ajax({
 			data: {
@@ -197,20 +212,29 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	
 	var highlightActive = false;
 	var allNodes;
-	function neighbourhoodHighlight(e) {
+	var allEdges;
+	function highlight(e) {
 		var newtork = g.network,
 			nodes = g.nodes,
+			edges = g.edges,
 			i, j,
-			selectedNode, degrees;
+			selectedNode, degrees, target,
+			iNode, iEdge,
+			updatedEdges = [],
+			updatedNodes = [];
 		
 		allNodes = nodes.get({
 			returnType: "Object"
 		});
-	
+		allEdges = edges.get({
+			returnType: "Object"
+		});
+		
 		// if something is selected:
 		if (e.nodes.length > 0) {
 			highlightActive = true;
-			selectedNode = e.nodes[0];
+			targetId = e.nodes[0],
+			selectedNode = allNodes[targetId];
 			degrees = 2;
 
 			// mark all nodes as hard to read.
@@ -223,62 +247,84 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 				}
 			});
 			
-		
-			var connectedNodes = network.getConnectedNodes(selectedNode);
-			console.log(connectedNodes);
+			var connectedNodes = network.getConnectedNodes(targetId);
 			var allConnectedNodes = [];
 
 			// get the second degree nodes
-			for (i = 1; i < degrees; i++) {
+			/* for (i = 1; i < degrees; i++) {
 				for (j = 0; j < connectedNodes.length; j++) {
 					allConnectedNodes = allConnectedNodes.concat(  network.getConnectedNodes( connectedNodes[j] )  );
 				}
-			}
+			} */
 
+			
 			// all second degree nodes get a different color and their label back
-			for (i = 0; i < allConnectedNodes.length; i++) {
-				allNodes[allConnectedNodes[i]].color = 'rgba(150,150,150,0.75)';
-				if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
-					allNodes[allConnectedNodes[i]].label = allNodes[allConnectedNodes[i]].hiddenLabel;
-					allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+			/* allConnectedNodes.forEach(function (k) {
+				var node = allNodes[k],
+					hiddenLabel = node.hiddenLabel;
+				
+				node.color = 'rgba(150,150,150,0.75)';
+				if (hiddenLabel !== undefined) {
+					node.label = hiddenLabel;
+					node.hiddenLabel = undefined;
 				}
-			}
+			}); */
 
-			// all first degree nodes get their own color and their label back
-			for (i = 0; i < connectedNodes.length; i++) {
-				allNodes[connectedNodes[i]].color = undefined;
-				if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
-					allNodes[connectedNodes[i]].label = allNodes[connectedNodes[i]].hiddenLabel;
-					allNodes[connectedNodes[i]].hiddenLabel = undefined;
+
+			connectedNodes.forEach(function (k) {
+				var node = allNodes[k],
+					hiddenLabel = node.hiddenLabel;
+				
+				node.color = undefined;
+				if (hiddenLabel !== undefined) {
+					node.label = hiddenLabel;
+					node.hiddenLabel = undefined;
 				}
+			});
+			
+			selectedNode.color = undefined;
+			if (selectedNode.hiddenLabel !== undefined) {
+				selectedNode.label = selectedNode.hiddenLabel;
+				selectedNode.hiddenLabel = undefined;
 			}
-
-			// the main node gets its own color and its label back.
-			allNodes[selectedNode].color = undefined;
-			if (allNodes[selectedNode].hiddenLabel !== undefined) {
-				allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
-				allNodes[selectedNode].hiddenLabel = undefined;
-			}
+			
+			
+			Object.keys(allEdges).forEach(function (k) {
+				allEdges[k].color = "rgba(200, 200, 200, 0.5)";
+				updatedEdges.push(allEdges[k]);
+			});
+			var connectedEdges = edges.get({
+				filter: function (i) {
+					return i.from === targetId || i.to === targetId ? i : false
+				}
+			});
 		} else if (highlightActive === true) {
 			// reset all nodes
-			for (var nodeId in allNodes) {
-				allNodes[nodeId].color = undefined;
-				if (allNodes[nodeId].hiddenLabel !== undefined) {
-					allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
-					allNodes[nodeId].hiddenLabel = undefined;
+			Object.keys(allNodes).forEach(function (k) {
+				var node = allNodes[k],
+					hiddenLabel = node.hiddenLabel;
+				
+				node.color = undefined;
+				if (hiddenLabel !== undefined) {
+					node.label = hiddenLabel;
+					node.hiddenLabel = undefined;
 				}
-			}
-			highlightActive = false
+			});
+			highlightActive = false;
 		}
 
 		// transform the object into an array
-		var updateArray = [];
+		
+		
 		for (nodeId in allNodes) {
 			if (allNodes.hasOwnProperty(nodeId)) {
-				updateArray.push(allNodes[nodeId]);
+				updatedNodes.push(allNodes[nodeId]);
 			}
 		}
-		nodes.update(updateArray);
+		nodes.update(updatedNodes);
+		
+		//-------------------------------------------------------------
+		edges.update(updatedEdges);
 	}
 
 	inst.convertData = convertData;
