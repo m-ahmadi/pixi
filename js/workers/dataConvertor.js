@@ -26,7 +26,7 @@ self.onmessage = function (e) {
 		
 		newEdges.push({
 			id: link.id,
-			from: isObj(src) ? src.id : src || link.source_id,
+			"from": isObj(src) ? src.id : src || link.source_id,
 			to: isObj(dest) ? dest.id : dest || link.destination_id,
 			color:	status === 0 ? "#33691e" : // green
 					status === 1 ? "#00695c" : // cyan

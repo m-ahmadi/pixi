@@ -32,7 +32,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 					scaleFactor: 0.6,
 					type: "arrow"
 				},
-				from: {
+				"from": {
 					enabled: true,
 					scaleFactor: 0.2,
 					type: "circle"
@@ -45,7 +45,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			borderWidth: 1,
 			shape: "dot",
 			color: "#4CAF50",
-			size: 15,
+			size: 10,
 			font: {
 				size: 12,
 				face: "Tahoma"
@@ -113,6 +113,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		},
 		interaction: {
 			hideEdgesOnDrag: true,
+			hover: true,
 			tooltipDelay: 200
 		},
 	//	manipulation: {},
@@ -162,7 +163,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 				/* from: link.src.id,
 				to: link.dest.id */
 				
-				from: u.isObj(src) ? src.id : src || link.source_id,
+				"from": u.isObj(src) ? src.id : src || link.source_id,
 				to: u.isObj(dest) ? dest.id : dest || link.destination_id,
 			});
 		});
@@ -210,18 +211,80 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	}
 	
 	
-	var highlightActive = false;
-	var allNodes;
-	var allEdges;
+	var GRAYED_OUT_COLOR = "rgba(200, 200, 200, 0.5)";
+	var active = false;
+	function highlight(e) {
+		var len = e.nodes.length,
+			targetId = e.nodes[0],
+			connectedNodes = g.network.getConnectedNodes(targetId),
+			connectedEdges = g.network.getConnectedEdges(targetId),
+			o = { returnType: "Object" },
+			nodes = g.nodes.get(o),
+			edges = g.edges.get(o),
+			toUpdateNodes = [],
+			toUpdateEdges = [];
+			
+		
+		if (len > 0) {
+			console.log("more than 0");
+			Object.keys(nodes).forEach(function (k) {
+				var node = nodes[k],
+					id = node.id;
+				if ( connectedNodes.indexOf(id) === -1  &&  id !== targetId ) {
+					node.tmpGroup = node.group;
+					node.group = undefined;
+					node.color = GRAYED_OUT_COLOR;
+					node.hiddenLabel = node.label;
+					node.label = undefined;
+					toUpdateNodes.push(node);
+				}
+			});
+			Object.keys(edges).forEach(function (k) {
+				var edge = edges[k],
+					id = edge.id;
+				if ( connectedEdges.indexOf(id) === -1 ) {
+					edge.tmpColor = edge.color;
+					edge.color = GRAYED_OUT_COLOR;
+					toUpdateEdges.push(edge);
+				}
+			});
+			active = true;
+		} else if (len === 0 && active) {
+			console.log("=== 0");
+			Object.keys(nodes).forEach(function (k) {
+				var node = nodes[k],
+					tmpGroup = node.tmpGroup;
+				if (tmpGroup) {
+					node.color = undefined;
+					node.group = tmpGroup;
+					node.label = node.hiddenLabel;
+				}
+				toUpdateNodes.push(node);
+			});
+			Object.keys(edges).forEach(function (k) {
+				var edge = edges[k];
+					tmpColor = edge.tmpColor;
+				if (tmpColor) {
+					edge.color = tmpColor;
+				}
+				toUpdateEdges.push(edge);
+			});
+			active = false;
+		}
+		
+		g.nodes.update(toUpdateNodes);
+		g.edges.update(toUpdateEdges);
+		
+	}
+	
+	/*
 	function highlight(e) {
 		var newtork = g.network,
 			nodes = g.nodes,
 			edges = g.edges,
-			i, j,
-			selectedNode, degrees, target,
-			iNode, iEdge,
-			updatedEdges = [],
-			updatedNodes = [];
+			selectedNode, target, connectedNodes, connectedEdges, highlightActive, allNodes, allEdges,
+			len = e.nodes.length,
+			updatedEdges, updatedNodes;
 		
 		allNodes = nodes.get({
 			returnType: "Object"
@@ -231,46 +294,23 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		});
 		
 		// if something is selected:
-		if (e.nodes.length > 0) {
+		if (len > 0) {
 			highlightActive = true;
-			targetId = e.nodes[0],
+			targetId = e.nodes[0];
 			selectedNode = allNodes[targetId];
-			degrees = 2;
 
-			// mark all nodes as hard to read.
+			// gray-out all nodes and hide their labels
 			Object.keys(allNodes).forEach(function (k) {
 				var node = allNodes[k];
-				node.color = "rgba(200, 200, 200, 0.5)";
+				node.color = GRAYED_OUT_COLOR;
 				if (node.hiddenLabel === undefined) {
 					node.hiddenLabel = node.label;
 					node.label = undefined;
 				}
 			});
 			
-			var connectedNodes = network.getConnectedNodes(targetId);
-			var allConnectedNodes = [];
-
-			// get the second degree nodes
-			/* for (i = 1; i < degrees; i++) {
-				for (j = 0; j < connectedNodes.length; j++) {
-					allConnectedNodes = allConnectedNodes.concat(  network.getConnectedNodes( connectedNodes[j] )  );
-				}
-			} */
-
-			
-			// all second degree nodes get a different color and their label back
-			/* allConnectedNodes.forEach(function (k) {
-				var node = allNodes[k],
-					hiddenLabel = node.hiddenLabel;
-				
-				node.color = 'rgba(150,150,150,0.75)';
-				if (hiddenLabel !== undefined) {
-					node.label = hiddenLabel;
-					node.hiddenLabel = undefined;
-				}
-			}); */
-
-
+			// give selected node and its connected nodes their color and label back
+			connectedNodes = network.getConnectedNodes(targetId);
 			connectedNodes.forEach(function (k) {
 				var node = allNodes[k],
 					hiddenLabel = node.hiddenLabel;
@@ -281,25 +321,33 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 					node.hiddenLabel = undefined;
 				}
 			});
-			
 			selectedNode.color = undefined;
 			if (selectedNode.hiddenLabel !== undefined) {
 				selectedNode.label = selectedNode.hiddenLabel;
 				selectedNode.hiddenLabel = undefined;
 			}
 			
-			
+			// gray-out all edges
 			Object.keys(allEdges).forEach(function (k) {
-				allEdges[k].color = "rgba(200, 200, 200, 0.5)";
-				updatedEdges.push(allEdges[k]);
+				var edge = allEdges[k];
+				edge.originalColor = edge.color;
+				edge.color = GRAYED_OUT_COLOR;
 			});
-			var connectedEdges = edges.get({
+			
+			// give connected edges their color back
+			connectedEdges = edges.get({
 				filter: function (i) {
-					return i.from === targetId || i.to === targetId ? i : false
+					return i["from"] === targetId || i.to === targetId ? i : false
 				}
 			});
-		} else if (highlightActive === true) {
+			connectedEdges.forEach(function (item) {
+				var edge = allEdges[item.id];
+				
+				edge.color = edge.originalColor;
+			});
+		} else if (len === 0) {
 			// reset all nodes
+			
 			Object.keys(allNodes).forEach(function (k) {
 				var node = allNodes[k],
 					hiddenLabel = node.hiddenLabel;
@@ -310,23 +358,26 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 					node.hiddenLabel = undefined;
 				}
 			});
-			highlightActive = false;
+			
+			Object.keys(allEdges).forEach(function (k) {
+				var edge = allEdges[k];
+				edge.color = edge.originalColor;
+			});
 		}
-
-		// transform the object into an array
 		
-		
-		for (nodeId in allNodes) {
-			if (allNodes.hasOwnProperty(nodeId)) {
-				updatedNodes.push(allNodes[nodeId]);
-			}
-		}
+		updatedNodes = [];
+		updatedEdges = [];
+		Object.keys(allNodes).forEach(function (k) {
+			updatedNodes.push( allNodes[k] );
+		});
+		Object.keys(allEdges).forEach(function (k) {
+			updatedEdges.push( allEdges[k] );
+		});
 		nodes.update(updatedNodes);
-		
-		//-------------------------------------------------------------
 		edges.update(updatedEdges);
 	}
-
+	*/
+	
 	inst.convertData = convertData;
 	inst.draw = draw;
 	inst.init = init;
