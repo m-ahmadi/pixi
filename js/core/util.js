@@ -18,7 +18,27 @@ var util = (function () {
 			return keys;
 		};
 	}
-	
+	Object.defineProperty(Array.prototype, 'myForEach', {
+		enumerable: false,
+		configurable: false,
+		value: function (f) {
+			var arr = this,
+				len = arr.length,
+				i;
+			for (i=0; i<len; i+=1) {
+				f(arr[i], i, arr);
+			}
+		}
+		/*
+		function (f) {
+			var arr = this,
+				i = arr.length;
+			while (i--) {
+				f(arr[i], i, arr);
+			}
+		}
+		*/
+	});
 	function isObj(v) {
 		return (
 			v &&

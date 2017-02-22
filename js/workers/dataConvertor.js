@@ -30,7 +30,7 @@ self.onmessage = function (e) {
 			to: isObj(dest) ? dest.id : dest || link.destination_id,
 			color:	status === 0 ? "#33691e" : // green
 					status === 1 ? "#00695c" : // cyan
-					status === 2 ? "#fd600"  : // yellow
+					status === 2 ? "#0fd600"  : // yellow
 					status === 3 ? "#e65100" : // orange
 					status === 4 ? "#ff1744" : // pink
 					status === 5 ? "#b71c1c" : undefined, // red
