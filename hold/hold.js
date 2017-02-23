@@ -2,6 +2,175 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+function highlight(e) {
+		var t0 = performance.now();
+		
+		var len = e.nodes.length,
+			targetId = e.nodes[0],
+			connectedNodes = g.network.getConnectedNodes(targetId),
+			connectedEdges = g.network.getConnectedEdges(targetId),
+			o = { returnType: "Object" },
+			nodes = g.nodes.get(o),
+			edges = g.edges.get(o),
+			toUpdateNodes = [],
+			toUpdateEdges = [];
+			
+		
+		if (len > 0) {
+			Object.keys(nodes).forEach(function (k) {
+				var node = nodes[k],
+					id = node.id;
+				if ( connectedNodes.indexOf(id) === -1  &&  id !== targetId ) {
+					node.tmpGroup = node.group;
+					node.group = undefined;
+					node.color = GRAYED_OUT_COLOR;
+					node.hiddenLabel = node.label;
+					node.label = undefined;
+					toUpdateNodes.push(node);
+				}
+			});
+			Object.keys(edges).forEach(function (k) {
+				var edge = edges[k],
+					id = edge.id;
+				if ( connectedEdges.indexOf(id) === -1 ) {
+					edge.tmpColor = edge.color;
+					edge.color = GRAYED_OUT_COLOR;
+					toUpdateEdges.push(edge);
+				}
+			});
+			active = true;
+		} else if (len === 0 && active) {
+			Object.keys(nodes).forEach(function (k) {
+				var node = nodes[k],
+					tmpGroup = node.tmpGroup;
+				if (tmpGroup) {
+					node.color = undefined;
+					node.group = tmpGroup;
+					node.label = node.hiddenLabel;
+				}
+				toUpdateNodes.push(node);
+			});
+			Object.keys(edges).forEach(function (k) {
+				var edge = edges[k];
+					tmpColor = edge.tmpColor;
+				if (tmpColor) {
+					edge.color = tmpColor;
+				}
+				toUpdateEdges.push(edge);
+			});
+			active = false;
+		}
+		var t1 = performance.now();
+		console.log("took " + (t1 - t0) + " milliseconds.");
+		
+		g.nodes.update(toUpdateNodes);
+		g.edges.update(toUpdateEdges);
+	}
+	
+	function highlight_2(e) {
+		var t0 = performance.now();
+		
+		var newtork = g.network,
+			nodes = g.nodes,
+			edges = g.edges,
+			selectedNode, target, connectedNodes, connectedEdges, highlightActive, allNodes, allEdges,
+			len = e.nodes.length,
+			updatedEdges, updatedNodes;
+		
+		allNodes = nodes.get({
+			returnType: "Object"
+		});
+		allEdges = edges.get({
+			returnType: "Object"
+		});
+		
+		// if something is selected:
+		if (len > 0) {
+			highlightActive = true;
+			targetId = e.nodes[0];
+			selectedNode = allNodes[targetId];
+
+			// gray-out all nodes and hide their labels
+			Object.keys(allNodes).forEach(function (k) {
+				var node = allNodes[k];
+				node.color = GRAYED_OUT_COLOR;
+				if (node.hiddenLabel === undefined) {
+					node.hiddenLabel = node.label;
+					node.label = undefined;
+				}
+			});
+			
+			// give selected node and its connected nodes their color and label back
+			connectedNodes = network.getConnectedNodes(targetId);
+			connectedNodes.forEach(function (k) {
+				var node = allNodes[k],
+					hiddenLabel = node.hiddenLabel;
+				
+				node.color = undefined;
+				if (hiddenLabel !== undefined) {
+					node.label = hiddenLabel;
+					node.hiddenLabel = undefined;
+				}
+			});
+			selectedNode.color = undefined;
+			if (selectedNode.hiddenLabel !== undefined) {
+				selectedNode.label = selectedNode.hiddenLabel;
+				selectedNode.hiddenLabel = undefined;
+			}
+			
+			// gray-out all edges
+			Object.keys(allEdges).forEach(function (k) {
+				var edge = allEdges[k];
+				edge.originalColor = edge.color;
+				edge.color = GRAYED_OUT_COLOR;
+			});
+			
+			// give connected edges their color back
+			connectedEdges = edges.get({
+				filter: function (i) {
+					return i["from"] === targetId || i.to === targetId ? i : false
+				}
+			});
+			connectedEdges.forEach(function (item) {
+				var edge = allEdges[item.id];
+				
+				edge.color = edge.originalColor;
+			});
+		} else if (len === 0) {
+			// reset all nodes
+			
+			Object.keys(allNodes).forEach(function (k) {
+				var node = allNodes[k],
+					hiddenLabel = node.hiddenLabel;
+				
+				node.color = undefined;
+				if (hiddenLabel !== undefined) {
+					node.label = hiddenLabel;
+					node.hiddenLabel = undefined;
+				}
+			});
+			
+			Object.keys(allEdges).forEach(function (k) {
+				var edge = allEdges[k];
+				edge.color = edge.originalColor;
+			});
+		}
+		
+		updatedNodes = [];
+		updatedEdges = [];
+		Object.keys(allNodes).forEach(function (k) {
+			updatedNodes.push( allNodes[k] );
+		});
+		Object.keys(allEdges).forEach(function (k) {
+			updatedEdges.push( allEdges[k] );
+		});
+		
+		var t1 = performance.now();
+		console.log("took " + (t1 - t0) + " milliseconds.");
+		
+		nodes.update(updatedNodes);
+		edges.update(updatedEdges);
+	}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // wpix
 function create3pointLine(conf) {

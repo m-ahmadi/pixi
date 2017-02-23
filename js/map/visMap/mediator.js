@@ -120,15 +120,34 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		physics: false // true false
 	};
 	
+	var t0, t1;
+	
 	function createWorker() {
 		if (window.Worker) {
 			g.dataConvertor = new Worker("js/workers/dataConvertor.js");
+			g.highlighter = new Worker("js/workers/highlighter.js");
 			
 			g.dataConvertor.onmessage = function (e) {
 				console.log("convert is finished.");
 				var data = e.data;
 				g.nodes.update(data.nodes);
 				g.edges.update(data.edges);
+			};
+			
+			g.highlighter.onmessage = function (e) {
+				t1 = performance.now();
+				console.log("worker is finished: "+ (t1-t0) );
+				var data = e.data,
+					nodes = data.nodes,
+					edges = data.edges
+				
+				if (nodes.length) {
+					g.nodes.update(data.nodes);
+				}
+				
+				if (edges.length) {
+					g.edges.update(data.edges);
+				}
 			};
 		} else {
 			console.warn("Your browser doesn't support web workers.");
@@ -192,7 +211,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		g.container.height(window.innerHeight);
 		
 		g.network = new vis.Network(g.container[0], {nodes: g.nodes, edges: g.edges}, g.options);
-		g.network.on("click", neighbourhoodHighlight); // neighbourhoodHighlight highlight highlight_2
+		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
 		window.network = g.network;
 		ajax({
 			data: {
@@ -211,183 +230,13 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	}
 	
 	
-	var GRAYED_OUT_COLOR = "rgba(200, 200, 200, 0.5)";
+	var GRAYED_OUT_COLOR = "rgba(200, 200, 200, 0.5)"; "rgba(150, 150, 150, 0.75)"
 	var active = false;
 	
-	function highlight(e) {
-		var t0 = performance.now();
-		
-		var len = e.nodes.length,
-			targetId = e.nodes[0],
-			connectedNodes = g.network.getConnectedNodes(targetId),
-			connectedEdges = g.network.getConnectedEdges(targetId),
-			o = { returnType: "Object" },
-			nodes = g.nodes.get(o),
-			edges = g.edges.get(o),
-			toUpdateNodes = [],
-			toUpdateEdges = [];
-			
-		
-		if (len > 0) {
-			Object.keys(nodes).forEach(function (k) {
-				var node = nodes[k],
-					id = node.id;
-				if ( connectedNodes.indexOf(id) === -1  &&  id !== targetId ) {
-					node.tmpGroup = node.group;
-					node.group = undefined;
-					node.color = GRAYED_OUT_COLOR;
-					node.hiddenLabel = node.label;
-					node.label = undefined;
-					toUpdateNodes.push(node);
-				}
-			});
-			Object.keys(edges).forEach(function (k) {
-				var edge = edges[k],
-					id = edge.id;
-				if ( connectedEdges.indexOf(id) === -1 ) {
-					edge.tmpColor = edge.color;
-					edge.color = GRAYED_OUT_COLOR;
-					toUpdateEdges.push(edge);
-				}
-			});
-			active = true;
-		} else if (len === 0 && active) {
-			Object.keys(nodes).forEach(function (k) {
-				var node = nodes[k],
-					tmpGroup = node.tmpGroup;
-				if (tmpGroup) {
-					node.color = undefined;
-					node.group = tmpGroup;
-					node.label = node.hiddenLabel;
-				}
-				toUpdateNodes.push(node);
-			});
-			Object.keys(edges).forEach(function (k) {
-				var edge = edges[k];
-					tmpColor = edge.tmpColor;
-				if (tmpColor) {
-					edge.color = tmpColor;
-				}
-				toUpdateEdges.push(edge);
-			});
-			active = false;
-		}
-		var t1 = performance.now();
-		console.log("took " + (t1 - t0) + " milliseconds.");
-		
-		g.nodes.update(toUpdateNodes);
-		g.edges.update(toUpdateEdges);
-	}
 	
-	function highlight_2(e) {
-		var t0 = performance.now();
-		
-		var newtork = g.network,
-			nodes = g.nodes,
-			edges = g.edges,
-			selectedNode, target, connectedNodes, connectedEdges, highlightActive, allNodes, allEdges,
-			len = e.nodes.length,
-			updatedEdges, updatedNodes;
-		
-		allNodes = nodes.get({
-			returnType: "Object"
-		});
-		allEdges = edges.get({
-			returnType: "Object"
-		});
-		
-		// if something is selected:
-		if (len > 0) {
-			highlightActive = true;
-			targetId = e.nodes[0];
-			selectedNode = allNodes[targetId];
-
-			// gray-out all nodes and hide their labels
-			Object.keys(allNodes).forEach(function (k) {
-				var node = allNodes[k];
-				node.color = GRAYED_OUT_COLOR;
-				if (node.hiddenLabel === undefined) {
-					node.hiddenLabel = node.label;
-					node.label = undefined;
-				}
-			});
-			
-			// give selected node and its connected nodes their color and label back
-			connectedNodes = network.getConnectedNodes(targetId);
-			connectedNodes.forEach(function (k) {
-				var node = allNodes[k],
-					hiddenLabel = node.hiddenLabel;
-				
-				node.color = undefined;
-				if (hiddenLabel !== undefined) {
-					node.label = hiddenLabel;
-					node.hiddenLabel = undefined;
-				}
-			});
-			selectedNode.color = undefined;
-			if (selectedNode.hiddenLabel !== undefined) {
-				selectedNode.label = selectedNode.hiddenLabel;
-				selectedNode.hiddenLabel = undefined;
-			}
-			
-			// gray-out all edges
-			Object.keys(allEdges).forEach(function (k) {
-				var edge = allEdges[k];
-				edge.originalColor = edge.color;
-				edge.color = GRAYED_OUT_COLOR;
-			});
-			
-			// give connected edges their color back
-			connectedEdges = edges.get({
-				filter: function (i) {
-					return i["from"] === targetId || i.to === targetId ? i : false
-				}
-			});
-			connectedEdges.forEach(function (item) {
-				var edge = allEdges[item.id];
-				
-				edge.color = edge.originalColor;
-			});
-		} else if (len === 0) {
-			// reset all nodes
-			
-			Object.keys(allNodes).forEach(function (k) {
-				var node = allNodes[k],
-					hiddenLabel = node.hiddenLabel;
-				
-				node.color = undefined;
-				if (hiddenLabel !== undefined) {
-					node.label = hiddenLabel;
-					node.hiddenLabel = undefined;
-				}
-			});
-			
-			Object.keys(allEdges).forEach(function (k) {
-				var edge = allEdges[k];
-				edge.color = edge.originalColor;
-			});
-		}
-		
-		updatedNodes = [];
-		updatedEdges = [];
-		Object.keys(allNodes).forEach(function (k) {
-			updatedNodes.push( allNodes[k] );
-		});
-		Object.keys(allEdges).forEach(function (k) {
-			updatedEdges.push( allEdges[k] );
-		});
-		
-		var t1 = performance.now();
-		console.log("took " + (t1 - t0) + " milliseconds.");
-		
-		nodes.update(updatedNodes);
-		edges.update(updatedEdges);
-	}
 	
-	var allNodes;
+	
 	var highlightActive = false;
-	// "rgba(150, 150, 150, 0.75)"
-	// "rgba(200, 200, 200, 0.5)"
 	function neighbourhoodHighlight(e) {
 		var t0 = performance.now();
 		
@@ -395,6 +244,7 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			nodes,
 			edges,
 			k, i, node, edge, hiddenLabel, len, originalColor,
+			keys,
 			targetId,
 			connectedNodes, connectedEdges,
 			o = {returnType: "Object"},
@@ -402,32 +252,31 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			toUpdateEdges = [];
 			
 		
-		
 		nodes = g.nodes.get(o);
 		edges = g.edges.get(o);
 		
 		if (e.nodes.length > 0) {
-			console.log(1);
 			network = g.network;
 			highlightActive = true;
 			targetId = e.nodes[0];
 			
-			for (k in nodes) {
-				if ( nodes.hasOwnProperty(k) ) {
-					node = nodes[k];
-					hiddenLabel = node.hiddenLabel;
-					
-					node.color = GRAYED_OUT_COLOR;
-					if (hiddenLabel === undefined) {
-						node.hiddenLabel = node.label;
-						node.label = undefined;
-					}
+			keys = Object.keys(nodes);
+			len = keys.length;
+			for (i=0; i<len; i+=1) {
+				node = nodes[ keys[i] ];
+				hiddenLabel = node.hiddenLabel;
+				
+				node.color = GRAYED_OUT_COLOR;
+				if (hiddenLabel === undefined) {
+					node.hiddenLabel = node.label;
+					node.label = undefined;
 				}
 			}
+			
 			connectedNodes = network.getConnectedNodes(targetId); // array of ids
 			len = connectedNodes.length;
 			
-			for (i=0; i < len; i+=1) {
+			for (i=0; i<len; i+=1) {
 				node = nodes[ connectedNodes[i] ];
 				hiddenLabel = node.hiddenLabel;
 				
@@ -446,42 +295,34 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 				node.hiddenLabel = undefined;
 			}
 			
-			
-			connectedEdges = network.getConnectedEdges(targetId);
-			
-			k = undefined;
-			for (k in edges) {
-				if ( edges.hasOwnProperty(k) ) {
-					edge = edges[k];
-					originalColor = edge.originalColor;
-					if (originalColor === undefined) {
-						edge.originalColor = edge.color;
-						edge.color = GRAYED_OUT_COLOR;
-					}
+			keys = Object.keys(edges);
+			len = keys.length;
+			for (i=0; i<len; i+=1) {
+				edge = edges[ keys[i] ];
+				originalColor = edge.originalColor;
+				if (originalColor === undefined) {
+					edge.originalColor = edge.color;
+					edge.color = GRAYED_OUT_COLOR;
 				}
 			}
 			
-			console.log(connectedEdges);
-			connectedEdges = g.edges.get( connectedEdges, o );
-			console.log(connectedEdges);
+			connectedEdges = network.getConnectedEdges(targetId); // array of ids
 			
-			k = undefined;
-			for (k in connectedEdges) {
-				if ( connectedEdges.hasOwnProperty(k) ) {
-					edge = edges[k];
-					originalColor = edge.originalColor;
-					if (originalColor !== undefined) {
-						edge.color = originalColor;
-						edge.originalColor = undefined;
-					}
+			len = connectedEdges.length;
+			for (i=0; i<len; i+=1) {
+				edge = edges[ connectedEdges[i] ];
+				originalColor = edge.originalColor;
+				if (originalColor !== undefined) {
+					edge.color = originalColor;
+					edge.originalColor = undefined;
 				}
 			}
 			
 		} else if (highlightActive === true) {
-			console.log(2);
-			k = undefined;
-			for (k in nodes) {
-				node = nodes[k];
+			keys = Object.keys(nodes);
+			len = keys.length;
+			for (i=0; i<len; i+=1) {
+				node = nodes[ keys[i] ];
 				hiddenLabel = node.hiddenLabel;
 				
 				node.color = undefined;
@@ -491,9 +332,10 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 				}
 			}
 			
-			k = undefined;
-			for (k in edges) {
-				edge = edges[k];
+			keys = Object.keys(edges);
+			len = keys.length;
+			for (i=0; i<len; i+=1) {
+				edge = edges[ keys[i] ];
 				originalColor = edge.originalColor;
 				if (originalColor !== undefined) {
 					edge.color = originalColor;
@@ -503,29 +345,43 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 			highlightActive = false
 		}
 		
-		
-		k = undefined;
-		for (k in nodes) {
-			if (nodes.hasOwnProperty(k)) {
-				toUpdateNodes.push( nodes[k] );
-			}
+		keys = Object.keys(nodes);
+		len = keys.length;
+		for (i=0; i<len; i+=1) {
+			toUpdateNodes.push( nodes[ keys[i] ] );
 		}
 		
-		k = undefined;
-		for (k in edges) {
-			if (edges.hasOwnProperty(k)) {
-				toUpdateEdges.push( edges[k] );
-			}
+		keys = Object.keys(edges);
+		len = keys.length;
+		for (i=0; i<len; i+=1) {
+			toUpdateEdges.push( edges[ keys[i] ] );
 		}
 		
 		var t1 = performance.now();
 		console.log("took " + (t1 - t0) + " milliseconds.");
 		
-		
 		g.nodes.update(toUpdateNodes);
 		g.edges.update(toUpdateEdges);
 	}
-
+	
+	var highlightActive = false;
+	function workerHighlight(e) {
+		
+		var targetId = e.nodes[0];
+		var network = g.network;
+		var o = {returnType: "Object"};
+		var data = {
+			len: e.nodes.length,
+			targetId: targetId,
+			nodes: g.nodes.get(o),
+			edges: g.edges.get(o),
+			connectedNodes: targetId ? network.getConnectedNodes(targetId) : [],
+			connectedEdges: targetId ? network.getConnectedEdges(targetId) : []
+		};
+		
+		t0 = performance.now();
+		g.highlighter.postMessage(data);
+	}
 	
 	
 	
