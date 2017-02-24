@@ -4,7 +4,7 @@ define(['./page', 'map/mediator'], function (page, map) {
 	
 	
 	function init() {
-		page.addEvt( map.init, ['pixiMap', "#map_container"] );
+		page.addEvt( map.init, ['visMap', "#map_container"] ); // visMap pixiMap
 	}
 	
 	inst.init = init;

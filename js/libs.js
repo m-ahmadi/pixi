@@ -1,22 +1,26 @@
-var LIB = 'js/lib/';
-var DEST_FILE = 'js/lib/all.js';
+var LIB = "js/lib/";
+var LIBS_DEST_FILE = "js/lib/all-libs.js";
 var list = [
-	"jquery/jquery.min.js",
-	"vis.min.js",
-	"uikit/v3/uikit.min.js",
-	"jquery/jquery-ui.min.js",
-	"jquery/jquery.mousewheel.min.js",
-	"pixi/pixi.min.js",
-	"ani/TweenLite.min.js",
-	"socket.io.min.js",
-	"handlebars.min.js",
+	"jquery/jquery",
+	"vis/vis",
+	"uikit/v3/uikit",
+	"jquery/jquery-ui",
+	"jquery/jquery.mousewheel",
+	"pixi/pixi",
+	"ani/TweenLite",
+	"socket.io",
+	"handlebars",
+	"require"
 ];
+function getLibs(min) { // default: not minified
+	var arr = list;
+	arr.forEach(function (itm, idx, arr) {
+		arr[idx] = LIB + itm + (min ? ".min" : "") + ".js";
+	});
+	arr.push("js/main-built.js");
+	console.log(arr);
+	return arr;
+}
+getLibs.DEST_FILE = LIBS_DEST_FILE;
 
-list.forEach(function (itm, idx, arr) {
-	arr[idx] = LIB + itm;
-});
-
-module.exports = {
-	list: list,
-	dest: DEST_FILE
-};
+module.exports = getLibs;

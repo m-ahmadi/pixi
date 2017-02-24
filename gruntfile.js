@@ -1,8 +1,6 @@
-var libs = require('./js/libs');
+var getLibs = require("./js/libs.js");
 
 module.exports = function(grunt) {
-	
-	
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		sass: {
@@ -53,8 +51,8 @@ module.exports = function(grunt) {
 			  separator: '\n',
 			},
 			dist: {
-				src: libs.list,
-				dest: libs.dest,
+				src: getLibs( grunt.option("min") ===  true), // ["", "", ""]
+				dest: getLibs.DEST_FILE, // ""
 			}
 		},
 		

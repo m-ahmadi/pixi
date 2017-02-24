@@ -65,10 +65,10 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 		// p.data.y1 = -hH;
 		// p.data.y2 = h + hH;
 		
-		d.x1 = 0;
-		d.x2 = w;
-		d.y1 = 0;
-		d.y2 = h;
+		d.x1 = -1000; // 0
+		d.x2 = 2000; // w
+		d.y1 = -500; // 0
+		d.y2 = 900; // h
 		
 		// p.bounds.x1 = hW;
 		// p.bounds.x2 = -hW;
