@@ -215,10 +215,10 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 		window.network = g.network;
 		ajax({
 			data: {
-				x1: -3000,// hW
-				x2: 3000,// hW window.innerWidth,
-				y1: -500, // hH
-				y2: 500 // hH window.innerHeight
+				x1: -hW,// hW
+				x2: hW,// hW window.innerWidth,
+				y1: -hH, // hH
+				y2: hH // hH window.innerHeight
 			}
 		})
 		.done(function (data) {

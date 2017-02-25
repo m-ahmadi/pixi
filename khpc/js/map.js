@@ -8,15 +8,12 @@ define(['util'], function (u) {
 		stage: {},
 		main: {},
 		ATLAS_PATH: "images/atlas.json",
+		PLANT: "images/plant.png",
 		BG_PATH: "images/bg.png",
 		textures: {}
 	};
 	
-	var tile;
 	
-	function addEvt() {
-		$("canvas").on("mousewheel", mousewheel);
-	}
 	function makeDraggable(el) {
 		el.interactive = true;
 		el
@@ -32,18 +29,6 @@ define(['util'], function (u) {
 	function animate() {
 		requestAnimationFrame(animate);
 		g.renderer.render(g.stage);
-	}
-	function newNode(conf) {
-		var sprite, img, scale;
-		
-		sprite = new PIXI.Sprite( g.textures[img] );
-		sprite.interactive = true;
-		sprite.buttonMode = true;
-		sprite.anchor.set(0, 0);
-		sprite.alpha = 1;
-		sprite.scale.set( scale );
-		
-		return sprite;
 	}
 	function dragStart(e) {
 		var arr;
@@ -74,8 +59,22 @@ define(['util'], function (u) {
 	function mousewheel(e) {
 		zoom(e.pageX, e.pageY, e.deltaY > 0);
 	}
+	function zoom(x, y, zoomIn) {
+		var direction = (zoomIn) ? 1 : -1,
+			factor = (1 + direction * 0.05),
+			local_pt = new PIXI.Point(),
+			point = new PIXI.Point(x, y),
+			el = g.main;
+		
+		PIXI.interaction.InteractionData.prototype.getLocalPosition(el, local_pt, point);
+		
+		el.scale.x *= factor;
+		el.scale.y *= factor;
+		el.pivot = local_pt;
+		el.position = point;
+	}
 	function start() {
-		tile = new PIXI.extras.TilingSprite.fromImage(g.BG_PATH, g.renderer.width / g.renderer.resolution * 1000000, g.renderer.height / g.renderer.resolution *1000000);
+		var tile = new PIXI.extras.TilingSprite.fromImage(g.BG_PATH, g.renderer.width / g.renderer.resolution * 1000000, g.renderer.height / g.renderer.resolution *1000000);
 		tile.position.x = -1000000;
 		tile.position.y = -1000000;
 		g.main.addChild(tile);
@@ -97,37 +96,37 @@ define(['util'], function (u) {
 			g.main.addChild(s);
 		}
 	}
-	function zoom(x, y, zoomIn) {
-		var direction = (zoomIn) ? 1 : -1,
-			factor = (1 + direction * 0.05),
-			local_pt = new PIXI.Point(),
-			point = new PIXI.Point(x, y),
-			el = g.main;
+	function createStuff() {
+		var tile = new PIXI.extras.TilingSprite.fromImage(g.BG_PATH, g.renderer.width / g.renderer.resolution * 1000000, g.renderer.height / g.renderer.resolution *1000000);
+		tile.position.x = -1000000;
+		tile.position.y = -1000000;
+		g.main.addChild(tile);
 		
-		PIXI.interaction.InteractionData.prototype.getLocalPosition(el, local_pt, point);
 		
-		el.scale.x *= factor;
-		el.scale.y *= factor;
-		el.pivot = local_pt;
-		el.position = point;
+		var s = new PIXI.Sprite( g.textures.plant );
+		g.main.addChild(s);
+		
+		g.stage.position.set(500, 50);
 	}
 	function init(div, fn) {
 		div = div instanceof jQuery ? div : u.isStr(div) ? $(div) : $(document.body);
 		var stage, main, renderer,
 			renReso,
 			N = 100000,
-			ATLAS = g.ATLAS_PATH;
+			ATLAS = g.ATLAS_PATH,
+			PLANT = g.PLANT;
 		
 		PIXI.utils.skipHello();
 		g.renderer = PIXI.autoDetectRenderer(
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: 0xFF0000 ,// 0xf5eed8, // 0xAB9988, // 0xAB9999,
+				backgroundColor: 0x4e342e ,// 0xf5eed8, // 0xAB9988, // 0xAB9999,
 				antialias: true,
-				transparent: true
+				transparent: false
 			}
 		);
+		
 		div.append( g.renderer.view );
 		g.stage = new PIXI.Container();
 		g.main = new PIXI.Container();
@@ -135,27 +134,32 @@ define(['util'], function (u) {
 		renderer = g.renderer;
 		stage = g.stage;
 		main = g.main;
-		
 		renReso = renderer.resolution;
-		stage.hitArea = new PIXI.Rectangle( -N, -N, renderer.width / renReso * N, renderer.height / renReso *N );
+		
+	//	main.hitArea = new PIXI.Rectangle( -1000000, -1000000, renderer.width / renReso * 1000000, renderer.height / renReso *1000000 );
+	//	stage.interactive = true;
+		
+		
 		makeDraggable(main);
-		addEvt();
+		$("canvas").on("mousewheel", mousewheel);
 		stage.addChild( main );
 		
+		PIXI.loader.add( PLANT );
 		PIXI.loader.add( ATLAS );
 		PIXI.loader.load(function () {
 			g.textures = PIXI.loader.resources[ATLAS].textures;
+			g.textures["plant"] = PIXI.loader.resources[PLANT].texture;
 			if ( u.isFn(fn) ) {
 				fn();
 			}
-			start();
+		//	start();
+			createStuff();
 		});
 		requestAnimationFrame( animate );
 		renderer.render( stage );
 	}
 	
 	inst.init = init;
-	inst.newNode = newNode;
 	
 	return inst;
 });

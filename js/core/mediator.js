@@ -1,4 +1,3 @@
-
 define(['./page', 'map/mediator'], function (page, map) {
 	var inst = {};
 	

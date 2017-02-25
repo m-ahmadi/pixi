@@ -2,20 +2,20 @@ var getLibs = require("./js/libs.js");
 
 module.exports = function(grunt) {
 	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
+		pkg: grunt.file.readJSON("package.json"),
 		sass: {
 			dist: {
 				options: {
-					style: 'expanded' // nested compact compressed
+					style: "expanded" // nested compact compressed
 				},
 				files: {
-					'css/style.css': 'sass/style.scss'
+					"css/style.css": "sass/style.scss"
 				}
 			}
 		},
 		jshint: {
 			options: {
-				reporter: require('jshint-stylish'),
+				reporter: require("jshint-stylish"),
 				curly: true,
 				eqeqeq: true,
 				eqnull: true,
@@ -25,37 +25,36 @@ module.exports = function(grunt) {
 				}
 			},
 			uses_defaults: [
-				'js/**/*.js',
-				'!js/lib/**/*'
-				//'!js/app/**/*'
+				"js/**/*.js",
+				"!js/lib/**/*"
+				//"!js/app/**/*"
 			]
-			//beforeconcat: ['public/js/app/**/*.js'],
-			//afterconcat: ['public/js/app.js']
+			//beforeconcat: ["public/js/app/**/*.js"],
+			//afterconcat: ["public/js/app.js"]
 		},
 		jslint: {
 			client: {
 				src: [
-					'js/fn.js'
+					"js/fn.js"
 				],
 				directives: {
 					browser: true,
 					predef: [
-						'jQuery', '$', 'PIXI', 'util', 'window', 'document', 'coPubsub'
+						"jQuery", "$", "PIXI", "util", "window", "document", "coPubsub"
 					]
 				}
 			}
 		},
 		
-		concat: {
+		/* concat: {
 			options: {
-			  separator: '\n',
+			  separator: "\n",
 			},
 			dist: {
 				src: getLibs( grunt.option("min") ===  true), // ["", "", ""]
 				dest: getLibs.DEST_FILE, // ""
 			}
-		},
-		
+		}, */
 		
 		/*
 		browserify: {
@@ -65,7 +64,7 @@ module.exports = function(grunt) {
 				},
 				options: {
 					watch: true,
-					plugin: ['tsify']
+					plugin: ["tsify"]
 				}
 			},
 			
@@ -76,11 +75,11 @@ module.exports = function(grunt) {
 		webpack: {
 			default: {
 				entry: {
-					main: './js/src/main.js'
+					main: "./js/src/main.js"
 				},
 				output: {
-					filename: 'bundle.js',
-					path: './js/dist'
+					filename: "bundle.js",
+					path: "./js/dist"
 				}
 			}
 		},
@@ -88,14 +87,14 @@ module.exports = function(grunt) {
 		watch: {
 			scripts: {
 				files: [
-					'sass/**/*.scss',
-					'css/**/*.css',
-					'js/**/*.js',
-					'gruntfile.js',
-					'test/**/*',
-					'khpc/**/*'
+					"sass/**/*.scss",
+					"css/**/*.css",
+					"js/**/*.js",
+					"gruntfile.js",
+					"test/**/*",
+					"khpc/**/*"
 				],
-				tasks: ['sass'], // 'webpack', 'jslint', 'browserify', 'jshint', 'concat'
+				tasks: ["sass"], // "webpack", "jslint", "browserify", "jshint", "concat"
 				options: {
 					spawn: false,
 					reload: true
@@ -104,27 +103,42 @@ module.exports = function(grunt) {
 			livereload: {
 				options: { livereload: true },
 				files: [
-					'**/*.htm',
-					'sass/**/*.scss',
-					'css/**/*.css',
-					'js/**/*.js',
-					'*.js',
-					'test/**/*',
-					'khpc/**/*'
+					"**/*.htm",
+					"sass/**/*.scss",
+					"css/**/*.css",
+					"js/**/*.js",
+					"*.js",
+					"test/**/*",
+					"khpc/**/*"
 				]
 			}
 		}
 	});
 	
-	// grunt.loadNpmTasks('grunt-webpack');
-//	grunt.loadNpmTasks('grunt-jslint');
-//	grunt.loadNpmTasks('grunt-browserify');
+	// grunt.loadNpmTasks("grunt-webpack");
+//	grunt.loadNpmTasks("grunt-jslint");
+//	grunt.loadNpmTasks("grunt-browserify");
 	
-	grunt.loadNpmTasks('grunt-contrib-sass');
-//	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks("grunt-contrib-sass");
+//	grunt.loadNpmTasks("grunt-contrib-jshint");
+	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-contrib-watch");
 	
-	grunt.registerTask('libs', ['concat']);
-	grunt.registerTask('default', ['watch']);
+	grunt.registerTask("libs", function () {
+		grunt.config.set("concat", {
+			options: {
+			  separator: "\n",
+			},
+			dist: {
+				src: getLibs( grunt.option("min") ===  true), // ["", "", ""]
+				dest: getLibs.DEST_FILE, // ""
+			}
+		});
+		grunt.task.run("concat");
+	});
+	grunt.registerTask("default", function (a, b, c) {
+		
+		
+		grunt.task.run("watch");
+	});
 };
