@@ -1,6 +1,5 @@
-define(["util", "positions"], function (u, sensorsPos) {
-	var inst = {},
-		p;
+define(["util", "positions"], function (u, sensorPos) {
+	var inst = {};
 		
 	// Scope Globals:
 	g = {
@@ -12,11 +11,33 @@ define(["util", "positions"], function (u, sensorsPos) {
 		BG_PATH: "images/bg.png",
 		AJAX_URL: "http://127.0.0.1:1081/khp/report",
 		textures: {},
-		sensorList: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-		sensors: {}
+		sensorsList: false,
+		sensors: {},
+		sensorsList: (function(){var a=[];Object.keys(sensorPos).forEach(function(k,i){a[i]=k;});}()),
+		initialAjaxLoaded: false,
+		assetsLoaded: false,
+		REFRESH_TIME: 60000
 	};
 	
-	
+	function ajax(data) {
+		var d = {};
+		
+		d.num_rows        = 1;
+		d.timestamp_start = 1487968298000;
+		d.timestamp_end   = 1488056858000;
+		d.table_name      = "csv_report";
+		d.sensors = data.sensorsList ? data.sensorsList.join(",") : g.sensorsList.join(",")
+		
+		$.ajax({
+			url: g.AJAX_URL,
+			type: "GET",
+			dataType: "json",
+			data: d,
+			beforeSend: data.beforeSend
+		})
+		.done( data.done )
+		.fail( data.fail );
+	}
 	
 	var makeDraggable = (function (el) {
 		function start(e) {
@@ -69,6 +90,12 @@ define(["util", "positions"], function (u, sensorsPos) {
 		console.log(e.deltaY);
 		zoom(e.pageX, e.pageY, e.deltaY > 0);
 	}
+	function addEvt() {
+		$("canvas").on("mousewheel", mousewheel);
+		$(window).on("resize", function () {
+			g.renderer.resize(window.innerWidth, window.innerHeight);
+		});
+	}
 	function zoom(x, y, zoomIn) {
 		var direction = (zoomIn) ? 1 : -1,
 			factor = (1 + direction * 0.1),
@@ -105,50 +132,50 @@ define(["util", "positions"], function (u, sensorsPos) {
 			g.main.addChild(s);
 		}
 	}
-	function updateSensors(arr) {
-		// Object.keys(g.sensors)
-		arr.forEach(function (itm, idx) {
-			
-			var sensor = g.sensors[ itm.sensorId ];
-			
-			sensor.nameEl.setText(itm.sensorName);
-			sensor.valueEl.setText(itm.value);
-		});
+	function createPlant() {
+		var c, s;
+		
+		c = new PIXI.Container();
+		s = new PIXI.Sprite( g.textures.plant );
+		s.scale.set(0.5);
+		c.addChild(s);
+		
+		g.main.addChild(c);
+		g.stage.position.set(500, 50);
 	}
-	function createStuff() {
-		var textStyle, c, s,
+	function createSensors(sensors) {
+		var ts1, ts2,
 			Text = PIXI.Text,
 			Graphics = PIXI.Graphics,
 			TXT_SCALE = 0.2;
 			BOX_COLOR = 0x02C4C4,
 			SCALE_X = 1.2;
 			SCALE_Y = 1.4;
-			SPACE_BETWEEN_BOXES = 10,
-			DEFAULT_NAME = "n\a",
-			DEFAULT_VALUE = "n\a";
-			
+			SPACE_BETWEEN_BOXES = 8;
 		
-		textStyle = {
+		ts1 = {
+			fontFamily: 'Arial',
+			fontSize: '100px',
+			fill: '#002200',
+			stroke: '#4a1850'
+		};
+		ts2 = {
 			fontFamily: 'Arial',
 			fontSize: '100px',
 			fill: '#F7EDCA',
 			stroke: '#4a1850'
 		};
-		c = new PIXI.Container();
-		s = new PIXI.Sprite( g.textures.plant );
-		s.scale.set(0.5);
-		c.addChild(s);
 		
-		Object.keys(sensorsPos).forEach(function (k) {
-			var sensor = sensorsPos[k],
+		Object.keys(sensors).forEach(function (k) {
+			var sensor = sensors[k],
 				b = new PIXI.Container(),
 				r1, r2,
 				t1, t2;
 			
-			t1 = new Text(""+sensor.name, textStyle);
+			t1 = new Text(""+sensor.name, ts1);
 			t1.scale.set( TXT_SCALE );
 			
-			t2 = new Text(""+sensor.value, textStyle);
+			t2 = new Text(""+sensor.value, ts2);
 			t2.scale.set( TXT_SCALE );
 			
 			r1 = new Graphics();
@@ -158,7 +185,7 @@ define(["util", "positions"], function (u, sensorsPos) {
 			
 			r2 = new Graphics();
 			r2.beginFill( BOX_COLOR );
-			r2.drawRect(0, 0, t2.width * SCALE_X, t2.height * SCALE_Y);
+			r2.drawRect(0, 0, t2.width * SCALE_X*1.3, t2.height * SCALE_Y);
 			r2.endFill();
 			r2.position.x = r1.x + r1.width + SPACE_BETWEEN_BOXES;
 			
@@ -173,50 +200,101 @@ define(["util", "positions"], function (u, sensorsPos) {
 			b.addChild(r2);
 			b.addChild(t1);
 			b.addChild(t2);
-			c.addChild(b);
+			
+			
+			g.main.addChild(b);
 			
 			g.sensors[k] = {
-				nameEl: t1,
-				valueEl: t2
+				box: b,
+				nameRectEl: r1,
+				valueTxtEl: t2,
+				valueRectEl: r2
 			};
-			inst.text = b;
 		});
 		
-
-		g.main.addChild(c);
-		g.stage.position.set(500, 50);
 		
-		
-		$.ajax({
-			url : g.AJAX_URL,
-			type : "GET",
-			dataType : "json",
-			data : {
-				num_rows: 1,
-				timestamp_start: 1487968298000,
-				timestamp_end: 1488056858000,
-				table_name: "csv_report",
-				sensors: g.sensorList.join(",")
-			},
-			beforeSend : function () {
-				// 
-			}
-		})
-		.done(function (data) {
-			var arr = data.rowList;
-			updateSensors( arr );
-		})
-		.fail(function (data) {
+	}
+	function updateSensors(arr) {
+		arr.forEach(function (itm, idx) {
+			var sensor = g.sensors[ itm.sensorId ],
+				r1, t2, r2;
 			
+			r2 = sensor.valueRectEl;
+			r1 = sensor.nameRectEl;
+			t2 = sensor.valueTxtEl;
+			
+			r2.destroy(true);
+			
+			t2.setText(""+itm.value);
+			
+			r2 = new PIXI.Graphics();
+			r2.beginFill( BOX_COLOR );
+			r2.drawRect(0, 0, t2.width * 1.5, t2.height * 1.4);
+			r2.endFill();
+			r2.position.x = r1.x + r1.width + SPACE_BETWEEN_BOXES;
+			sensor.box.addChild(r2);
+			
+			var arr = t2.parent.children;
+			arr.splice( arr.indexOf(t2), 1 );
+			arr.push(t2);
+			
+			sensor.valueRectEl = r2;
 		});
 	}
-	function addEvt() {
-		$("canvas").on("mousewheel", mousewheel);
-		$(window).on("resize", function () {
-			g.renderer.resize(window.innerWidth, window.innerHeight);
+	function loadData() {
+		ajax({
+			done: function (data) {
+				
+				updateSensors( data.rowList );
+				
+				setTimeout(loadData, g.REFRESH_TIME);
+			},
+			fail: function () {
+				setTimeout(loadData, 1000);
+			}
 		});
+	}
+	function makeInitAjax() {
+		var list, o;
+		
+		if ( g.assetsLoaded ) {
+			list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+			o = {};
+			g.sensorsList = list;
+			
+			o.sensorsList = list;
+			o.done = function (data) {
+				var arr;
+				
+				g.initialAjaxLoaded = true;
+				
+				arr = data.rowList;
+				arr.forEach(function (itm) {
+					
+					var sensor = sensorPos[itm.sensorId];
+					
+					sensor.name = itm.sensorName + " :";
+					sensor.value = itm.value;
+					
+				});
+				
+				createSensors(sensorPos);
+				
+				setTimeout(loadData, g.REFRESH_TIME);
+			};
+			o.fail = function (data) {
+				setTimeout(makeInitAjax, 1000);
+			};
+			
+			ajax(o);
+		
+		} else {
+			setTimeout(makeInitAjax, 1000);
+		}
 	}
 	function init(div, fn) {
+		makeInitAjax();
+		
 		div = div instanceof jQuery ? div : u.isStr(div) ? $(div) : $(document.body);
 		var stage, main, renderer,
 			renReso,
@@ -254,13 +332,14 @@ define(["util", "positions"], function (u, sensorsPos) {
 		PIXI.loader.add( PLANT );
 		PIXI.loader.add( ATLAS );
 		PIXI.loader.load(function () {
+			g.assetsLoaded = true;
 			g.textures = PIXI.loader.resources[ATLAS].textures;
 			g.textures["plant"] = PIXI.loader.resources[PLANT].texture;
 			if ( u.isFn(fn) ) {
 				fn();
 			}
 		//	start();
-			createStuff();
+			createPlant();
 		});
 		requestAnimationFrame( animate );
 		renderer.render( stage );
