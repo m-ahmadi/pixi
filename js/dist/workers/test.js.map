@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/workers/test.js"],"names":["onmessage","e","console","log","data","postMessage"],"mappings":"AAAAA,YAAY,UAAUC,CAAV,EAAa;AACxBC,SAAQC,GAAR,CAAYF,EAAEG,IAAd;AACAC,aAAY,mBAAZ;AACA,CAHD","file":"test.js","sourcesContent":["onmessage = function (e) {\r\n\tconsole.log(e.data);\r\n\tpostMessage(\"worker says hello\");\r\n};"]}

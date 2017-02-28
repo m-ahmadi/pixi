@@ -1,6 +1,6 @@
-var getLibs = require("./js/libs.js");
+var getLibs = require("./js/dist/libs.js");
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON("package.json"),
 		sass: {
@@ -89,7 +89,7 @@ module.exports = function(grunt) {
 				files: [
 					"sass/**/*.scss",
 					"css/**/*.css",
-					"js/**/*.js",
+					"js/dist/**/*.js",
 					"gruntfile.js",
 					"test/**/*",
 					"khpc/**/*"
@@ -106,7 +106,7 @@ module.exports = function(grunt) {
 					"**/*.htm",
 					"sass/**/*.scss",
 					"css/**/*.css",
-					"js/**/*.js",
+					"js/dist/**/*.js",
 					"*.js",
 					"test/**/*",
 					"khpc/**/*"
@@ -136,9 +136,5 @@ module.exports = function(grunt) {
 		});
 		grunt.task.run("concat");
 	});
-	grunt.registerTask("default", function (a, b, c) {
-		
-		
-		grunt.task.run("watch");
-	});
+	grunt.registerTask("default", ["watch"]);
 };
