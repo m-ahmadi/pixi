@@ -319,12 +319,12 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 	// getters
 	Object.defineProperties(inst, {
 		"width": {
-			get: function () {
+			get: function get() {
 				return wpix.renderer.width;
 			}
 		},
 		"height": {
-			get: function () {
+			get: function get() {
 				return wpix.renderer.height;
 			}
 		}
@@ -342,4 +342,3 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 
 	return inst;
 });
-//# sourceMappingURL=mediator.js.map

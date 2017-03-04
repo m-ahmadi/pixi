@@ -57,13 +57,13 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 
 		$("canvas").on({
 			"mousewheel": mousewheel,
-			"mouseout": function () {
+			"mouseout": function mouseout() {
 				p.events = false;
 			},
-			"mouseover": function () {
+			"mouseover": function mouseover() {
 				p.events = true;
 			},
-			"contextmenu": function (e) {
+			"contextmenu": function contextmenu(e) {
 				e.preventDefault();
 			}
 		});
@@ -279,7 +279,7 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 		}
 
 		return {
-			get: function () {
+			get: function get() {
 				return bounds;
 			},
 			setBounds: setBounds,
@@ -497,7 +497,7 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 		line.increaseWidth = increaseWidth;
 		line.defaultWidth = defaultWidth;
 		Object.defineProperty(line, "points", {
-			get: function () {
+			get: function get() {
 				return { start: start, end: end };
 			}
 		});
@@ -682,43 +682,43 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 
 	Object.defineProperties(inst, {
 		"renderer": {
-			get: function () {
+			get: function get() {
 				return p.renderer;
 			}
 		},
 		"stage": {
-			get: function () {
+			get: function get() {
 				return p.stage;
 			}
 		},
 		"mainContainer": {
-			get: function () {
+			get: function get() {
 				return p.mainContainer;
 			}
 		},
 		"viewport": {
-			get: function () {
+			get: function get() {
 				return p.viewport;
 			}
 		},
 		"textures": {
-			get: function () {
+			get: function get() {
 				return p.textures;
 			}
 		},
 		"zoom": {
-			get: function () {
+			get: function get() {
 				return p.zoom;
 			},
-			set: function (v) {
+			set: function set(v) {
 				p.zoom = v;
 			}
 		},
 		"events": {
-			get: function () {
+			get: function get() {
 				return p.events;
 			},
-			set: function (v) {
+			set: function set(v) {
 				p.events = v;
 			}
 		}
@@ -734,4 +734,3 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 	window.wpix = inst;
 	return inst;
 });
-//# sourceMappingURL=wpix.js.map

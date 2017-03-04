@@ -15,27 +15,27 @@ define([/* './pixiMap/mediator',  */'./visMap/mediator', 'core/util'], function 
 
 	Object.defineProperties(inst, {
 		"width": {
-			get: function () {
+			get: function get() {
 				return map.width;
 			}
 		},
 		"height": {
-			get: function () {
+			get: function get() {
 				return map.height;
 			}
 		},
 		"resize": {
-			get: function () {
+			get: function get() {
 				return map.resize;
 			}
 		},
 		"setPosition": {
-			get: function () {
+			get: function get() {
 				return map.setPosition;
 			}
 		},
 		"clear": {
-			get: function () {
+			get: function get() {
 				return map.clear;
 			}
 		}
@@ -52,4 +52,3 @@ define([/* './pixiMap/mediator',  */'./visMap/mediator', 'core/util'], function 
 	window.map = inst;
 	return inst;
 });
-//# sourceMappingURL=mediator.js.map

@@ -2,7 +2,7 @@ var baseRoot = "192.168.10.13:3000",
     t;
 
 require.config({
-	baseUrl: "js/src",
+	baseUrl: "js/dist",
 	paths: {
 		lib: "lib",
 		core: "core",
@@ -16,4 +16,3 @@ require(["core/mediator"], function (core) {
 		core.init();
 	});
 });
-//# sourceMappingURL=main.js.map

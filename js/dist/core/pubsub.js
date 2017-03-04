@@ -16,7 +16,7 @@ define(function () {
 
 		inst.subscribe = function (evt, fn, par) {
 			var events,
-			    add = function (str) {
+			    add = function add(str) {
 				if (typeof subscribers[str] === 'undefined') {
 					subscribers[str] = [];
 				}
@@ -78,4 +78,3 @@ define(function () {
 
 	return newPubSub;
 });
-//# sourceMappingURL=pubsub.js.map

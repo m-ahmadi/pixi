@@ -15,4 +15,3 @@ require(['wpix'], function (wpix) {
 		wpix.init();
 	});
 });
-//# sourceMappingURL=main2.js.map

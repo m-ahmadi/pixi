@@ -1,3 +1,5 @@
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 self.onmessage = function (e) {
 	var data = e.data,
 	    oldNodes = data.nodes,
@@ -91,6 +93,5 @@ function template(name, id) {
 	return t;
 }
 function isObj(v) {
-	return v && typeof v === 'object' && typeof v !== null && Object.prototype.toString.call(v) === '[object Object]' ? true : false;
+	return v && (typeof v === "undefined" ? "undefined" : _typeof(v)) === 'object' && typeof v !== null && Object.prototype.toString.call(v) === '[object Object]' ? true : false;
 }
-//# sourceMappingURL=dataConvertor.js.map

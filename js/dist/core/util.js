@@ -1,3 +1,5 @@
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var util = function () {
 	if (typeof Object.create !== 'function') {
 		Object.create = function (o) {
@@ -21,7 +23,7 @@ var util = function () {
 	Object.defineProperty(Array.prototype, 'myForEach', {
 		enumerable: false,
 		configurable: false,
-		value: function (f) {
+		value: function value(f) {
 			var arr = this,
 			    len = arr.length,
 			    i;
@@ -40,13 +42,13 @@ var util = function () {
   */
 	});
 	function isObj(v) {
-		return v && typeof v === 'object' && typeof v !== null && Object.prototype.toString.call(v) === '[object Object]' ? true : false;
+		return v && (typeof v === 'undefined' ? 'undefined' : _typeof(v)) === 'object' && typeof v !== null && Object.prototype.toString.call(v) === '[object Object]' ? true : false;
 	}
 	function isArr(v) {
 		if (typeof Array.isArray === 'function') {
 			return Array.isArray(v);
 		} else {
-			return v && typeof v === 'object' && typeof v.length === 'number' && typeof v.splice === 'function' && !v.propertyIsEnumerable('length') && Object.prototype.toString.call(v) === '[object Array]' ? true : false;
+			return v && (typeof v === 'undefined' ? 'undefined' : _typeof(v)) === 'object' && typeof v.length === 'number' && typeof v.splice === 'function' && !v.propertyIsEnumerable('length') && Object.prototype.toString.call(v) === '[object Array]' ? true : false;
 		}
 	}
 	function getArgs(a) {
@@ -223,4 +225,3 @@ if (typeof define === 'function' && define.amd) {
 } else if (typeof module !== 'undefined') {
 	module.exports = util;
 }
-//# sourceMappingURL=util.js.map

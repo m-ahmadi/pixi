@@ -196,4 +196,3 @@ define(['./wpix', 'core/pubsub', 'core/util'], function (wpix, newPubSub, u) {
 	inst.init = init;
 	return inst;
 });
-//# sourceMappingURL=navigation.js.map

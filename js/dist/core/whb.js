@@ -14,7 +14,7 @@ define(["./util"], function (u) {
 
 	Object.defineProperties(inst, {
 		"tmpl": {
-			get: function () {
+			get: function get() {
 				return tmpl;
 			}
 		}
@@ -23,4 +23,3 @@ define(["./util"], function (u) {
 	window.whb = inst;
 	return inst;
 });
-//# sourceMappingURL=whb.js.map

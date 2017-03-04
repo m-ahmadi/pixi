@@ -129,4 +129,3 @@ define(['./util'], function (u) {
 	window.wuk = inst;
 	return inst;
 });
-//# sourceMappingURL=wuk.js.map

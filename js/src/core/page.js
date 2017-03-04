@@ -149,7 +149,6 @@ define(['map/mediator', './wuk', './whb', './discovery', './traceroute', './mock
 	
 	
 	inst.addEvt = addEvt;
-	
 	return inst;
 });
 

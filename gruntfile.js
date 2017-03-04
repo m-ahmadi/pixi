@@ -1,4 +1,4 @@
-var getLibs = require("./js/dist/libs.js");
+var getLibs = require("./libs.js");
 
 module.exports = function (grunt) {
 	grunt.initConfig({
@@ -92,7 +92,8 @@ module.exports = function (grunt) {
 					"js/dist/**/*.js",
 					"gruntfile.js",
 					"test/**/*",
-					"khpc/**/*"
+					"khpc/**/*",
+					"!**/node_modules/**"
 				],
 				tasks: ["sass"], // "webpack", "jslint", "browserify", "jshint", "concat"
 				options: {
@@ -109,7 +110,8 @@ module.exports = function (grunt) {
 					"js/dist/**/*.js",
 					"*.js",
 					"test/**/*",
-					"khpc/**/*"
+					"khpc/**/*",
+					"!**/node_modules/**"
 				]
 			}
 		}
@@ -130,7 +132,7 @@ module.exports = function (grunt) {
 			  separator: "\n",
 			},
 			dist: {
-				src: getLibs( grunt.option("min") ===  true), // ["", "", ""]
+				src: getLibs( grunt.option("min") === true ), // ["", "", ""]
 				dest: getLibs.DEST_FILE, // ""
 			}
 		});

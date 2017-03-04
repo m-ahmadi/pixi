@@ -125,8 +125,8 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 
 	function createWorker() {
 		if (window.Worker) {
-			g.dataConvertor = new Worker(`${g.WORKERS_DIR}/dataConvertor.js`);
-			g.highlighter = new Worker(`${g.WORKERS_DIR}/highlighter.js`);
+			g.dataConvertor = new Worker(g.WORKERS_DIR + "/dataConvertor.js");
+			g.highlighter = new Worker(g.WORKERS_DIR + "/highlighter.js");
 
 			g.dataConvertor.onmessage = function (e) {
 				console.log("convert is finished.");
@@ -395,4 +395,3 @@ define(["core/util", "core/ajax", "core/whb"], function (u, ajax, whb) {
 	window.visMap = g;
 	return inst;
 });
-//# sourceMappingURL=mediator.js.map

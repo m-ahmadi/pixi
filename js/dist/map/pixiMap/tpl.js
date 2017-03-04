@@ -51,51 +51,51 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 			}
 			Object.defineProperties(node, {
 				"top": {
-					get: function () {
+					get: function get() {
 						return b.y;
 					}
 				},
 				"bott": {
-					get: function () {
+					get: function get() {
 						return b.y + s.height;
 					} // b.height
 				},
 				"left": {
-					get: function () {
+					get: function get() {
 						return b.x;
 					}
 				},
 				"right": {
-					get: function () {
+					get: function get() {
 						return b.x + s.width;
 					} // b.width
 				},
 				//--------------------------------------------------------
-				"topLeft": { get: function () {
+				"topLeft": { get: function get() {
 						return wpix.coPoint(this.left, this.top);
 					} },
-				"topRight": { get: function () {
+				"topRight": { get: function get() {
 						return wpix.coPoint(this.right, this.top);
 					} },
-				"bottLeft": { get: function () {
+				"bottLeft": { get: function get() {
 						return wpix.coPoint(this.left, this.bott);
 					} },
-				"bottRight": { get: function () {
+				"bottRight": { get: function get() {
 						return wpix.coPoint(this.right, this.bott);
 					} },
-				"topMid": { get: function () {
+				"topMid": { get: function get() {
 						return wpix.coPoint(midX(), this.top);
 					} },
-				"bottMid": { get: function () {
+				"bottMid": { get: function get() {
 						return wpix.coPoint(midX(), this.bott);
 					} },
-				"leftMid": { get: function () {
+				"leftMid": { get: function get() {
 						return wpix.coPoint(this.left, midY());
 					} },
-				"rightMid": { get: function () {
+				"rightMid": { get: function get() {
 						return wpix.coPoint(this.right, midY());
 					} },
-				"center": { get: function () {
+				"center": { get: function get() {
 						return wpix.coPoint(midX(), midY());
 					} }
 			});
@@ -378,12 +378,12 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 
 	Object.defineProperties(inst, {
 		"nodes": {
-			get: function () {
+			get: function get() {
 				return p.nodes;
 			}
 		},
 		"links": {
-			get: function () {
+			get: function get() {
 				return p.links;
 			}
 		}
@@ -395,4 +395,3 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 	window.tpl = inst;
 	return inst;
 });
-//# sourceMappingURL=tpl.js.map
