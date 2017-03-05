@@ -72,3 +72,4 @@ define(function () {
 
 	return ajax;
 });
+//# sourceMappingURL=ajax.js.map

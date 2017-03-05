@@ -91,3 +91,4 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 
 	return inst;
 });
+//# sourceMappingURL=discovery.js.map

@@ -9,3 +9,4 @@ define(['./page', 'map/mediator'], function (page, map) {
 
 	return inst;
 });
+//# sourceMappingURL=mediator.js.map

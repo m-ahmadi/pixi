@@ -23,3 +23,4 @@ define(["./util"], function (u) {
 	window.whb = inst;
 	return inst;
 });
+//# sourceMappingURL=whb.js.map

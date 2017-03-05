@@ -16,3 +16,4 @@ require(["core/mediator"], function (core) {
 		core.init();
 	});
 });
+//# sourceMappingURL=main.js.map

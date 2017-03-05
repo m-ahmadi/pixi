@@ -95,3 +95,4 @@ function template(name, id) {
 function isObj(v) {
 	return v && (typeof v === "undefined" ? "undefined" : _typeof(v)) === 'object' && typeof v !== null && Object.prototype.toString.call(v) === '[object Object]' ? true : false;
 }
+//# sourceMappingURL=dataConvertor.js.map
