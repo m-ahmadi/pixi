@@ -741,15 +741,35 @@ var nodes = [
 ];
 
 const MAX = 37;
-const LIMIT = 25;
+const MIN = 22;
+const DIR = "images/vis/";
+
+function s(n) {
+	return `${DIR}${n}.png`;
+}
 nodes.forEach(function (itm, idx, arr) {
+	let val = itm.value;
+	itm.shape = "image";
 	itm.label = undefined;
-	if (itm.value > LIMIT) {
-		itm.shape = "image";
-		itm.image = "images/vis/1.png";
+	switch (val) {
+		case 37: itm.image = s(13); break;
+		case 36: itm.image = s(13); break;
+		case 35: itm.image = s(13); break;
+		case 34: itm.image = s(25); break;
+		case 33: itm.image = s(20); break;
+		case 32: itm.image = s(25); break;
+		case 31: itm.image = s(24); break;
+		case 30: itm.image = s(14); break;
+		case 29: itm.image = s(14); break;
+		case 28: itm.image = s(14); break;
+		case 27: itm.image = s(14); break;
+		case 26: itm.image = s(18); break;
+		case 25: itm.image = s(8); break;
+		case 24: itm.image = s(18); break;
+		case 23: itm.image = s(18); break;
+		case 22: itm.image = s(9); break;																									
 	}
 });
-console.log(nodes);
 
 var edges = [
   {from: 1, to: 15},

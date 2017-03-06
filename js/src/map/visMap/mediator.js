@@ -35,7 +35,7 @@ define(["core/util", "./worldcup2014", "./groups"], function (u, worldcup, group
 					inherit: "from"
 				},
 				smooth: {
-					type: "continuous"
+					type: "cubicBezier" //
 				}
 			},
 			physics: false,
@@ -150,3 +150,4 @@ define(["core/util", "./worldcup2014", "./groups"], function (u, worldcup, group
 	inst.init = redrawAll;
 	return inst;
 });
+// https://thenounproject.com/
