@@ -78,4 +78,3 @@ define(function () {
 
 	return newPubSub;
 });
-//# sourceMappingURL=pubsub.js.map

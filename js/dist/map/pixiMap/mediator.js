@@ -342,4 +342,3 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/u
 
 	return inst;
 });
-//# sourceMappingURL=mediator.js.map

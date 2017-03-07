@@ -395,4 +395,3 @@ define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], fun
 	window.tpl = inst;
 	return inst;
 });
-//# sourceMappingURL=tpl.js.map

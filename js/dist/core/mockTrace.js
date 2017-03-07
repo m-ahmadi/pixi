@@ -23,4 +23,3 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 		trace: trace
 	};
 });
-//# sourceMappingURL=mockTrace.js.map

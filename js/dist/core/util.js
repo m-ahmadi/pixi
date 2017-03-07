@@ -225,4 +225,3 @@ if (typeof define === 'function' && define.amd) {
 } else if (typeof module !== 'undefined') {
 	module.exports = util;
 }
-//# sourceMappingURL=util.js.map

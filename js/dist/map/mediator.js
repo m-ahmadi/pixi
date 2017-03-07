@@ -52,4 +52,3 @@ define([/* './pixiMap/mediator',  */'./visMap/mediator', 'core/util'], function 
 	window.map = inst;
 	return inst;
 });
-//# sourceMappingURL=mediator.js.map

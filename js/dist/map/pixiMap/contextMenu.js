@@ -39,4 +39,3 @@ define(['core/whb', 'core/util'], function (whb, u) {
 	window.ctx = inst;
 	return inst;
 });
-//# sourceMappingURL=contextMenu.js.map

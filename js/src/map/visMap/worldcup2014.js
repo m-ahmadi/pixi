@@ -10002,5 +10002,6 @@ var edges = [
   {from: 734, to: 735}
 ];
 	
+	console.log(nodes.length, edges.length);
 	return {nodes, edges};
 });
