@@ -36,7 +36,7 @@ function onReady() {
 	stage = new PIXI.Stage(0xFFFFFF);
 	//stage.filterArea = new PIXI.math.Rectangle(0, 0, 800 ,600);
 
-	amount = (renderer instanceof PIXI.WebGLRenderer) ? 100000 : 5;
+	amount = (renderer instanceof PIXI.WebGLRenderer) ? 100 : 5;
 	//
 	//	bloom = new PIXI.filters.BloomFilter();
 	//stage.filters = [bloom];
