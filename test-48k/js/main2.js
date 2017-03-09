@@ -112,34 +112,110 @@ function onReady() {
 var s, p1, p2;
 
 function create() {
-	p1 = new PIXI.Graphics();
-	p1.beginFill(0xFF0000);
-	p1.drawRect(0, 0, 5, 5);
-	p1.endFill();
-	p1.x = 100;
-	p1.y = 200;
-	stage.addChild(p1);
+	var start = {x: 200, y: 400},
+		end = {x: 100, y: 100};
 	
 	p1 = new PIXI.Graphics();
-	p1.beginFill(0xFF0000);
-	p1.drawRect(0, 0, 5, 5);
+	p1.beginFill(0x0000FF, 0.5);
+	p1.drawRect(0, 0, 6, 6);
 	p1.endFill();
-	p1.x = 400;
-	p1.y = 200;
+	p1.position.set(start.x, start.y);
 	stage.addChild(p1);
 	
+	p2 = new PIXI.Graphics();
+	p2.beginFill(0xFF0000, 0.5);
+	p2.drawRect(0, 0, 6, 6);
+	p2.endFill();
+	p2.position.set(end.x, end.y);
+	stage.addChild(p2);
+	
+	newLine(start, end);
+}
+var lineTexture = new PIXI.Texture.fromImage("images/line.png");
+function newLine(start, end) {
+	var sX = start.x,
+		sY = start.y,
+		eX = end.x,
+		eY = end.y,
+		pow = Math.pow,
+		sqrt = Math.sqrt,
+		atan = Math.atan,
+		abs = Math.abs,
+		PI = Math.PI,
+		dx, dy, width, teta;
+		
+	s = new PIXI.Sprite(lineTexture);
+	
+	dx = abs(eX-sX);
+	dy = abs(eY-sY);
+	
+	if (sY === eY) { // horizontal
+		if (sX < eX) {
+			s.x = sX;
+			s.y = sY;
+			s.width = eX-sX;
+		} else if (eX < sX) {
+			s.x = eX;
+			s.y = eY;
+			s.width = sX-eX;
+		}
+	} else if (sX === eX) { // vertical
+		if (sY < eY) {
+			s.x = sX;
+			s.y = sY;
+			s.height = eY-sY;
+		} else if (eY < sY) {
+			s.x = eX;
+			s.y = eY;
+			s.height = sY-eY;
+		}
+	} else if (sX < eX && eY > sY) { // to bott right
+		teta = atan(dy / dx);
+		width = sqrt( pow(dy, 2) + pow(dx, 2) );
+		s.x = sX;
+		s.y = sY;
+		s.width = width;
+		s.rotation = teta;
+	} else if (sX < eX && eY < sY) { // to top right
+		teta = -atan(dy / dx);
+		width = sqrt( pow(dy, 2) + pow(dx, 2) );
+		s.x = sX;
+		s.y = sY;
+		s.width = width;
+		s.rotation = teta;
+		
+	} else if (sX > eX && eY > sY) { // to bott left
+		teta = PI-atan(dy / dx);
+		width = sqrt( pow(dy, 2) + pow(dx, 2) );
+		s.x = sX;
+		s.y = sY;
+		s.width = width;
+		s.rotation = teta;
+	} else if (sX > eX && eY < sY) { // to top left
+		teta = PI+atan(dy / dx);
+		width = sqrt( pow(dy, 2) + pow(dx, 2) );
+		s.x = sX;
+		s.y = sY;
+		s.width = width;
+		s.rotation = teta;
+	}
 	
 	
-	s = new PIXI.Sprite.fromImage("images/line.png");
-	s.x = 100;
-	s.y = 100;
-	s.anchor.set(0, 0);
+	
 	container.addChild(s);
 }
 
 
-
-
+/*
+	else if (sX < eX && eY > sY) { // to bott right
+		x = eX-sX;
+		y = eY-sY;
+		s.x = sX;
+		s.y = sY;
+		s.width = sqrt( pow(x, 2) + pow(y, 2) );
+		s.rotation = atan( y / x );
+	} 
+*/
 
 
 $(onReady);
