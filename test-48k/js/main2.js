@@ -1,7 +1,17 @@
 PIXI.utils.skipHello();
 var renderer, stage, container, cnt,
-	textures = {};
+	textures = {},
+	HOW_MANY_NODES, HOW_MANY_LINES, NODE_AREA_SPAN, LINE_AREA_SPAN;
 
+
+NODE_AREA_SPAN = 20;
+LINE_AREA_SPAN = 600;
+HOW_MANY_NODES = 16000;
+HOW_MANY_LINES = 36000;
+
+
+
+	
 var makeDraggable = (function () {
 	var isDragging, prevX, prevY;
 	function start(e) {
@@ -82,7 +92,7 @@ function onReady() {
 	$("#container").append(renderer.view);
 	stage = new PIXI.Container(0xFFFF00);
 	stage.interactive = true;
-	stage.hitArea = new PIXI.Rectangle(-100000, -100000, 1000000, 1000000);
+	stage.hitArea = new PIXI.Rectangle(-1000000, -1000000, 10000000, 10000000);
 	makeDraggable(stage);
 	$("canvas").on("mousewheel", function (e) {
 		zoom(e.pageX, e.pageY, e.deltaY > 0);
@@ -92,24 +102,54 @@ function onReady() {
 
 	createTextures();
 	
-	container = new PIXI.ParticleContainer(200000, {
-		scale:    true,
-		position: true,
-		rotation: true,
+	container = new PIXI.ParticleContainer(600000, {
+		scale:    false,
+		position: false,
+		rotation: false,
+		uvs:      true,
+		alpha:    false,
+	}, 600000);
+	cnt = new PIXI.ParticleContainer(600000, {
+		scale:    false,
+		position: false,
+		rotation: false,
 		uvs:      false,
 		alpha:    false,
-	});
+	}, 600000);
 	stage.addChild(container);
-	/* for (var i = 0; i < 200000; i++) {
-		s = new PIXI.Sprite(textures[util.randInt(1, 9)]);
-		s.position.set(Math.random()*renderer.width*50, Math.random()*renderer.height*50);
-		container.addChild(s);
-	} */
+	stage.addChild(cnt);
 
-	create();
+	for (var i = 0; i < HOW_MANY_LINES; i++) {
+		newLine({
+			x: Math.random()*renderer.width*-LINE_AREA_SPAN,
+			y: Math.random()*renderer.height*-LINE_AREA_SPAN,
+		}, {
+			x: Math.random()*renderer.width*LINE_AREA_SPAN,
+			y: Math.random()*renderer.height*LINE_AREA_SPAN,
+		});
+	}
+	
+	var spr;
+	for (var j = 0; j < HOW_MANY_NODES; j++) {
+		var k = ""+util.randInt(1, 10);
+		// spr = new PIXI.Sprite( textures[k] );
+		spr = new PIXI.Sprite.fromImage("images/t.png");
+		spr.position.set(
+			util.randInt(
+				Math.random()*renderer.width*-NODE_AREA_SPAN,
+				Math.random()*renderer.width*NODE_AREA_SPAN
+			), util.randInt(
+				Math.random()*renderer.height*-NODE_AREA_SPAN,
+				Math.random()*renderer.height*NODE_AREA_SPAN
+			)
+		);
+		cnt.addChild(spr);
+	}
+	
+	// create();
 }
 
-var s, p1, p2;
+var p1, p2;
 
 function create() {
 	var start = {x: 200, y: 400},
@@ -131,7 +171,7 @@ function create() {
 	
 	newLine(start, end);
 }
-var lineTexture = new PIXI.Texture.fromImage("images/line.png");
+var lineTexture = new PIXI.Texture.fromImage("images/line2.png");
 function newLine(start, end) {
 	var sX = start.x,
 		sY = start.y,
@@ -144,8 +184,8 @@ function newLine(start, end) {
 		PI = Math.PI,
 		dx, dy, width, teta;
 		
-	s = new PIXI.Sprite(lineTexture);
-	
+	var s = new PIXI.Sprite(lineTexture);
+	s.height = 1;
 	dx = abs(eX-sX);
 	dy = abs(eY-sY);
 	
@@ -169,38 +209,23 @@ function newLine(start, end) {
 			s.y = eY;
 			s.height = sY-eY;
 		}
-	} else if (sX < eX && eY > sY) { // to bott right
-		teta = atan(dy / dx);
-		width = sqrt( pow(dy, 2) + pow(dx, 2) );
+	} else {
 		s.x = sX;
 		s.y = sY;
-		s.width = width;
-		s.rotation = teta;
-	} else if (sX < eX && eY < sY) { // to top right
-		teta = -atan(dy / dx);
-		width = sqrt( pow(dy, 2) + pow(dx, 2) );
-		s.x = sX;
-		s.y = sY;
-		s.width = width;
-		s.rotation = teta;
-		
-	} else if (sX > eX && eY > sY) { // to bott left
-		teta = PI-atan(dy / dx);
-		width = sqrt( pow(dy, 2) + pow(dx, 2) );
-		s.x = sX;
-		s.y = sY;
-		s.width = width;
-		s.rotation = teta;
-	} else if (sX > eX && eY < sY) { // to top left
-		teta = PI+atan(dy / dx);
-		width = sqrt( pow(dy, 2) + pow(dx, 2) );
-		s.x = sX;
-		s.y = sY;
-		s.width = width;
-		s.rotation = teta;
+		if (sX < eX && eY > sY) { // to bott right
+			s.width = sqrt( pow(dy, 2) + pow(dx, 2) );
+			s.rotation = atan(dy / dx);
+		} else if (sX < eX && eY < sY) { // to top right
+			s.width = sqrt( pow(dy, 2) + pow(dx, 2) );
+			s.rotation = -atan(dy / dx);;
+		} else if (sX > eX && eY > sY) { // to bott left
+			s.width = sqrt( pow(dy, 2) + pow(dx, 2) );
+			s.rotation = PI-atan(dy / dx);;
+		} else if (sX > eX && eY < sY) { // to top left
+			s.width = sqrt( pow(dy, 2) + pow(dx, 2) );
+			s.rotation = PI+atan(dy / dx);;
+		}
 	}
-	
-	
 	
 	container.addChild(s);
 }
