@@ -45,7 +45,7 @@ define(['./util'], function (u) {
 		return result;
 		// return u.isEmptyObj(modals) ? false : true;
 	}
-	var note = (function () {
+	let note = (function () {
 		var icons = {
 			INFO:    '<i class="fa  fa-info-circle           fa-lg"  aria-hidden="true"></i>',
 			SUCCESS: '<i class="fa  fa-check-circle          fa-lg"  aria-hidden="true"></i> ',
@@ -113,7 +113,27 @@ define(['./util'], function (u) {
 			process: process
 		};
 	}());
-	
+	function init() {
+		$(document).on('keydown', function (e) {
+			if (e.keyCode === 27) {
+				if ( !isAnyModalActive() ) {
+					let sb = $('#newSide');
+					if ( !sb.is(':animated') ) {
+						sb.toggle('slide');
+					}
+				}
+			}
+		});
+		/* $('a[href^="#modal_"]').on('click', function (e) {
+			modalState(true, e.target.hash.substr(1));
+		}); */
+		$('div[id^="modal_"]').on('beforeshow', function (e) {
+			modalState(true, e.target.id);
+		});
+		$('div[id^="modal_"]').on('hide', function (e) {
+			modalState(false, e.target.id);
+		});
+	}
 	
 	inst.note = note;
 	inst.disable = disable;
@@ -122,6 +142,7 @@ define(['./util'], function (u) {
 	inst.openModal = openModal;
 	inst.isAnyModalActive = isAnyModalActive;
 	inst.modalState = modalState;
+	inst.init = init;
 	
 	window.mmm = modals;
 	window.wuk = inst;

@@ -117,3 +117,4 @@ self.onmessage = function (e) {
 		edges: toUpdateEdges
 	});
 };
+//# sourceMappingURL=highlighter.js.map

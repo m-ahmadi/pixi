@@ -146,3 +146,4 @@ define(["core/util", "./worldcup2014", "./groups"], function (u, worldcup, group
 	return inst;
 });
 // https://thenounproject.com/
+//# sourceMappingURL=mediator.js.map

@@ -734,3 +734,4 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 	window.wpix = inst;
 	return inst;
 });
+//# sourceMappingURL=wpix.js.map

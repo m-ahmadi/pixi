@@ -35,3 +35,4 @@ define([], function () {
 		fadeOut: fadeOut
 	};
 });
+//# sourceMappingURL=wani.js.map

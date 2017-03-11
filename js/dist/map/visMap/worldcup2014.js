@@ -54,3 +54,4 @@ define(function () {
   console.log(nodes.length, edges.length);
   return { nodes: nodes, edges: edges };
 });
+//# sourceMappingURL=worldcup2014.js.map

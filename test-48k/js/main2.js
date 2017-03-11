@@ -58,7 +58,7 @@ function createTextures() {
 	});
 }
 function zoom(x, y, zoomIn) {
-	let direction = (zoomIn) ? 1 : -1,
+	var direction = (zoomIn) ? 1 : -1,
 		factor = (1 + direction * 0.1),
 		local_pt = new PIXI.Point(),
 		point = new PIXI.Point(x, y),

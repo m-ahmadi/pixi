@@ -6,7 +6,6 @@
 	<link rel="icon" type="image/x-icon" href="images/favicon.ico"/>
 	<link rel="stylesheet" type="text/css" href="css/byekan-fontface.css"/>
 	<link rel="stylesheet" type="text/css" href="css/lib/font-awesome.css"/>
-	<!-- <link rel="stylesheet" type="text/css" href="css/speech-bubbles.css"/> -->
 	
 <!--
 	<link rel="stylesheet" type="text/css" href="css/uikit/uikit.gradient.css"/>
@@ -14,17 +13,18 @@
 	<link rel="stylesheet" type="text/css" href="css/uikit/form-select.gradient.css"/>
 	<link rel="stylesheet" type="text/css" href="css/uikit/notify.gradient.css"/>
 -->
-	
 	<link rel="stylesheet" type="text/css" href="css/lib/vis/vis.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/lib/uikit/v3/uikit.css"/>
 	<link rel="stylesheet" type="text/css" href="css/lib/folding-cube.css"/>
 	<link rel="stylesheet" type="text/css" href="css/lib/nouislider.css"/>
+	
 	
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<title>Topology</title>
 </head>
 
 <body>
+<div id="slider"></div>
 
 <header id="main_header">
 	<!-- <button id="sidebar-btn" class="uk-button uk-button-default uk-button-small" data-uk-offcanvas="{target:'#sidebar', mode: 'slide'}"> -->
@@ -164,6 +164,31 @@ cvas.ir</textarea></label>
 		</div>
 		<div class="uk-modal-footer uk-text-right">
 			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button">Cancel</button>
+			<button id="discovery_next" class="uk-button uk-button-primary uk-text-bold" type="button" disabled>Next</button>
+		</div>
+	</div>
+</div>
+<div id="modal_snmpcredentials" uk-modal="center: true; esc-close: false; bg-close: false;">
+	<div class="uk-modal-dialog">
+		<button class="uk-modal-close-default" type="button" uk-close></button>
+		<div class="uk-modal-header">
+			<h2 class="uk-modal-title">Discover Available Nodes</h2>
+		</div>
+		<div class="uk-modal-body">
+			<form>
+				<div class="uk-margin">
+					<label class="ul-dark"><input class="uk-radio j-discovery-radios" type="radio" name="radio1" value="0" checked/> IP with Start/End</label><br/>
+					<label class="ul-dark"><input class="uk-radio j-discovery-radios" type="radio" name="radio1" value="1"/> IP and Subnet</label>
+				</div>
+				<div class="uk-margin uk-form-horizontal">
+					<input class="uk-input uk-form-width-medium" type="text" name="first-input" value="192.168.1.1" id="disc_left_input"/>
+					<span class="uk-label">-</span>
+					<input class="uk-input uk-form-width-medium" type="text" name="second-input" value="192.168.1.255" id="disc_right_input"/>
+				</div>
+			</form>
+		</div>
+		<div class="uk-modal-footer uk-text-right">
+			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button">Cancel</button>
 			<button id="discovery_start" class="uk-button uk-button-primary uk-text-bold" type="button" disabled>Start</button>
 		</div>
 	</div>
@@ -211,7 +236,6 @@ cvas.ir</textarea></label>
 
 	<div id="map_container"></div>
 	<div id="map"></div>
-	<div id="range"></div>
 </div>
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <!-------------------------------------- Main Libs ----------------------------------------------->
@@ -229,7 +253,7 @@ cvas.ir</textarea></label>
 <script type="text/javascript" src="js/lib/handlebars.min.js"></script> -->
 <!-------------------------------------- Main Libs ----------------------------------------------->
 
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxmIf4m82A68RbkO-N3Ag5v92p27tTKzQ"></script>
+<!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxmIf4m82A68RbkO-N3Ag5v92p27tTKzQ"></script> -->
 <script type="text/javascript" src="js/lib/all-libs.js"></script>
 <script data-main="js/dist/main" src="js/lib/require.min.js"></script> <!-- main-built -->
 

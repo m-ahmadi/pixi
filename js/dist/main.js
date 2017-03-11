@@ -6,7 +6,8 @@ require.config({
 	paths: {
 		lib: "lib",
 		core: "core",
-		map: "map"
+		map: "map",
+		page: "page"
 	}
 });
 
@@ -16,3 +17,4 @@ require(["core/mediator"], function (core) {
 		core.init();
 	});
 });
+//# sourceMappingURL=main.js.map
