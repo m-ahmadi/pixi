@@ -174,4 +174,53 @@ function createIndex() {
 
 if (files.filter(v => {return /.htm/.test(v)}).length) { // at-least one .htm file
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+walk(DIR).forEach(i => {
+		let p = i.replace(DIR, "").slice(1);
+		let a = p.split("/");
+		let last = a[a.length-1];
+		console.log(a);
+		if (last.endsWith(".handlebars")) {
+			// console.log(last.replace(DIR, ""));
+		}
+	});
+	// console.log( walk(DIR) );
+
+
+
+
+
+
+/* let source = readFile(DIR+"/main"+EXT);
+	let a = Handlebars.compile(source);
+	
+	console.log(a);
+	fs.writeFile("shindex.html", "Hey there!", "utf8", (err) => {
+		if (err) { return console.log(err); }
+		log("The file was saved!");
+	}); */
+
+
+
+/*
+let g = Handlebars.compile(src.main)();
+	console.log(g);
+	// getDirsIn(DIR).forEach(i => {
+	
+*/
 */
