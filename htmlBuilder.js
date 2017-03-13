@@ -76,21 +76,34 @@ let src = {
 
 function addTemplate(path, namespace) {
 	if (namespace) {
-		src[namespace].template = Handlebars.compile( readFile(path) );
+		src.data[namespace].template = Handlebars.compile( readFile(path) );
 	} else {
 		src.template = Handlebars.compile( readFile(path) );
 	}
 }
-function addData(path, namespace, fileName) {
+function addData(path, namespace, fileName, noTemp) {
 	if (namespace) {
-		src[namespace].data[fileName] = readFile(path);
+		if (!noTemp) {
+			if (!src.data[namespace]) {
+				src.data[namespace] = {
+					template: undefined,
+					data: {}
+				};
+			}
+			src.data[namespace].data[fileName] = readFile(path);
+		} else {
+			if (!src.data[namespace]) {
+				src.data[namespace] = "";
+			}
+			src.data[namespace].concat( readFile(path) );
+		}
 	} else {
 		src.data[fileName] = readFile(path);
 	}
 }
 
 function fudge(path, namespace) {
-	let root = path+"/";
+	let root = path.endsWith("/") ? path: path+"/";
 	
 	files(path).forEach(i => {
 		let fullPath = root+i;
@@ -101,36 +114,36 @@ function fudge(path, namespace) {
 			addData(fullPath, namespace, fileName);
 		}
 	});
-	["a.htm", "b.htm", "c.asad"]
+	let ass = dirs(path);
 	dirs(path).forEach(i => {
 		let fullPath = root+i;
 		console.log( fullPath );
-		let files = files(fullPath);
+		let filesList = files(fullPath);
 		
-		if (files.indexOf("main.handlebars") !== -1) { // folder contains .handlebars
-		
+		if (filesList.indexOf("main.handlebars") !== -1) { // folder contains .handlebars
+			fudge(fullPath, i);
 		} else { // folder doesn't contain .handlebars
-			if (files.length) {
-				files.forEach(i => {
-					if ( i.endsWith("htm") ) {
-						addData( fullPath, i, i.substr( 0, i.indexOf('.') ) );
+			if (filesList.length) {
+				filesList.forEach(j => {
+					if ( j.endsWith("htm") ) {
+						addData( fullPath+"/"+j, i, j.substr( 0, j.indexOf('.') ), true );
 					}
 				});
 			} else {
-				fudge(fullPath, i);
+				
 			}
 		}
 	});
-	
+	debugger
 	console.log(src);
 }
 function createIndex() {
-	fudge("template/static/modals");
+	fudge("template/static");
 	
 	
 }
 
-
+debugger
 createIndex();
 
 /*
@@ -206,21 +219,19 @@ walk(DIR).forEach(i => {
 
 
 
-/* let source = readFile(DIR+"/main"+EXT);
+	let source = readFile(DIR+"/main"+EXT);
 	let a = Handlebars.compile(source);
 	
 	console.log(a);
 	fs.writeFile("shindex.html", "Hey there!", "utf8", (err) => {
 		if (err) { return console.log(err); }
 		log("The file was saved!");
-	}); */
+	});
 
 
 
-/*
 let g = Handlebars.compile(src.main)();
 	console.log(g);
 	// getDirsIn(DIR).forEach(i => {
 	
-*/
 */
