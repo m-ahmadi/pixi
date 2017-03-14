@@ -36,6 +36,7 @@
     "socket.io": "^1.7.2",
     "tsify": "^3.0.0",
     "typescript": "^2.1.5",
+    "util-ma": "^1.0.8",
     "watchify": "^3.8.0",
     "webpack": "^2.2.0-rc.3"
   },

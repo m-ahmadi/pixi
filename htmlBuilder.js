@@ -6,9 +6,15 @@ let chokidar = require("chokidar");
 let watcher = chokidar.watch(`${DIR}/**/*${EXT}`, {ignored: /[\/\\]\./, persistent: true});
 let colors = require("colors/safe");
 let fs = require("fs");
+let u = require("util-ma");
 let fileOpt = {encoding: "utf-8", flag: "r"};
 let once = process.argv.indexOf("--once") !== -1;
 let log = console.log;
+let src = {
+	template: undefined,
+	data: {}
+};
+let html = "";
 
 if (!once) {
 	watcher
@@ -32,48 +38,15 @@ if (!once) {
 		});
 }
 
-
-function walk(dir) {
-	let results = []
-	let list = fs.readdirSync(dir);
-	list.forEach( function (file) {
-		file = dir + '/' + file;
-		let stat = fs.statSync(file);
-		if ( stat && stat.isDirectory() ) {
-			results = results.concat( walk(file) );
-		} else {
-			results.push(file)
-		}
-	});
-	return results;
-};
-
 function readFile(path) {
 	return fs.readFileSync(path, { encoding: 'utf-8', flag: 'r' });
 }
-function dirs(p) {
+function getDirs(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isDirectory() );
 }
-function files(p) {
+function getFiles(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isFile() );
 }
-
-let src = {
-	template: undefined,
-	data: {}
-};
-/*
-	{
-		template: fn(data),
-		data: {
-			profile: "",
-			modals: "",
-			box: "",
-		},
-	
-	}
-*/
-
 function addTemplate(path, namespace) {
 	if (namespace) {
 		src.data[namespace].template = Handlebars.compile( readFile(path) );
@@ -95,56 +68,102 @@ function addData(path, namespace, fileName, noTemp) {
 			if (!src.data[namespace]) {
 				src.data[namespace] = "";
 			}
-			src.data[namespace].concat( readFile(path) );
+			src.data[namespace] += readFile(path) ;
 		}
 	} else {
 		src.data[fileName] = readFile(path);
 	}
 }
-
 function fudge(path, namespace) {
 	let root = path.endsWith("/") ? path: path+"/";
 	
-	files(path).forEach(i => {
-		let fullPath = root+i;
-		if ( i.endsWith(".handlebars") ) {
-			addTemplate(fullPath, namespace);
-		} else if ( i.endsWith(".htm") ) {
-			let fileName = i.substr( 0, i.indexOf('.') );
-			addData(fullPath, namespace, fileName);
-		}
-	});
-	let ass = dirs(path);
-	dirs(path).forEach(i => {
-		let fullPath = root+i;
-		console.log( fullPath );
-		let filesList = files(fullPath);
-		
-		if (filesList.indexOf("main.handlebars") !== -1) { // folder contains .handlebars
-			fudge(fullPath, i);
-		} else { // folder doesn't contain .handlebars
-			if (filesList.length) {
-				filesList.forEach(j => {
-					if ( j.endsWith("htm") ) {
-						addData( fullPath+"/"+j, i, j.substr( 0, j.indexOf('.') ), true );
-					}
-				});
-			} else {
-				
+	let files = getFiles(path);
+	if (files.length) {
+		files.forEach(i => {
+			let fullPath = root+i;
+			if ( i.endsWith(".handlebars") ) {
+				addTemplate(fullPath, namespace);
+			} else if ( i.endsWith(".htm") ) {
+				let fileName = i.substr( 0, i.indexOf('.') );
+				addData(fullPath, namespace, fileName);
 			}
-		}
-	});
-	debugger
-	console.log(src);
-}
-function createIndex() {
-	fudge("template/static");
-	
-	
+		});
+	}
+	let dirs = getDirs(path);
+	if (dirs.length) { // folder contains folder(s)
+		dirs.forEach(i => {
+			let fullPath = root+i;
+			let files = getFiles(fullPath);
+			if (files.length) {
+				if (files.indexOf("main.handlebars") !== -1) { // folder contains .handlebars
+					fudge(fullPath, i);
+				} else { // folder doesn't contain .handlebars
+					dirHandler(fullPath, i);
+				}
+			}
+		});
+	}
 }
 
-debugger
-createIndex();
+function dirHandler(p, root) {
+	let path = p.endsWith("/") ? p : p+"/";
+	let files = getFiles(path);
+	let dirs = getDirs(path);
+	
+	if (files.length) {
+		files.forEach(i => {
+			if ( i.endsWith(".htm") ) {
+				addData( path+i, root, i.substr( 0, i.indexOf('.') ), true );
+			}
+		});
+	}
+	if (dirs.length) {
+		dirs.forEach(i => {
+			dirHandler(path+i, root);
+		});
+	}
+}
+
+function buildSrc() {
+	debugger
+	fudge("template/static");
+	console.log(src);
+}
+
+function compile(o) {
+	Object.keys(o).forEach(i => {
+		let p = o[i];
+		
+		if ( u.isObj(p) ) {
+			
+		}
+	});
+}
+function buildHtml() {
+	let template = src.templatel
+	let data = src.data;
+	
+	if ( u.isFn(template) ) {
+		if ( !u.isEmptyObj(data) ) {
+			compile(data);
+		}
+	}
+}
+
+buildSrc();
+
+
+console.log(html);
+/* fs.writeFile("shindex.html", text, "utf8", (err) => {
+	if (err) { return console.log(err); }
+	log("The file was saved!");
+}); */
+
+
+
+
+
+
 
 /*
 
@@ -233,5 +252,20 @@ walk(DIR).forEach(i => {
 let g = Handlebars.compile(src.main)();
 	console.log(g);
 	// getDirsIn(DIR).forEach(i => {
-	
+
+
+function walk(dir) {
+	let results = []
+	let list = fs.readdirSync(dir);
+	list.forEach( function (file) {
+		file = dir + '/' + file;
+		let stat = fs.statSync(file);
+		if ( stat && stat.isDirectory() ) {
+			results = results.concat( walk(file) );
+		} else {
+			results.push(file)
+		}
+	});
+	return results;
+};
 */
