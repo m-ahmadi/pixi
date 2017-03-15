@@ -49,38 +49,34 @@ function getDirs(p) {
 function getFiles(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isFile() );
 }
-function addTemplate(path, o) {
-	o.template = Handlebars.compile( readFile(path) );
-}
-function addData(path, namespace, fileName, root, noTemp) {
-	let o;
+function addTemplate(path, namespace) {
 	if (namespace) {
-		if ( u.isObj(root) ) {
-			o = root;
-		} else if ( u.isStr(root) ) {
-			if (!src.data[root]) {
-				src.data[root] = {
+		src.data[namespace].template = Handlebars.compile( readFile(path) );
+	} else {
+		src.template = Handlebars.compile( readFile(path) );
+	}
+}
+function addData(path, namespace, fileName, noTemp) {
+	if (namespace) {
+		if (!noTemp) {
+			if (!src.data[namespace]) {
+				src.data[namespace] = {
 					template: undefined,
 					data: {}
 				};
 			}
-			o = src.data[root];
+			src.data[namespace].data[fileName] = readFile(path);
+		} else {
+			if (!src.data[namespace]) {
+				src.data[namespace] = "";
+			}
+			src.data[namespace] += readFile(path) ;
 		}
 	} else {
-		o = src;
-	}
-	
-
-	if (!noTemp) {
-		o.data[fileName] = readFile(path);
-	} else {
-		if (!o.data[fileName]) {
-			o.data[fileName] = "";
-		}
-		o.data[fileName] += readFile(path) ;
+		src.data[fileName] = readFile(path);
 	}
 }
-function fudge(path, namespace, o) {
+function fudge(path, namespace) {
 	let root = path.endsWith("/") ? path: path+"/";
 	
 	let files = getFiles(path);
@@ -88,10 +84,10 @@ function fudge(path, namespace, o) {
 		files.forEach(i => {
 			let fullPath = root+i;
 			if ( i.endsWith("main.handlebars") ) {
-				addTemplate(fullPath, namespace ? src.data[namespace] : src);
+				addTemplate(fullPath, namespace);
 			} else if ( i.endsWith(".htm") ) {
 				let fileName = i.substr( 0, i.indexOf('.') );
-				addData(fullPath, namespace, fileName, o);
+				addData(fullPath, namespace, fileName);
 			}
 		});
 	}
@@ -102,7 +98,7 @@ function fudge(path, namespace, o) {
 			let files = getFiles(fullPath);
 			if (files.length) {
 				if (files.indexOf("main.handlebars") !== -1) { // folder contains main.handlebars
-					fudge(fullPath, namespace, src.data[namespace]);
+					fudge(fullPath, namespace || i);
 				} else { // folder doesn't contain .handlebars
 					dirHandler(fullPath, i);
 				}
@@ -118,7 +114,7 @@ function dirHandler(p, root) {
 	if (files.length) {
 		files.forEach(i => {
 			if ( i.endsWith(".htm") ) {
-				// addData( path+i, root, i.substr( 0, i.indexOf('.') ), true );
+				addData( path+i, root, i.substr( 0, i.indexOf('.') ), true );
 			}
 		});
 	}
@@ -131,7 +127,7 @@ function dirHandler(p, root) {
 
 function buildSrc() {
 	debugger
-	fudge("template/static", undefined, src);
+	fudge("template/static");
 	
 	console.log(src);
 	
