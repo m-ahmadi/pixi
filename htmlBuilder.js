@@ -12,10 +12,15 @@ let once = process.argv.indexOf("--once") !== -1;
 let log = console.log;
 
 
-let src = {
-	template: undefined,
-	data: {}
-};
+
+function newEmpty() {
+	return {
+		template: undefined,
+		data: {}
+	};
+}
+
+let src = newEmpty();
 let html = "";
 
 if (!once) {
@@ -49,38 +54,58 @@ function getDirs(p) {
 function getFiles(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isFile() );
 }
-function addTemplate(path, o) {
-	o.template = Handlebars.compile( readFile(path) );
-}
-function addData(path, namespace, fileName, root, noTemp) {
+
+function getTarget(root, namespace) {
 	let o;
-	if (namespace) {
-		if ( u.isObj(root) ) {
-			o = root;
-		} else if ( u.isStr(root) ) {
-			if (!src.data[root]) {
-				src.data[root] = {
-					template: undefined,
-					data: {}
-				};
+	if (root) {
+		if (!namespace) {
+			if ( u.isObj(root) ) {
+				o = root;
+			} else if ( u.isStr(root) ) {
+				if (!src.data[root]) {
+					src.data[root] = newEmpty();
+				}
+				o = src.data[root];
 			}
-			o = src.data[root];
+		} else if (namespace) {
+			if ( u.isObj(root) ) {
+				if ( u.isObj(root.data[namespace]) ) {
+					o = root.data[namespace];
+				} else {
+					root.data[namespace] = newEmpty();
+					o = root.data[namespace];
+				}
+			} else if ( u.isStr(root) ) {
+				if (!src.data[root]) {
+					src.data[root] = newEmpty();
+					src.data[root].data[namespace] = newEmpty();
+				}
+				o = src.data[root].data[namespace];
+			}
 		}
 	} else {
 		o = src;
 	}
 	
-
+	return o;
+}
+function addTemplate(path, root, namespace) {
+	let o = getTarget(root, namespace);
+	o.template = Handlebars.compile( readFile(path) );
+}
+function addData(filePath, fileName, root, namespace, noTemp) {
+	let o = getTarget(root, namespace);
+	
 	if (!noTemp) {
-		o.data[fileName] = readFile(path);
+		o.data[fileName] = readFile(filePath);
 	} else {
 		if (!o.data[fileName]) {
 			o.data[fileName] = "";
 		}
-		o.data[fileName] += readFile(path) ;
+		o.data[fileName] += readFile(filePath) ;
 	}
 }
-function fudge(path, namespace, o) {
+function fudge(path, o, ns) {
 	let root = path.endsWith("/") ? path: path+"/";
 	
 	let files = getFiles(path);
@@ -88,10 +113,10 @@ function fudge(path, namespace, o) {
 		files.forEach(i => {
 			let fullPath = root+i;
 			if ( i.endsWith("main.handlebars") ) {
-				addTemplate(fullPath, namespace ? src.data[namespace] : src);
+				addTemplate(fullPath, o, ns);
 			} else if ( i.endsWith(".htm") ) {
 				let fileName = i.substr( 0, i.indexOf('.') );
-				addData(fullPath, namespace, fileName, o);
+				addData(fullPath, fileName, o, ns);
 			}
 		});
 	}
@@ -102,15 +127,15 @@ function fudge(path, namespace, o) {
 			let files = getFiles(fullPath);
 			if (files.length) {
 				if (files.indexOf("main.handlebars") !== -1) { // folder contains main.handlebars
-					fudge(fullPath, namespace, src.data[namespace]);
+					fudge(fullPath, ns ? o.data[ns] : o, i);
 				} else { // folder doesn't contain .handlebars
-					dirHandler(fullPath, i);
+					dirHandler(fullPath, ns, i);
 				}
 			}
 		});
 	}
 }
-function dirHandler(p, root) {
+function dirHandler(p, root, ns) {
 	let path = p.endsWith("/") ? p : p+"/";
 	let files = getFiles(path);
 	let dirs = getDirs(path);
@@ -119,6 +144,7 @@ function dirHandler(p, root) {
 		files.forEach(i => {
 			if ( i.endsWith(".htm") ) {
 				// addData( path+i, root, i.substr( 0, i.indexOf('.') ), true );
+				addData(path+i, i.substr( 0, i.indexOf('.') ), root, ns, true);
 			}
 		});
 	}
@@ -131,7 +157,7 @@ function dirHandler(p, root) {
 
 function buildSrc() {
 	debugger
-	fudge("template/static", undefined, src);
+	fudge("template/static", src);
 	
 	console.log(src);
 	

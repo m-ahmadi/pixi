@@ -2,6 +2,10 @@ var express = require('express'),
 	util = require('./u'),
 	server = express();
 
+var bodyParser = require('body-parser');
+server.use( bodyParser.json() );       // to support JSON-encoded bodies
+server.use( bodyParser.urlencoded({extended: true}) ); 
+
 var nCount, m, e,
 	x1, x2,
 	y1, y2;
@@ -205,6 +209,18 @@ function get(req, res) {
 	res.end();
 }
 
+function post(req, res) {
+	var q = req.body;
+	setThings(req.body);
+	
+	// var o = generateJson(nCount);
+	var o = getData(q.x1, q.x2, q.y1, q.y2);
+	
+	
+	res.write( JSON.stringify(o) );
+	res.end();
+}
 
 server.get('/', get);
+server.post('/', post);
 server.listen(3000);

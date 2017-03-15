@@ -33,7 +33,7 @@ define(function () {
 
 		xhr = $.ajax({
 			url: o.url || 'http://localhost:3000',
-			type: o.type || 'GET',
+			type: o.type || 'POST',
 			dataType: o.dataType || 'json',
 			data: o.data,
 			beforeSend: o.beforeSend,
