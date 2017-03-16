@@ -55,7 +55,7 @@ function getFiles(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isFile() );
 }
 
-function getTarget(root, namespace) {
+function getTarget(root, namespace, noTemp) {
 	let o;
 	if (root) {
 		if (!namespace) {
@@ -78,9 +78,11 @@ function getTarget(root, namespace) {
 			} else if ( u.isStr(root) ) {
 				if (!src.data[root]) {
 					src.data[root] = newEmpty();
-					src.data[root].data[namespace] = newEmpty();
 				}
-				o = src.data[root].data[namespace];
+				if (!src.data[root].data[namespace]) {
+					src.data[root].data[namespace] = noTemp ? "" : newEmpty();
+				}
+				o = noTemp ? src.data[root].data : src.data[root].data[namespace];
 			}
 		}
 	} else {
@@ -94,15 +96,12 @@ function addTemplate(path, root, namespace) {
 	o.template = Handlebars.compile( readFile(path) );
 }
 function addData(filePath, fileName, root, namespace, noTemp) {
-	let o = getTarget(root, namespace);
+	let o = getTarget(root, namespace, noTemp);
 	
 	if (!noTemp) {
 		o.data[fileName] = readFile(filePath);
 	} else {
-		if (!o.data[fileName]) {
-			o.data[fileName] = "";
-		}
-		o.data[fileName] += readFile(filePath) ;
+		o[namespace] += readFile(filePath) ;
 	}
 }
 function fudge(path, o, ns) {
@@ -129,7 +128,7 @@ function fudge(path, o, ns) {
 				if (files.indexOf("main.handlebars") !== -1) { // folder contains main.handlebars
 					fudge(fullPath, ns ? o.data[ns] : o, i);
 				} else { // folder doesn't contain .handlebars
-					dirHandler(fullPath, ns, i);
+					dirHandler(fullPath, o.data[ns] || o, i);
 				}
 			}
 		});
@@ -150,7 +149,7 @@ function dirHandler(p, root, ns) {
 	}
 	if (dirs.length) {
 		dirs.forEach(i => {
-			dirHandler(path+i, root);
+			dirHandler(path+i, root, ns);
 		});
 	}
 }
