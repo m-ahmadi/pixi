@@ -1,6 +1,4 @@
 @import "materialize/color";
-// @import "pixiMap";
-@import "visMap";
 
 body {
 	width: 100%;
@@ -43,3 +41,7 @@ body {
 .no-display {
 	display: none;
 }
+
+// @import "pixiMap";
+@import "visMap";
+@import "discovery_modal";

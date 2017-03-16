@@ -10,10 +10,12 @@ require.config({
     }
 });
 
-require(["core/mediator"], function (core) {
+require(["page/mediator", "map/mediator", "core/whb", "core/wuk"], function (page, map, whb, wuk) {
+	whb.compileAll();
 	
 	$(function () {
-		core.init();
+		wuk.init();
+		page.init();
+		map.init("visMap", "#map_container");
 	});
-
 });

@@ -215,7 +215,6 @@ define(["core/util", "core/whb"], function (u, whb) {
 		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
 		window.network = g.network;
 		
-		console.warn("amirhossein");
 		$.ajax({
 			url: "http://localhost:3000",
 			type: "POST",

@@ -101,7 +101,12 @@ function addData(filePath, fileName, root, namespace, noTemp) {
 	if (!noTemp) {
 		o.data[fileName] = readFile(filePath);
 	} else {
-		o[namespace] += readFile(filePath) ;
+		if (namespace) {
+			o[namespace] += readFile(filePath) ;
+		} else {
+			o += readFile(filePath) ;
+		}
+		
 	}
 }
 function fudge(path, o, ns) {

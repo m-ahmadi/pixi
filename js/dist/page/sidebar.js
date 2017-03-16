@@ -1,5 +1,5 @@
-define([], function () {
-	var inst = {};
+define(["core/util", "core/pubsub"], function (u, newPubSub) {
+	var inst = u.extend(newPubSub());
 
 	function init() {
 		var sidebar = $('#newSide'),
@@ -13,18 +13,15 @@ define([], function () {
 		$('#sidebar_btn').on('click', function () {
 			this.closed = this.closed ? false : true;
 			var sb = $('#newSide');
-
 			if (!sb.is(':animated')) {
 				sb.toggle('slide');
 			}
-
-			// if (this.closed) {
-			// sb.toggleClass('uk-animation-slide-left');
-			// sb.toggleClass('no-display');
-			// } else {
-			// sb.addClass('uk-animation-reverse');
-
-			// }
+		});
+		$("#traceroute_item").on("click", function () {
+			inst.emit("traceroute_item_clicked");
+		});
+		$("#discovery_item").on("click", function () {
+			inst.emit("discovery_item_clicked");
 		});
 	}
 

@@ -44,14 +44,10 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) { // wp
 		}
 	}
 	function closeModal() {
-		var u;
-		// $('#newSide').toggle('slide');
-		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
-		
-		u = UIkit.modal('#modal_traceroute')[0];
-		if ( u.isActive() ) {
-			u.toggle('close');
-		}
+		wuk.closeModal("#modal_traceroute");
+	}
+	function begin() {
+		wuk.openModal("#modal_traceroute");
 	}
 	function closeSidebar() {
 		var sb = $('#newSide')
@@ -177,8 +173,6 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) { // wp
 	function trace(arr, opt) {
 		noteMsgs.init = wuk.note.process('Opening socket...', false, 'top-center');
 		
-		scanBtn = $('#traceroute_scan');
-		cancelBtn = $('#traceroute_scan');
 		wuk.disable(scanBtn);
 		
 		createSock(opt);
@@ -188,7 +182,10 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) { // wp
 		
 	}
 	function init() {
-		$('#traceroute_scan').on('click', function (e) {
+		scanBtn = $('#traceroute_scan');
+		cancelBtn = $('#abort');
+		
+		scanBtn.on('click', function (e) {
 			var txtarea, checkbox, txt, arr;
 			
 			e.preventDefault();
@@ -201,20 +198,21 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) { // wp
 				arr = txt.split("\n");
 				//console.log(arr, checkbox);
 				
-				traceroute.trace(arr, checkbox);
+				trace(arr, checkbox);
 			//	mockTrace.trace();
 			}
-			$('#abort').removeAttr('disabled');
+			cancelBtn.removeAttr('disabled');
 		});
-		$('#abort').on('click', function (e) {
+		cancelBtn.on('click', function (e) {
 			e.preventDefault();
-			traceroute.abort();
+			abort();
 		});
 	}
 	
 	return {
 		abort: abort,
 		trace: trace,
+		begin: begin,
 		init: init
 	};
 	

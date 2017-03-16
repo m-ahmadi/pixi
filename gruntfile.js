@@ -48,5 +48,6 @@ module.exports = function (grunt) {
 		});
 		grunt.task.run("concat");
 	});
+	
 	grunt.registerTask("default", ["watch"]);
 };

@@ -3,7 +3,7 @@ define(['./util'], function (u) {
 	    modals = {};
 
 	function getModal(str) {
-		return UIkit.modal(str)[0];
+		return UIkit.modal(str);
 	}
 
 	function disable(el) {
@@ -17,15 +17,15 @@ define(['./util'], function (u) {
 		}
 	}
 	function closeModal(s) {
-		u = getModal(s);
-		if (u.isActive()) {
-			u.hide();
+		var m = getModal(s);
+		if (m.isActive()) {
+			m.hide();
 		}
 	}
 	function openModal(s) {
-		u = getModal(s);
-		if (!u.isActive()) {
-			u.show();
+		var m = getModal(s);
+		if (!m.isActive()) {
+			m.show();
 		}
 	}
 	function modalState(state, id) {

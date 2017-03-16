@@ -1,9 +1,8 @@
-define(["./whb"], function (whb) {
+define(["core/whb"], function (whb) {
 	var inst = {};
 
 	function init(fn, par) {
 		fn.apply(undefined, par);
-		whb.compileAll();
 	}
 
 	inst.init = init;

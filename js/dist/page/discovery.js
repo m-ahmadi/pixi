@@ -19,7 +19,7 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 		    res = false,
 		    startBtn = $('#discovery_next');
 
-		res = discovery.isValidIp(val);
+		res = isValidIp(val);
 
 		inputEl.removeClass('uk-form-success uk-form-danger');
 		if (res) {
@@ -31,15 +31,10 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 		}
 	}
 	function closeModal() {
-		var u;
-		// $('#newSide').toggle('slide');
-		// $("body").trigger( $.Event("keydown", { keyCode: 27 }) );
-
-		/* u = UIkit.modal('#modal_discovery')[0];
-  if ( u.isActive() ) {
-  	u.close();
-  } */
 		wuk.closeModal("#modal_discovery");
+	}
+	function begin() {
+		wuk.openModal("#modal_discovery");
 	}
 	function closeSidebar() {
 		var sb = $('#newSide');
@@ -48,6 +43,7 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 			sb.toggle('slide');
 		}
 	}
+
 	function discover(first, second, opt) {
 		var d = {
 			StartRange: "",
@@ -102,6 +98,54 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 			console.log("Connection closed", e);
 		};
 	}
+
+	var SL1_DEFAULT = 180;
+	var SL2_DEFAULT = 5;
+	var SL3_DEFAULT = 3;
+	function initSliders() {
+		var root = "#modal_timesettings";
+		var slider1 = $(root + ' #discovery_timeout_slider')[0];
+		var slider2 = $(root + ' #snpm_timout_slider')[0];
+		var slider3 = $(root + ' #snpm_retries_slider')[0];
+		var input1 = $(root + ' #discovery_timeout_input');
+		var input2 = $(root + ' #snpm_timout_input');
+		var input3 = $(root + ' #snpm_retries_input');
+
+		noUiSlider.create(slider1, {
+			start: 180,
+			connect: [true, false],
+			range: {
+				min: 10,
+				max: 600
+			}
+		});
+		noUiSlider.create(slider2, {
+			start: 5,
+			connect: [true, false],
+			range: {
+				min: 1,
+				max: 10
+			}
+		});
+		noUiSlider.create(slider3, {
+			start: 3,
+			connect: [true, false],
+			range: {
+				min: 1,
+				max: 10
+			}
+		});
+
+		slider1.noUiSlider.on("update", function (a, b, c) {
+			input1.val(c[0].toFixed());
+		});
+		slider2.noUiSlider.on("update", function (a, b, c) {
+			input2.val(c[0].toFixed());
+		});
+		slider3.noUiSlider.on("update", function (a, b, c) {
+			input3.val(c[0].toFixed());
+		});
+	}
 	function init() {
 		doValidation($('#disc_left_input'));
 		doValidation($('#disc_right_input'));
@@ -141,10 +185,13 @@ define(['map/mediator', 'core/wuk'], function (map, wuk) {
 		$('#disc_right_input').on('keyup', function () {
 			doValidation($(this));
 		});
+
+		initSliders();
 	}
 
 	inst.isValidIp = isValidIp;
 	inst.discover = discover;
+	inst.begin = begin;
 	inst.init = init;
 
 	return inst;
