@@ -12,7 +12,8 @@ var list = [
 	"pixi/pixi",
 	"ani/TweenLite",
 	"socket.io",
-	"handlebars",
+//	"handlebars",
+	"handlebars.runtime"
 	// "require"
 ];
 function getLibs(min) { // default: not minified

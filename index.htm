@@ -42,8 +42,6 @@
 <div id="contextmenu"></div>
 
 
-<div id="html5"></div>
-
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    Templates    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="templates">
 <div id="nodepopup_template">
@@ -147,6 +145,7 @@ cvas.ir</textarea></label>
     </div>
 </div>
 
+
 <div id="modal_discovery" uk-modal="center: true; esc-close: true; bg-close: false;">
 	<div class="uk-modal-dialog">
 		<button class="uk-modal-close-default" type="button" uk-close></button>
@@ -154,25 +153,25 @@ cvas.ir</textarea></label>
 			<h2 class="uk-modal-title">Discover Available Nodes</h2>
 		</div>
 		<div class="uk-modal-body">
-			<form>
+			<form data-el="form">
 				<div class="uk-margin">
-					<label class="ul-dark"><input class="uk-radio j-discovery-radios" type="radio" name="radio1" value="0" checked/> IP with Start/End</label><br/>
-					<label class="ul-dark"><input class="uk-radio j-discovery-radios" type="radio" name="radio1" value="1"/> IP and Subnet</label>
+					<label class="ul-dark"><input class="uk-radio" type="radio" name="rangeType" value="0" checked data-els="radios" data-el="radio1"/> IP with Start/End</label><br/>
+					<label class="ul-dark"><input class="uk-radio" type="radio" name="rangeType" value="1" data-els="radios"/> IP and Subnet</label>
 				</div>
 				<div class="uk-margin uk-form-horizontal">
-					<input class="uk-input uk-form-width-medium" type="text" name="first-input" value="192.168.1.1" id="disc_left_input"/>
+					<input class="uk-input uk-form-width-medium" type="text" name="range1" value="" data-el="input1"/>
 					<span class="uk-label">-</span>
-					<input class="uk-input uk-form-width-medium" type="text" name="second-input" value="192.168.1.255" id="disc_right_input"/>
+					<input class="uk-input uk-form-width-medium" type="text" name="range2" value="" data-el="input2"/>
 				</div>
 			</form>
 		</div>
 		<div class="uk-modal-footer uk-text-right">
-			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button">Cancel</button>
-			<button id="discovery_next" class="uk-button uk-button-primary uk-text-bold" type="button" disabled>Next</button>
+			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button" data-el="cancel">Cancel</button>
+			<button class="uk-button uk-button-primary uk-text-bold" type="button" disabled data-el="next">Next</button>
 		</div>
 	</div>
 </div>
-<div id="modal_snmpcredentials" uk-modal="center: true; esc-close: false; bg-close: false;">
+<div id="modal_snmpcreds" uk-modal="center: true; esc-close: false; bg-close: false;">
 	<div class="uk-modal-dialog">
 		<div class="uk-modal-header">
 			<h2 class="uk-modal-title">SNPM Creadentials</h2>
@@ -180,29 +179,29 @@ cvas.ir</textarea></label>
 		<div class="uk-modal-body">
 			<form>
 				<div class="uk-margin">
-					<button class="uk-button uk-button-default uk-button-primary uk-button-small  light-green darken-2" type="button">Add New</button>
+					<button class="uk-button uk-button-primary uk-button-small light-green darken-2" type="button" data-el="addnew">Add New</button>
 				</div>
 			</form>
 			
-			<table class="uk-table">
+			<table class="uk-table" data-el="table">
 				<tr>
 					<th>Creadential</th>
 					<th>Action</th>
 				</tr>
 				<tr>
-					<td>asad</td>
-					<td>hamid</td>
+					<td><input class="uk-input" type="text" value="" placeholder="Type here..."/ data-input></td>
+					<td><button class="uk-button uk-button-danger uk-button-small" type="button" data-delete>Delete</button></td>
 				</tr>
 			</table>
 		</div>
 		<div class="uk-modal-footer uk-text-right">
-			<button id="snpmcred_cancel" class="uk-button uk-button-danger uk-modal-close uk-text-bold" type="button">Prev</button>
-			<button id="snpmcred_submit" class="uk-button uk-button-primary uk-text-bold" type="button" >Next</button>
+			<button class="uk-button uk-button-default uk-modal-close uk-text-bold" type="button" data-el="cancel">Cancel</button>
+			<button class="uk-button uk-button-secondary uk-text-bold" type="button" data-el="prev">Prev</button>
+			<button class="uk-button uk-button-primary uk-text-bold" type="button" data-el="next">Next</button>
 		</div>
 	</div>
 </div>
-
-<div id="modal_timesettings" uk-modal="center: true; esc-close: false; bg-close: false;">
+<div id="modal_snmptimes" uk-modal="center: true; esc-close: false; bg-close: false;">
 	<div class="uk-modal-dialog">
 		<div class="uk-modal-header">
 			<h2 class="uk-modal-title">Times Settings</h2>
@@ -211,32 +210,34 @@ cvas.ir</textarea></label>
 			<form>
 				<div class="uk-margin">
 					<label class="uk-text-bold">Discovery Timeout:</label>
-					<input id="discovery_timeout_input" class="uk-input uk-form-width-xsmall" type="text"/>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input1"/>
 					<label>ms</label>
 				</div>
-				<div id="discovery_timeout_slider"></div>
+				<div data-el="slider1"></div>
 				
 				<div class="uk-margin">
 					<label class="uk-text-bold">SNPM Timeout:</label>
-					<input id="snpm_timout_input" class="uk-input uk-form-width-xsmall" type="text"/>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input2"/>
 					<label>ms</label>
 				</div>
-				<div id="snpm_timout_slider"></div>
+				<div data-el="slider2"></div>
 				
 				<div class="uk-margin">
 					<label class="uk-text-bold">SNPM Retries:</label>
-					<input id="snpm_retries_input" class="uk-input uk-form-width-xsmall" type="text"/>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input3"/>
 					<label>retry(s)</label>
 				</div>
-				<div id="snpm_retries_slider"></div>
+				<div data-el="slider3"></div>
 			</form>
 		</div>
 		<div class="uk-modal-footer uk-text-right">
-			<button id="snpmcred_cancel" class="uk-button uk-button-danger uk-modal-close uk-text-bold" type="button">Prev</button>
-			<button id="snpmcred_submit" class="uk-button uk-button-primary uk-text-bold" type="button" >Start Discovery</button>
+			<button class="uk-button uk-button-default uk-text-bold uk-modal-close" type="button" data-el="cancel">Cancel</button>
+			<button class="uk-button uk-button-secondary uk-text-bold" type="button" data-el="prev">Prev</button>
+			<button class="uk-button uk-button-primary uk-text-bold" type="button" data-el="submit">Start Discovery</button>
 		</div>
 	</div>
 </div>
+
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="contents">
 

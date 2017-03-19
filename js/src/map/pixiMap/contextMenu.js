@@ -1,6 +1,7 @@
 define(['core/whb', 'core/util'], function (whb, u) {
 	var inst = {},
-		tmpl = whb.tmpl;
+	//	tmpl = whb.tmpl;
+		tmpl = Handlebars.templates;
 	
 	// tmpl.ctxnode tmpl.ctxlink
 	function get(type) {

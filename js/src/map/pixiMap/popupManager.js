@@ -25,7 +25,8 @@ define(['./wpix', 'core/util', 'core/whb'], function (wpix, u, whb) {
 	});
 	function create(data, pos) {
 		removeAll();
-		var div = whb.tmpl.bubble(data),
+	//	var div = whb.tmpl.bubble(data),
+		var div = Handlebars.templates.bubble(data),
 			left, top;
 		
 		div = $(div);

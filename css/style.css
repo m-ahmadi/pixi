@@ -1676,6 +1676,18 @@ body {
 #map_container {
   background: #f5eed8; }
 
+#modal_snmpcreds .uk-modal-body {
+  max-height: 300px;
+  overflow-y: scroll; }
+#modal_snmpcreds table .uk-button-danger {
+  text-transform: lowercase;
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: 15px;
+  line-height: 18px; }
+#modal_snmpcreds table input[type=text] {
+  height: 29px; }
+
 #modal_timesettings label {
   margin-right: 10px; }
 

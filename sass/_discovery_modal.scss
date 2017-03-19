@@ -1,3 +1,23 @@
+#modal_snmpcreds {
+	.uk-modal-body {
+		max-height: 300px;
+		overflow-y: scroll;
+	}
+	
+	table {
+		.uk-button-danger {
+			text-transform: lowercase;
+			padding: 0 8px;
+			font-size: 12px;
+			border-radius: 15px;
+			line-height: 18px;
+		}
+		input[type=text] {
+			height: 29px;
+		}
+	}
+}
+
 #modal_timesettings {
 	label {
 		margin-right: 10px;

@@ -214,21 +214,25 @@ define(["core/util", "core/whb"], function (u, whb) {
 		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
 		window.network = g.network;
 
-		$.ajax({
-			url: "http://localhost:3000",
-			type: "POST",
-			dataType: "json",
-			data: {
-				x1: -hW, // hW
-				x2: hW, // hW window.innerWidth,
-				y1: -hH, // hH
-				y2: hH // hH window.innerHeight
-			}
-		}).done(function (data) {
-			console.log(data);
-			t = data;
-			draw(data);
+		$(window).on("resize", function () {
+			g.container.height(window.innerHeight);
 		});
+		/* $.ajax({
+  	url: "http://localhost:3000",
+  	type: "POST",
+  	dataType: "json",
+  	data: {
+  		x1: -hW,// hW
+  		x2: hW,// hW window.innerWidth,
+  		y1: -hH, // hH
+  		y2: hH // hH window.innerHeight
+  	}
+  })
+  .done(function (data) {
+  	console.log(data);
+  	t = data;
+  	draw(data);
+  }); */
 		createWorker();
 	}
 

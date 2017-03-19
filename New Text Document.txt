@@ -1,0 +1,16 @@
+scripts: {
+				files: [
+					"!**/node_modules/**",
+					"!**/.git/**",
+					"index.htm",
+					"css/**/*.css",
+					"js/dist/**/*.js",
+					"gruntfile.js",
+					"test/**/*"
+				],
+				tasks: [],
+				options: {
+					spawn: false,
+					reload: true
+				}
+			},

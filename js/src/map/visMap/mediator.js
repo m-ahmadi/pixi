@@ -215,7 +215,10 @@ define(["core/util", "core/whb"], function (u, whb) {
 		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
 		window.network = g.network;
 		
-		$.ajax({
+		$(window).on("resize", function () {
+			g.container.height(window.innerHeight);
+		});
+		/* $.ajax({
 			url: "http://localhost:3000",
 			type: "POST",
 			dataType: "json",
@@ -230,7 +233,7 @@ define(["core/util", "core/whb"], function (u, whb) {
 			console.log(data);
 			t = data;
 			draw(data);
-		});
+		}); */
 		createWorker();
 	}
 	

@@ -4,20 +4,17 @@ var baseRoot = "192.168.10.13:3000",
 require.config({
 	baseUrl: "js/dist",
 	paths: {
-		lib: "lib",
-		core: "core",
-		map: "map",
-		page: "page"
+		lib: "../lib"
 	}
 });
 
-require(["page/mediator", "map/mediator", "core/whb", "core/wuk"], function (page, map, whb, wuk) {
-	whb.compileAll();
+require(["./mediator"], function (page) {
+
+	page.beforeReady();
 
 	$(function () {
-		wuk.init();
-		page.init();
-		map.init("visMap", "#map_container");
+
+		page.onReady();
 	});
 });
 //# sourceMappingURL=main.js.map
