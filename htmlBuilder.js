@@ -1,17 +1,32 @@
-const DIR = "template/static";
-const EXT = ".handlebars";
+const DEFAULT = {
+	root:        "template/static",
+	outFile:     "shindex.html",
+	indentChar:  "\t"
+};
+const log = console.log;
+const args = process.argv; 
+const once = args.indexOf("--once") !== -1;
+const ROOT = set("--root"); 
+const OUTPUT_FILE = set("--outFile");
+const INDENT_CHAR = set("--indentChar");
+const DIR = ROOT;
 
 let Handlebars = require("handlebars");
 let chokidar = require("chokidar");
-let watcher = chokidar.watch(`${DIR}/**/*${EXT}`, {ignored: /[\/\\]\./, persistent: true});
+let watcher = chokidar.watch(`${DIR}/**/*`, {ignored: /[\/\\]\./, persistent: true});
+let indent = require("indent.js");
 let colors = require("colors/safe");
 let fs = require("fs");
 let u = require("util-ma");
+
+let first = false;
 let fileOpt = {encoding: "utf-8", flag: "r"};
-let once = process.argv.indexOf("--once") !== -1;
-let log = console.log;
+const isObj = u.isObj;
+const isStr = u.isStr;
+const isUndef = u.isUndef;
 
-
+let src = newEmpty();
+let html = "";
 
 function newEmpty() {
 	return {
@@ -20,33 +35,64 @@ function newEmpty() {
 	};
 }
 
-let src = newEmpty();
-let html = "";
-
-if (!once) {
+if (once) {
+	buildHtml();
+	log( colors.blue.bold("The file ", colors.yellow(OUTPUT_FILE), "is created.") );
+} else {
 	watcher
 		.on("ready", function () {
-			log( colors.blue.bold("Initial scan complete. Ready for changes.") );
+			first = true;
+			buildHtml();
+			log( colors.blue.bold("Initial", colors.yellow(OUTPUT_FILE), "is created.") );
+			log( colors.blue.bold("Watching", colors.yellow(DIR), "for changes...") );
 		})
 		.on("add", path => {
 			log( colors.green.bold("File added:"), path );
+			buildHtml();
+			msg();
 		})
 		.on("addDir", path => {
 			log( colors.black.bgGreen("Folder added: "), path );
+			buildHtml();
+			msg();
 		})
 		.on("unlink", path => {
 			log( colors.red.bold("File removed: "), path );
+			buildHtml();
+			msg();
 		})
 		.on("unlinkDir", path => {
 			log( colors.white.bgRed("Folder removed:"), path );
+			buildHtml();
+			msg();
 		})
 		.on("change", path => {
 			log( colors.cyan.bold("File changed: "), path );
+			buildHtml();
+			msg();
 		});
 }
 
+function msg() {
+	if (first) {
+		log( colors.blue.bold(colors.yellow(OUTPUT_FILE), "was recreated.") );
+	}
+}
+function set(arg) {
+	let idx = args.indexOf(arg);
+	if (idx !== -1) {
+		return args[ idx + 1 ];
+	} else {
+		// let k = arg.slice(2).replace(/([A-Z])/g, '_$1').toUpperCase(); // --outDir  to  OUT_DIR
+		let k = arg.slice(2); // --outDir  to  outDir
+		return DEFAULT[k];
+	}
+}
 function readFile(path) {
 	return fs.readFileSync(path, { encoding: 'utf-8', flag: 'r' });
+}
+function writeFile(txt) {
+	fs.writeFileSync("shindex.html", txt);
 }
 function getDirs(p) {
 	return fs.readdirSync(p).filter( f => fs.statSync(p+"/"+f).isDirectory() );
@@ -59,27 +105,35 @@ function getTarget(root, namespace, noTemp) {
 	let o;
 	if (root) {
 		if (!namespace) {
-			if ( u.isObj(root) ) {
+			if ( isObj(root) ) {
 				o = root;
-			} else if ( u.isStr(root) ) {
+			} else if ( isStr(root) ) {
 				if (!src.data[root]) {
 					src.data[root] = newEmpty();
 				}
 				o = src.data[root];
 			}
 		} else if (namespace) {
-			if ( u.isObj(root) ) {
-				if ( u.isObj(root.data[namespace]) ) {
-					o = root.data[namespace];
+			if ( isObj(root) ) {
+				let p = root.data[namespace];
+				if ( isUndef(p) || isStr(p) ) {
+					if (noTemp) {
+						if ( isUndef(p) ) { root.data[namespace] = ""; }
+						o = root.data;
+					} else {
+						root.data[namespace] = newEmpty();
+						o = root.data[namespace];
+					}
 				} else {
-					root.data[namespace] = newEmpty();
-					o = root.data[namespace];
+					if ( isObj(p) ) {
+						o = root.data[namespace];
+					}
 				}
-			} else if ( u.isStr(root) ) {
-				if (!src.data[root]) {
+			} else if ( isStr(root) ) {
+				let p = src.data[root];
+				if (!p) {
 					src.data[root] = newEmpty();
-				}
-				if (!src.data[root].data[namespace]) {
+				} else if (!p.data[namespace]) {
 					src.data[root].data[namespace] = noTemp ? "" : newEmpty();
 				}
 				o = noTemp ? src.data[root].data : src.data[root].data[namespace];
@@ -147,7 +201,6 @@ function dirHandler(p, root, ns) {
 	if (files.length) {
 		files.forEach(i => {
 			if ( i.endsWith(".htm") ) {
-				// addData( path+i, root, i.substr( 0, i.indexOf('.') ), true );
 				addData(path+i, i.substr( 0, i.indexOf('.') ), root, ns, true);
 			}
 		});
@@ -160,147 +213,26 @@ function dirHandler(p, root, ns) {
 }
 
 function buildSrc() {
-	debugger
-	fudge("template/static", src);
-	
-	console.log(src);
-	
+	fudge(DIR, src);
+	// console.log(src);
 }
-
-function compile(o) {
-	Object.keys(o).forEach(k => {
-		let p = o[k];
-		
-		if ( u.isObj(p) ) {
-			o[k] = p.template(p.data);
+function compile(o, parent, key) {
+	let data = o.data;
+	Object.keys(data).forEach(i => {
+		let p = data[i];
+		if ( isObj(p) ) {
+			compile(p, o, i);
 		}
 	});
+	if (parent && key) {
+		parent.data[key] = o.template(data);
+	} else {
+		return o.template(data);
+	}
 }
 function buildHtml() {
-	let template = src.template;
-	let data = src.data;
-	
-	compile(src.data);
-	html = src.template(src.data);
-	
+	buildSrc();
+	html = compile(src);
+	html = indent.indentHTML(html, "\t");
+	fs.writeFileSync(OUTPUT_FILE, html);
 }
-
-buildSrc();
-// buildHtml();
-
-console.log(html);
-/* fs.writeFile("shindex.html", text, "utf8", (err) => {
-	if (err) { return console.log(err); }
-	log("The file was saved!");
-}); */
-
-
-
-
-
-
-
-/*
-
-function createIndex() {
-	let index = readFile(DIR+"/index.handlebars");
-	
-	let output = "";
-	
-	console.log( files(DIR) );
-	walk("template/static/profile").forEach(i => {
-		let p = i.replace(DIR, "").slice(1);
-		let a = p.split("/");
-		
-		if (p.indexOf("/") === -1) { // root folder
-			src.data = {};
-			if ( p.endsWith(".handlebars") ) { // template
-				
-				
-				src.template = Handlebars.compile( readFile(i) )();
-				
-			} else if ( p.endsWith(".htm") ) { // data
-				let fileName = p.substr( 0, p.indexOf('.') );
-				src.data[fileName] = readFile(i);
-				
-				
-			}
-		} else if (p.indexOf("/") >=0) { // 
-			
-		}
-	});
-	// console.log( walk(DIR) );
-	
-	
-	
-	
-	
-	
-}
-
-
-if (files.filter(v => {return /.htm/.test(v)}).length) { // at-least one .htm file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-walk(DIR).forEach(i => {
-		let p = i.replace(DIR, "").slice(1);
-		let a = p.split("/");
-		let last = a[a.length-1];
-		console.log(a);
-		if (last.endsWith(".handlebars")) {
-			// console.log(last.replace(DIR, ""));
-		}
-	});
-	// console.log( walk(DIR) );
-
-
-
-
-
-
-	let source = readFile(DIR+"/main"+EXT);
-	let a = Handlebars.compile(source);
-	
-	console.log(a);
-	fs.writeFile("shindex.html", "Hey there!", "utf8", (err) => {
-		if (err) { return console.log(err); }
-		log("The file was saved!");
-	});
-
-
-
-let g = Handlebars.compile(src.main)();
-	console.log(g);
-	// getDirsIn(DIR).forEach(i => {
-
-
-function walk(dir) {
-	let results = []
-	let list = fs.readdirSync(dir);
-	list.forEach( function (file) {
-		file = dir + '/' + file;
-		let stat = fs.statSync(file);
-		if ( stat && stat.isDirectory() ) {
-			results = results.concat( walk(file) );
-		} else {
-			results.push(file)
-		}
-	});
-	return results;
-};
-*/
