@@ -4,6 +4,9 @@
   "description": "Network topology visualizer and tools",
   "version": "1.0.0",
   "main": "index.htm",
+  "bin": {
+    "htmlBuilder": "./htmlBuilder.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
