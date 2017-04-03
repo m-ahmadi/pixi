@@ -4,10 +4,8 @@
   "description": "Network topology visualizer and tools",
   "version": "1.0.0",
   "main": "index.htm",
-  "bin": {
-    "htmlBuilder": "./htmlBuilder.js"
-  },
   "scripts": {
+    "release": "node release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mohammad Ahmadi",
@@ -26,7 +24,9 @@
     "browserify": "^13.3.0",
     "chokidar": "^1.6.1",
     "colors": "^1.1.2",
+    "copy-dir": "^0.3.0",
     "express": "^4.14.0",
+    "find-in-files": "^0.4.0",
     "grunt": "^1.0.1",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-concat": "^1.0.1",
@@ -40,6 +40,7 @@
     "handlebars": "^4.0.6",
     "indent.js": "^0.1.4",
     "jshint-stylish": "^2.2.1",
+    "line-by-line": "^0.1.5",
     "socket.io": "^1.7.2",
     "tsify": "^3.0.0",
     "typescript": "^2.1.5",
