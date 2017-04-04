@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "main": "index.htm",
   "scripts": {
+    "compile-js": "babel js/src -d js/dist -s",
     "release": "node release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

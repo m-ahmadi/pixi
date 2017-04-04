@@ -1,7 +1,7 @@
 define(["core/util"], function (u) {
 	let inst = {};
 	
-	const URL = "ws://echo.websocket.org/echo";
+	const URL = "ws://127.0.0.1:3000/socket/open";
 	let ws;
 	let opened = false;
 	let callbacks = {};
