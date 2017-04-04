@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/config.js"],"names":["define","JS_ROOT"],"mappings":"AAAAA,OAAO,YAAY;AAClB,QAAO;AACNC,WAAS;;AADH,EAAP;AAIA,CALD","file":"config.js","sourcesContent":["define(function () {\r\n\treturn {\r\n\t\tJS_ROOT: \"\",\r\n\t\t\r\n\t};\r\n});"]}

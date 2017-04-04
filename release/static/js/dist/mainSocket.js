@@ -1,7 +1,7 @@
 define(["core/util"], function (u) {
 	var inst = {};
 
-	var URL = "ws://echo.websocket.org/echo";
+	var URL = "ws://127.0.0.1:3000/socket/open";
 	var ws = void 0;
 	var opened = false;
 	var callbacks = {};

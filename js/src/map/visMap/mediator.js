@@ -1,9 +1,9 @@
-define(["core/util", "core/whb"], function (u, whb) {
+define(["config", "core/util", "core/whb"], function (conf, u, whb) {
 	var inst = {},
 		g = {},
 		tmpl = whb.tmpl;
 	
-	g.WORKERS_DIR = "js/dist/workers";
+	g.WORKERS_DIR = `${conf.JS_ROOT}/js/dist/workers`;
 	g.network = {};
 	g.options = {};
 	g.container = {};

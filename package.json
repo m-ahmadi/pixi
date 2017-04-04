@@ -3,9 +3,10 @@
   "title": "Argus Topology",
   "description": "Network topology visualizer and tools",
   "version": "1.0.0",
-  "main": "index.htm",
   "scripts": {
-    "compile-js": "babel js/src -d js/dist -s",
+    "compile-js": "cd node_modules/.bin/ && babel ../../js/src -d ../../js/dist -s",
+    "compile-temps": "cd node_modules/.bin/ && handlebars ../../template/dynamic/ > ../../js/src/templates.js -e hbs -m",
+    "jslibs": "cd node_modules/.bin/ && concat --help",
     "release": "node release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +26,7 @@
     "browserify": "^13.3.0",
     "chokidar": "^1.6.1",
     "colors": "^1.1.2",
+    "concat": "^3.0.0",
     "copy-dir": "^0.3.0",
     "express": "^4.14.0",
     "find-in-files": "^0.4.0",
@@ -42,6 +44,7 @@
     "indent.js": "^0.1.4",
     "jshint-stylish": "^2.2.1",
     "line-by-line": "^0.1.5",
+    "shelljs": "^0.7.7",
     "socket.io": "^1.7.2",
     "tsify": "^3.0.0",
     "typescript": "^2.1.5",

@@ -2,7 +2,7 @@ var baseRoot = "192.168.10.13:3000",
     t;
 
 require.config({
-	baseUrl: "js/dist",
+	baseUrl: "/static/js/dist",
 	paths: {
 		lib: "../lib"
 	}

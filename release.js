@@ -28,9 +28,10 @@ lr.on("line", line => {
 	if (isLink) {
 		newLine = line.replace(/href="/, href);
 	} else if (isScript) {
+		debugger
 		newLine = line.replace(/src="/ , src);
 		if ( /data-main="/.test(line) ) {
-			newLine = line.replace(/data-main="/ , dataMain);
+			newLine = newLine.replace(/data-main="/ , dataMain);
 		}
 	} else {
 		newLine = line;
@@ -49,6 +50,10 @@ toMakeDirs.forEach(i => {
 	mkdirSafe(path);
 	copydir.sync(i, path);
 });
+
+
+change(`${ASSETS}/js/dist/config.js`, "JS_ROOT.*", 'JS_ROOT: "/static",');
+change(`${ASSETS}/js/dist/main.js`, "baseUrl.*", 'baseUrl: "/static/js/dist",');
 
 console.log(
 	colors.yellow("Release build"), colors.green.bold("done."),
@@ -72,4 +77,9 @@ function mkdirIf(path) {
 	if ( !fs.existsSync(path) ) {
 		fs.mkdirSync(path);
 	}
+}
+function change(filePath, ferom, to) {
+	let c = fs.readFileSync(filePath, "utf-8");
+	let result = c.replace(new RegExp(ferom), to);
+	fs.writeFileSync(filePath, result);
 }
