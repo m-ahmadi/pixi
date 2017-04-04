@@ -4,9 +4,9 @@
   "description": "Network topology visualizer and tools",
   "version": "1.0.0",
   "scripts": {
-    "compile-js": "cd node_modules/.bin/ && babel ../../js/src -d ../../js/dist -s",
-    "compile-temps": "cd node_modules/.bin/ && handlebars ../../template/dynamic/ > ../../js/src/templates.js -e hbs -m",
-    "jslibs": "cd node_modules/.bin/ && concat --help",
+    "compile-js":    "cd node_modules/.bin/  &&  babel ../../js/src -d ../../js/dist -s",
+    "compile-temps": "cd node_modules/.bin/  &&  handlebars ../../template/dynamic/ > ../../js/src/templates.js -e hbs -m",
+    "jslibs":        "cd node_modules/.bin/  &&  concat --help",
     "release": "node release",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

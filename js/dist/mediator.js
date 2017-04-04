@@ -15,6 +15,9 @@ define([
 		discovery.on("submit", function (toSend) {
 			mainSocket.send(JSON.stringify(toSend), function (e) {
 				var data = JSON.parse(e.data);
+				if (DEBUG) {
+					console.log(data);
+				}
 				map.draw(data);
 			});
 		});
@@ -30,6 +33,14 @@ define([
 		traceroute.init();
 		discovery.init();
 		addCustomEvts();
+
+		mainSocket.send(JSON.stringify({ "action": "getAllNodes" }), function (e) {
+			var data = JSON.parse(e.data);
+			if (DEBUG) {
+				console.log(data);
+			}
+			map.draw(data);
+		});
 	}
 	inst.beforeReady = beforeReady;
 	inst.onReady = onReady;

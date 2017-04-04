@@ -51,7 +51,7 @@ toMakeDirs.forEach(i => {
 	copydir.sync(i, path);
 });
 
-
+// handle edge cases
 change(`${ASSETS}/js/dist/config.js`, "JS_ROOT.*", 'JS_ROOT: "/static",');
 change(`${ASSETS}/js/dist/main.js`, "baseUrl.*", 'baseUrl: "/static/js/dist",');
 

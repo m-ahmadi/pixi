@@ -1,6 +1,3 @@
-define(function () {
-	return {
-		JS_ROOT: "",
-		
-	};
+define({
+	JS_ROOT: ""
 });

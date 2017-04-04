@@ -222,7 +222,7 @@ var util = function () {
 
 if (typeof define === 'function' && define.amd) {
 	define(util);
-} else if (typeof module !== 'undefined') {
+} else if (typeof process !== "undefined" && typeof process.versions.node !== "undefined") {
 	module.exports = util;
 }
 //# sourceMappingURL=util.js.map
