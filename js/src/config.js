@@ -1,3 +1,3 @@
 define({
-	JS_ROOT: ""
+	ROOT: ""
 });

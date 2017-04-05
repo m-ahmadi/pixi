@@ -52,7 +52,7 @@ toMakeDirs.forEach(i => {
 });
 
 // handle edge cases
-change(`${ASSETS}/js/dist/config.js`, "JS_ROOT.*", 'JS_ROOT: "/static",');
+change(`${ASSETS}/js/dist/config.js`, "ROOT.*", 'ROOT: "/static/"');
 change(`${ASSETS}/js/dist/main.js`, "baseUrl.*", 'baseUrl: "/static/js/dist",');
 
 console.log(

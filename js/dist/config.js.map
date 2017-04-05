@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/config.js"],"names":["define","JS_ROOT"],"mappings":"AAAAA,OAAO;AACNC,UAAS;AADH,CAAP","file":"config.js","sourcesContent":["define({\r\n\tJS_ROOT: \"\"\r\n});"]}
+{"version":3,"sources":["../src/config.js"],"names":["define","ROOT"],"mappings":"AAAAA,OAAO;AACNC,OAAM;AADA,CAAP","file":"config.js","sourcesContent":["define({\r\n\tROOT: \"\"\r\n});"]}

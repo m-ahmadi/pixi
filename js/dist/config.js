@@ -1,4 +1,4 @@
 define({
-	JS_ROOT: ""
+	ROOT: ""
 });
 //# sourceMappingURL=config.js.map

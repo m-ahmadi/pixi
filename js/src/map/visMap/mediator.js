@@ -3,10 +3,9 @@ define(["config", "core/util", "core/whb"], function (conf, u, whb) {
 		g = {},
 		tmpl = whb.tmpl;
 	
-	const JS_ROOT = conf.JS_ROOT;
-	const DIR = JS_ROOT.slice(-1) === "/" ? JS_ROOT : "";
+	const ROOT = conf.ROOT;
 	
-	g.WORKERS_DIR = `${DIR}js/dist/workers`;
+	g.WORKERS_DIR = `${ROOT}js/dist/workers`;
 	g.network = {};
 	g.options = {};
 	g.container = {};
