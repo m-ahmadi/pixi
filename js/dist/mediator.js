@@ -23,7 +23,13 @@ define([
 		});
 	}
 	function beforeReady() {
-		mainSocket.init();
+		mainSocket.init(mainSocket.send, [JSON.stringify({ "action": "getAllNodes" }), function (e) {
+			var data = JSON.parse(e.data);
+			if (DEBUG) {
+				console.log(data);
+			}
+			map.draw(data);
+		}]);
 		// whb.compileAll();
 	}
 	function onReady() {
@@ -33,14 +39,6 @@ define([
 		traceroute.init();
 		discovery.init();
 		addCustomEvts();
-
-		mainSocket.send(JSON.stringify({ "action": "getAllNodes" }), function (e) {
-			var data = JSON.parse(e.data);
-			if (DEBUG) {
-				console.log(data);
-			}
-			map.draw(data);
-		});
 	}
 	inst.beforeReady = beforeReady;
 	inst.onReady = onReady;

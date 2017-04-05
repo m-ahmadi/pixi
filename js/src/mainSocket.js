@@ -18,12 +18,16 @@ define(["core/util"], function (u) {
 			ws.send(str);
 		}
 	}
-	function init() {
+	function init(callback, callbackArgs) {
 		ws = new WebSocket(URL);
 		
 		ws.onopen = function (e) {
 			console.log("Connection open...", e);
 			opened = true;
+			
+			if ( u.isFn(callback) ) {
+				callback.apply(undefined, callbackArgs);
+			}
 		};
 		ws.onmessage = function (e) {
 			if ( u.isStr(e.data) ) {
