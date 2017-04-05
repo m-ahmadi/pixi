@@ -17,7 +17,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           o = "function",
           c = t.escapeExpression;return '<table class="uk-table">\r\n\t<tr>\r\n\t\t<th>Node Name</th>\r\n\t\t<th>Node Id</th>\r\n\t</tr>\r\n\t<tr>\r\n\t\t<td>' + c((s = null != (s = a.name || (null != n ? n.name : n)) ? s : r, (typeof s === "undefined" ? "undefined" : _typeof(s)) === o ? s.call(e, { name: "name", hash: {}, data: i }) : s)) + "</td>\r\n\t\t<td>" + c((s = null != (s = a.id || (null != n ? n.id : n)) ? s : r, (typeof s === "undefined" ? "undefined" : _typeof(s)) === o ? s.call(e, { name: "id", hash: {}, data: i }) : s)) + "</td>\r\n\t</tr>\r\n</table>";
     }, useData: !0 }), n.reza = t({ compiler: [7, ">= 4.0.0"], main: function main(t, n, a, l, i) {
-      var s;return "<tr>\r\n\t<td>" + t.escapeExpression((s = null != (s = a.text || (null != n ? n.text : n)) ? s : a.helperMissing, "function" == typeof s ? s.call(null != n ? n : {}, { name: "text", hash: {}, data: i }) : s)) + '</td>\r\n\t<td><button class="uk-button uk-button-danger uk-button-small" type="button">Delete</td>\r\n</tr>';
+      var s;return "<tr>\r\n\t<td>" + t.escapeExpression((s = null != (s = a.text || (null != n ? n.text : n)) ? s : a.helperMissing, "function" == typeof s ? s.call(null != n ? n : {}, { name: "text", hash: {}, data: i }) : s)) + '</td>\r\n\t<td><button class="uk-button uk-button-danger uk-button-small" type="button">Delete</td> aa\r\n</tr>';
     }, useData: !0 });
 }();
 //# sourceMappingURL=templates.js.map

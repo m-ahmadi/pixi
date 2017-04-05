@@ -1,3 +1,3 @@
 define({
-	ROOT: "js/app/"
+	ROOT: ""
 });

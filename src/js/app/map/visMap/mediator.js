@@ -1,11 +1,11 @@
-define(["config", "core/util", "core/whb"], function (conf, u, whb) {
+define(["config", "core/util"], function (conf, u) {
 	var inst = {},
 		g = {},
-		tmpl = whb.tmpl;
+		tmpl = Handlebars.templates;
 	
 	const ROOT = conf.ROOT;
 	
-	g.WORKERS_DIR = `${ROOT}js/dist/workers`;
+	g.WORKERS_DIR = `${ROOT}js/app/workers`;
 	g.network = {};
 	g.options = {};
 	g.container = {};

@@ -4,7 +4,8 @@
   "description": "Network topology visualizer and tools.",
   "version": "1.0.0",
   "scripts": {
-    "compile-js": "cd node_modules/.bin/  &&  babel ../../src/js/app -d ../../dist/js/dist -s",
+    "col": "gulp compile-js",
+    "compile-js": "cd node_modules/.bin/  &&  babel ../../src/js/app -d ../../dist/js/app -s",
     "compile-temps": "cd node_modules/.bin/  &&  handlebars ../../src/template/dynamic/ > ../../src/js/app/templates.js -e hbs -m",
     "js-libs": "node build/jsLibs",
     "css-libs": "node build/cssLibs",

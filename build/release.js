@@ -1,13 +1,9 @@
-const OUT_DIR = "release";
-const ASSETS = `${OUT_DIR}/static`;
-const INPUT_HTML = "index.htm";
-const OUT_HTML = "index.html"
-const toMakeDirs = ["css", "fonts", "images", "js/lib", "js/dist"];
-const link = /<link {1}/;
-const script = /<script {1}/;
-const href = 'href="/static/';
-const src = 'src="/static/';
-const dataMain = 'data-main="/static/';
+const OUT_DIR = "dist-custom/";
+const ASSETS = OUT_DIR+"/static";
+const ROOT = "dist/";
+const INPUT_HTML = ROOT+"index.html";
+const OUT_HTML = "index.html";
+const toMakeDirs = ["css", "fonts", "images", "js/lib", "js/app"];
 
 const LineByLineReader = require("line-by-line");
 const copydir = require("copy-dir");
@@ -16,7 +12,11 @@ const fs = require("fs");
 const path = require("path");
 const colors = require("colors/safe");
 
-
+const link = /<link {1}/;
+const script = /<script {1}/;
+const href = 'href="/static/';
+const src = 'src="/static/';
+const dataMain = 'data-main="/static/';
 // handle index.html
 let html = "";
 lr.on("error", err => { console.log( colors.red.bold("Something went wrong!") ); });
@@ -28,7 +28,6 @@ lr.on("line", line => {
 	if (isLink) {
 		newLine = line.replace(/href="/, href);
 	} else if (isScript) {
-		debugger
 		newLine = line.replace(/src="/ , src);
 		if ( /data-main="/.test(line) ) {
 			newLine = newLine.replace(/data-main="/ , dataMain);
@@ -48,12 +47,12 @@ mkdirIf(ASSETS);
 toMakeDirs.forEach(i => {
 	let path = `${ASSETS}/${i}`;
 	mkdirSafe(path);
-	copydir.sync(i, path);
+	copydir.sync(ROOT+i, path);
 });
 
 // handle edge cases
-change(`${ASSETS}/js/dist/config.js`, "ROOT.*", 'ROOT: "/static/"');
-change(`${ASSETS}/js/dist/main.js`, "baseUrl.*", 'baseUrl: "/static/js/dist",');
+change(ASSETS+"/js/app/config.js", "ROOT.*", 'ROOT: "/static/"');
+change(ASSETS+"/js/app/main.js", "baseUrl.*", 'baseUrl: "/static/js/app",');
 
 console.log(
 	colors.yellow("Release build"), colors.green.bold("done."),

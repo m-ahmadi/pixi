@@ -3,17 +3,16 @@ const livereload = require("gulp-livereload");
 const shell = require("gulp-shell");
 const changed = require('gulp-changed');
 
+const UP = "../../";
+
 gulp.task("compile-temps", shell.task([
 	"cd node_modules/.bin/  &&  handlebars ../../src/template/dynamic/ > ../../src/js/app/templates.js -e hbs -m"
 	// "npm run compile-temps"
 ]));
 
-gulp.task("css", function () {
-	return gulp.src("client/templates/*.less")
-		.pipe( less() )
-		.pipe( minifyCSS() )
-		.pipe( gulp.dest("build/css") )
-});
+gulp.task("compile-js", shell.task([
+	"cd node_modules/.bin/  &&  babel ../../src/js/app -d ../../dist/js/app -s"
+]));
 
 gulp.task( "default", ["watch-live"] );
 

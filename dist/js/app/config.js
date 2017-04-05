@@ -1,4 +1,4 @@
 define({
-	ROOT: "js/app/"
+	ROOT: ""
 });
 //# sourceMappingURL=config.js.map

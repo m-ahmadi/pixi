@@ -1,4 +1,2 @@
 node_modules/
 .sass-cache/*
-compiler.jar
-test-48k/node_modules/*
