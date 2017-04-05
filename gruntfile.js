@@ -1,4 +1,5 @@
-var getLibs = require("./libs.js");
+var getLibs = require("./build/libs.js");
+
 
 module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-shell");
@@ -12,12 +13,19 @@ module.exports = function (grunt) {
 				stderr: false
 			},
 			templates: {
-				command: "handlebars template/dynamic/ > js/src/templates.js -e hbs -m"
+				command: "npm run compile-temps"
 			}
 		},
 		watch: {
+			gruntfile: {
+				files: ["gruntfile.js" ],
+				options: {
+					spawn: false,
+					reload: true
+				}
+			},
 			temps: {
-				files: ["template/dynamic/**/*.hbs"],
+				files: ["src/template/dynamic/**/*.hbs"],
 				tasks: ["shell:templates"]
 			},
 			livereload: {
@@ -25,11 +33,9 @@ module.exports = function (grunt) {
 				files: [
 					"!**/node_modules/**",
 					"!**/.git/**",
-					"index.htm",
-					"css/**/*.css",
-					"js/dist/**/*.js",
-					"template/dynamic/**/*.hbs",
-					"test/**/*"
+					"dist/index.htm",
+					"dist/css/**/*.css",
+					"dist/js/app/**/*.js"
 				]
 			}
 		}

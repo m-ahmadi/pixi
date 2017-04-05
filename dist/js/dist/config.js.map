@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/js/app/config.js"],"names":["define","ROOT"],"mappings":"AAAAA,OAAO;AACNC,OAAM;AADA,CAAP","file":"config.js","sourcesContent":["define({\r\n\tROOT: \"js/app/\"\r\n});"]}
