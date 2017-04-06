@@ -1,8 +1,12 @@
-const OUT_DIR = "dist-custom/";
+const DEFAULT = {
+	outDir: "./release/"
+};
+const OUT_DIR = set("--outDir");
+const OUT_HTML = "index.html";
+
 const ASSETS = OUT_DIR+"/static";
 const ROOT = "dist/";
 const INPUT_HTML = ROOT+"index.html";
-const OUT_HTML = "index.html";
 const toMakeDirs = ["css", "fonts", "images", "js/lib", "js/app"];
 
 const LineByLineReader = require("line-by-line");
@@ -45,9 +49,9 @@ lr.on("end", a => {
 mkdirIf(OUT_DIR);
 mkdirIf(ASSETS);
 toMakeDirs.forEach(i => {
-	let path = `${ASSETS}/${i}`;
-	mkdirSafe(path);
-	copydir.sync(ROOT+i, path);
+	let p = `${ASSETS}/${i}`;
+	mkdirSafe(p);
+	copydir.sync(ROOT+i, p);
 });
 
 // handle edge cases
@@ -57,7 +61,7 @@ change(ASSETS+"/js/app/main.js", "baseUrl.*", 'baseUrl: "/static/js/app",');
 console.log(
 	colors.yellow("Release build"), colors.green.bold("done."),
 	colors.magenta.bold("\nOutput dir: "),
-	colors.blue.bold(__dirname + path.sep + colors.cyan.bold("release"))
+	colors.blue.bold(OUT_DIR)
 );
 
 function mkdirSafe(p) {
@@ -81,4 +85,15 @@ function change(filePath, ferom, to) {
 	let c = fs.readFileSync(filePath, "utf-8");
 	let result = c.replace(new RegExp(ferom), to);
 	fs.writeFileSync(filePath, result);
+}
+function set(arg) {
+	let args = process.argv;
+	let idx = args.indexOf(arg);
+	if (idx !== -1) {
+		let v = args[ idx + 1 ];
+		if (v) {
+			return v;
+		}
+	}
+	return DEFAULT[ arg.slice(2) ];
 }
