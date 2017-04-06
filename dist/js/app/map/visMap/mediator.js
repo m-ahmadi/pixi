@@ -1,4 +1,4 @@
-define(["config", "core/util"], function (conf, u) {
+define(["config", "core/util", "./groups"], function (conf, u, groups) {
 	var inst = {},
 	    g = {},
 	    tmpl = Handlebars.templates;
@@ -11,7 +11,8 @@ define(["config", "core/util"], function (conf, u) {
 	g.container = {};
 	g.nodes = new vis.DataSet();
 	g.edges = new vis.DataSet();
-	g.nodeTypes = ["type1", "type2", "type3", "type4", "type5", "type6", "type7", "type8", "type9"];
+
+	g.nodeTypes = ["type0", "type1", "type2", "type3", "type4", "type5", "type6"];
 	g.dataConvertor = {};
 
 	g.options = {
@@ -29,19 +30,20 @@ define(["config", "core/util"], function (conf, u) {
 			smooth: {
 				type: "continuous" // "dynamic", "continuous", "discrete", "diagonalCross", "straightCross", "horizontal", "vertical", "curvedCW", "curvedCCW", "cubicBezier"
 			},
-			arrows: {
-				to: {
-					enabled: true,
-					scaleFactor: 0.6,
-					type: "arrow"
-				},
-				"from": {
-					enabled: true,
-					scaleFactor: 0.2,
-					type: "circle"
-				}
 
-			},
+			/* arrows: {
+   	to: {
+   		enabled: true,
+   		scaleFactor: 0.6,
+   		type: "arrow"
+   	},
+   	"from": {
+   		enabled: true,
+   		scaleFactor: 0.2,
+   		type: "circle"
+   	},
+   	
+   }, */
 			arrowStrikethrough: true // default true
 		},
 		nodes: {
@@ -54,63 +56,7 @@ define(["config", "core/util"], function (conf, u) {
 				face: "Tahoma"
 			}
 		},
-		groups: {
-			/* type1: {
-   	shape: "icon",
-   	icon: {
-   		face: "FontAwesome",
-   		code: "\uf0c0", // group
-   		size: 50,
-   		color: "#57169a"
-   	}
-   },
-   type2: {
-   	shape: "icon",
-   	icon: {
-   		face: "FontAwesome",
-   		code: "\uf007", // users
-   		size: 50,
-   		color: "#3f51b5"
-   	}
-   }, */
-			type1: {
-				shape: "dot",
-				color: "red"
-			},
-			type2: {
-				shape: "dot",
-				color: "blue"
-			},
-			type3: {
-				shape: "dot",
-				color: "#e91e63"
-			},
-			type4: {
-				shape: "diamond",
-				color: "#fb7e81"
-			},
-			type5: {
-				shape: "star",
-				color: "#FFEB3B"
-			},
-			type6: {
-				shape: "triangle",
-				color: "#ffff00"
-			},
-			type7: {
-				shape: "dot",
-				color: "#33691e"
-			},
-			type8: {
-				shape: "square",
-				color: "#ffd600"
-			},
-			type9: {
-				shape: "triangleDown",
-				color: "#ff1744"
-			}
-
-		},
+		groups: groups,
 		layout: {
 			improvedLayout: false
 		},
@@ -219,22 +165,21 @@ define(["config", "core/util"], function (conf, u) {
 		$(window).on("resize", function () {
 			g.container.height(window.innerHeight);
 		});
-		/* $.ajax({
-  	url: "http://localhost:3000",
-  	type: "POST",
-  	dataType: "json",
-  	data: {
-  		x1: -hW,// hW
-  		x2: hW,// hW window.innerWidth,
-  		y1: -hH, // hH
-  		y2: hH // hH window.innerHeight
-  	}
-  })
-  .done(function (data) {
-  	console.log(data);
-  	t = data;
-  	draw(data);
-  }); */
+		$.ajax({
+			url: "http://localhost:3000",
+			type: "POST",
+			dataType: "json",
+			data: {
+				x1: -1000, // -hW
+				x2: 1000, // hW window.innerWidth,
+				y1: -600, // -hH
+				y2: 600 // hH window.innerHeight
+			}
+		}).done(function (data) {
+			console.log(data);
+			t = data;
+			draw(data);
+		});
 		createWorker();
 	}
 

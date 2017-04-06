@@ -1,5 +1,6 @@
-define(function () {
-	const DIR = "images/vis/";
+define(["config"], function (conf) {
+	const ROOT = conf.ROOT;
+	const DIR = ROOT+"images/vis/demo/";
 	const EXT = ".png";
 	
 /* '#33691e' // green

@@ -1,5 +1,5 @@
 var express = require('express'),
-	util = require('./u'),
+	util = require('util-ma'),
 	server = express();
 
 var bodyParser = require('body-parser');
