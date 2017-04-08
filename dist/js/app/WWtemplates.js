@@ -20,4 +20,4 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var i;return "<tr>\r\n\t<td>" + t.escapeExpression((i = null != (i = n.text || (null != a ? a.text : a)) ? i : n.helperMissing, "function" == typeof i ? i.call(null != a ? a : {}, { name: "text", hash: {}, data: e }) : i)) + '</td>\r\n\t<td><button class="uk-button uk-button-danger uk-button-small" type="button">Delete</td> aa\r\n</tr>';
     }, useData: !0 });
 }();
-//# sourceMappingURL=templates.js.map
+//# sourceMappingURL=WWtemplates.js.map

@@ -1,5 +1,8 @@
-var LIB = "js/lib/";
-var LIBS_DEST_FILE = "js/lib/all-libs.js";
+const DIR = "src/js/lib/";
+const LIBS_DEST_FILE = "dist/js/lib/all-libs.js";
+
+const concat = require("concat");
+
 var list = [
 	"jquery/jquery",
 	"jquery/jquery-ui",

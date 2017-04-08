@@ -19,30 +19,19 @@ define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, 
 		MIN_SNMP_RETRIES: 1,
 		MAX_SNMP_RETRIES: 10
 	};
+	let host = window.location.host;
+	let substrBeforeLast = u.substrBeforeLast;
+	if ( isValidIp(host) ) {
+		d.DEFAULT_START_IP = substrBeforeLast(".", host) + ".1"; 
+		d.DEFAULT_END_IP = substrBeforeLast(".", host) + ".255";
+		d.DEFAULT_IP = d.DEFAULT_START_IP;
+	}
+	const getEls = u.getEls;
 	
 	let els1, els2, els3;
 	let toSend;
 	
 	resetData();
-	function getEls(root, obj) {
-		let o = {};
-		$(`${root} [data-el]`).each((i, domEl) => {
-			let jEl = $(domEl);
-			o[ jEl.data("el") ] = jEl; 
-		});
-		$(`${root} [data-els]`).each((i, domEl) => {
-			let jEl = $(domEl);
-			let k = jEl.data("els");
-			if (!o[k]) {
-				o[k] = $(`${root} [data-els="${k}"]`);
-			}
-		});
-		if (obj) {
-			obj = o;
-		} else {
-			return o;
-		}
-	}
 	function resetData() {
 		toSend = {
 			action: "discovery",

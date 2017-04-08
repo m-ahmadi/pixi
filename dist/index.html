@@ -30,7 +30,7 @@
 		<!-- <i class="fa fa-bars" aria-hidden="true"></i> what -->
 	<!-- </button> -->
 	
-	<button id="sidebar_btn" class="uk-button uk-button-default">
+	<button data-el="menu" class="uk-button uk-button-default">
 		<i class="fa fa-bars" aria-hidden="true"></i>
 	</button>
 	
@@ -164,12 +164,14 @@ cvas.ir</textarea></label>
 <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 <div id="contents">
 
-<div id="newSide" class="no-display">
+<div id="sidebar" class="no-display">
 	<ul class="uk-nav uk-nav-default uk-nav-parent-icon uk-light" uk-nav="multiple: true">
 		<li class="uk-nav-header uk-light">Menu</li>
-		<li><a id="traceroute_item"><span uk-icon="icon: bolt; ratio: 1.5;"></span> Trace Route</a></li>
-		<li><a id="discovery_item"><span uk-icon="icon: server; ratio: 1.5;"></span> Discovery</a></li>
+		<li><a data-el="traceroute"><span uk-icon="icon: bolt; ratio: 1.5;"></span> Trace Route</a></li>
+		<li><a data-el="discovery"><span uk-icon="icon: server; ratio: 1.5;"></span> Discovery</a></li>
 		<li class="uk-nav-divider"></li>
+		
+	<!--
 		<li class="uk-parent">
 			<a href="#"><span uk-icon="icon: list; ratio: 1.5"></span> Performing Actions</a>
 			<ul class="uk-nav-sub">
@@ -197,7 +199,7 @@ cvas.ir</textarea></label>
 		<li><a href="#"><span uk-icon="icon: twitter"></span> Twitter</a></li>
 		<li class="uk-nav-divider"></li>
 		<li><a href="#"><span uk-icon="icon: rss"></span> RSS Feed</a></li>
-	
+	-->
 	</ul>
 </div>
 

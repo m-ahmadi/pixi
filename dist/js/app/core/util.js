@@ -136,6 +136,18 @@ var util = function () {
 			return Object.keys(o).length;
 		}
 	}
+	function substrBeforeLast(c, s) {
+		return isStr(c) && isStr(s) ? s.substr(0, s.lastIndexOf(c)) : false;
+	}
+	function substrAfterLast(c, s) {
+		return isStr(c) && isStr(s) ? s.substring(s.lastIndexOf(c) + 1) : false;
+	}
+	function substrBeforeFirst(c, s) {
+		return isStr(c) && isStr(s) ? s.substr(0, s.indexOf(c)) : false;
+	}
+	function substrAfterFirst(c, s) {
+		return isStr(c) && isStr(s) ? s.substring(s.indexOf(c) + 1) : false;
+	}
 	function extend() {
 		var args = Array.prototype.slice.call(arguments),
 		    len = args.length,
@@ -192,6 +204,25 @@ var util = function () {
 	function getFirstCommentInside(selector) {
 		return getCommentsInside(selector)[0].nodeValue.trim();
 	}
+	function getEls(root, obj) {
+		var o = {};
+		$(root + " [data-el]").each(function (i, domEl) {
+			var jEl = $(domEl);
+			o[jEl.data("el")] = jEl;
+		});
+		$(root + " [data-els]").each(function (i, domEl) {
+			var jEl = $(domEl);
+			var k = jEl.data("els");
+			if (!o[k]) {
+				o[k] = $(root + " [data-els=" + k + "]");
+			}
+		});
+		if (obj) {
+			obj = o;
+		} else {
+			return o;
+		}
+	}
 
 	return {
 		isObj: isObj,
@@ -215,8 +246,13 @@ var util = function () {
 		isEmptyStr: isEmptyStr,
 		objLength: objLength,
 		extend: extend,
+		substrBeforeLast: substrBeforeLast,
+		substrAfterLast: substrAfterLast,
+		substrBeforeFirst: substrBeforeFirst,
+		substrAfterFirst: substrAfterFirst,
 		getCommentsInside: getCommentsInside,
-		getFirstCommentInside: getFirstCommentInside
+		getFirstCommentInside: getFirstCommentInside,
+		getEls: getEls
 	};
 }();
 

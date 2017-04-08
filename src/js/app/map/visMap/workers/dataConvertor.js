@@ -1,3 +1,10 @@
+const JS = "../../../../";
+importScripts(JS+ "lib/handlebars.runtime.min.js")
+importScripts(JS+ "app/templates.js");
+
+// let template = nodepopup;
+let template = Handlebars.templates.nodepopup;
+
 self.onmessage = function (e) {
 	var data = e.data,
 		oldNodes = data.nodes,
@@ -21,7 +28,7 @@ self.onmessage = function (e) {
 			group: nodeTypes[node.type],
 			x: node.x,
 			y: node.y,
-			title: template(node.name, node.id)
+			title: template(node)
 		});
 	}
 	/* Object.keys(oldNodes).forEach(function (k) {
@@ -80,19 +87,28 @@ self.onmessage = function (e) {
 	postMessage(newData);
 };
 
-function template(name, id) {
-	var t = '' +
-		'<table class="uk-table">'
-	+		'<tr>'
-	+			'<th>Node Name</th>'
-	+			'<th>Node Id</th>'
-	+		'</tr>'
-	+		'<tr>'
-	+			'<td>'+name+'</td>'
-	+			'<td>'+id+'</td>'
-	+		'</tr>'
-	+	'</table>';
-	
+function nodepopup(ctx) {
+	let t = `
+<table class="uk-table">
+<tr>
+	<th>Node Name</th>
+	<th>Node Id</th>
+	<th>IP Management</th>
+	<th>Last Seen</th>
+	<th>Serial</th>
+	<th>Manufacturer</th>
+	<th>Model</th>
+</tr>
+<tr>
+	<td>${ ctx.name }</td>
+	<td>${ ctx.id }</td>
+	<td>${ ctx.ipManagement }</td>
+	<td>${ ctx.lastSeen }</td>
+	<td>${ ctx.serial }</td>
+	<td>${ ctx.manufacturer }</td>
+	<td>${ ctx.model }</td>
+</tr>
+</table>`;
 	return t;
 }
 function isObj(v) {

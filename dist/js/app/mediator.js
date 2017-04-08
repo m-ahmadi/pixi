@@ -1,9 +1,12 @@
 define([
 //	"core/whb",
-"./mainSocket", "core/wuk", "map/mediator", "./sidebar", "./traceroute", "./discovery/mediator", "./templates"], function (mainSocket, wuk, map, sidebar, traceroute, discovery) {
+"./mainSocket", "core/wuk", "map/mediator", "./sidebar", "./header", "./traceroute", "./discovery/mediator", "./templates"], function (mainSocket, wuk, map, sidebar, header, traceroute, discovery) {
 	var inst = {};
 
 	function addCustomEvts() {
+		header.on("menu_clicked", function () {
+			sidebar.toggle();
+		});
 		sidebar.on("traceroute_item_clicked", function () {
 			traceroute.begin();
 		});
@@ -36,6 +39,7 @@ define([
 		wuk.init();
 		map.init("visMap", "#map_container");
 		sidebar.init();
+		header.init();
 		traceroute.init();
 		discovery.init();
 		addCustomEvts();

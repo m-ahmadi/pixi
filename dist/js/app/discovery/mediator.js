@@ -19,6 +19,14 @@ define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, 
 		MIN_SNMP_RETRIES: 1,
 		MAX_SNMP_RETRIES: 10
 	};
+	var host = window.location.host;
+	var substrBeforeLast = u.substrBeforeLast;
+	if (isValidIp(host)) {
+		d.DEFAULT_START_IP = substrBeforeLast(".", host) + ".1";
+		d.DEFAULT_END_IP = substrBeforeLast(".", host) + ".255";
+		d.DEFAULT_IP = d.DEFAULT_START_IP;
+	}
+	var getEls = u.getEls;
 
 	var els1 = void 0,
 	    els2 = void 0,
@@ -26,25 +34,6 @@ define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, 
 	var toSend = void 0;
 
 	resetData();
-	function getEls(root, obj) {
-		var o = {};
-		$(root + " [data-el]").each(function (i, domEl) {
-			var jEl = $(domEl);
-			o[jEl.data("el")] = jEl;
-		});
-		$(root + " [data-els]").each(function (i, domEl) {
-			var jEl = $(domEl);
-			var k = jEl.data("els");
-			if (!o[k]) {
-				o[k] = $(root + " [data-els=\"" + k + "\"]");
-			}
-		});
-		if (obj) {
-			obj = o;
-		} else {
-			return o;
-		}
-	}
 	function resetData() {
 		toSend = {
 			action: "discovery",

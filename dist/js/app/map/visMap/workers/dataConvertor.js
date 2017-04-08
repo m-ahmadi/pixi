@@ -1,7 +1,11 @@
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-importScripts("../../lib/handlebars.runtime.min.js");
-importScripts("../templates.js");
+var JS = "../../../../";
+importScripts(JS + "lib/handlebars.runtime.min.js");
+importScripts(JS + "app/templates.js");
+
+// let template = nodepopup;
+var template = Handlebars.templates.nodepopup;
 
 self.onmessage = function (e) {
 	var data = e.data,
@@ -32,8 +36,7 @@ self.onmessage = function (e) {
 			group: nodeTypes[node.type],
 			x: node.x,
 			y: node.y,
-			//	title: template(node)
-			title: Handlebars.templates.nodepopup(node)
+			title: template(node)
 		});
 	}
 	/* Object.keys(oldNodes).forEach(function (k) {
@@ -91,7 +94,7 @@ self.onmessage = function (e) {
 	postMessage(newData);
 };
 
-function template(ctx) {
+function nodepopup(ctx) {
 	var t = "\n<table class=\"uk-table\">\n<tr>\n\t<th>Node Name</th>\n\t<th>Node Id</th>\n\t<th>IP Management</th>\n\t<th>Last Seen</th>\n\t<th>Serial</th>\n\t<th>Manufacturer</th>\n\t<th>Model</th>\n</tr>\n<tr>\n\t<td>" + ctx.name + "</td>\n\t<td>" + ctx.id + "</td>\n\t<td>" + ctx.ipManagement + "</td>\n\t<td>" + ctx.lastSeen + "</td>\n\t<td>" + ctx.serial + "</td>\n\t<td>" + ctx.manufacturer + "</td>\n\t<td>" + ctx.model + "</td>\n</tr>\n</table>";
 	return t;
 }

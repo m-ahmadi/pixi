@@ -1619,16 +1619,16 @@ body {
   height: 400px;
   width: 100%; }
 
-#newSide {
+#sidebar {
   position: absolute;
   width: 20%;
   height: 600px;
   background: #333;
   z-index: 1;
   padding-left: 15px; }
-  #newSide a {
+  #sidebar a {
     text-decoration: none; }
-  #newSide ul.uk-nav-sub > li {
+  #sidebar ul.uk-nav-sub > li {
     padding-left: 20px; }
 
 .no-display {

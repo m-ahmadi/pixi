@@ -1,11 +1,10 @@
-define(["config", "core/util", "./groups"], function (conf, u, groups) {
-	var inst = {},
-	    g = {},
-	    tmpl = Handlebars.templates;
+define(["config", "core/util", "./groups"], function (CONF, u, groups) {
+	var WORKERS_DIR = CONF.ROOT + "js/app/map/visMap/workers";
 
-	var ROOT = conf.ROOT;
+	var inst = {};
+	var g = {};
+	var tmpl = Handlebars.templates;
 
-	g.WORKERS_DIR = ROOT + "js/app/workers";
 	g.network = {};
 	g.options = {};
 	g.container = {};
@@ -73,8 +72,8 @@ define(["config", "core/util", "./groups"], function (conf, u, groups) {
 
 	function createWorker() {
 		if (window.Worker) {
-			g.dataConvertor = new Worker(g.WORKERS_DIR + "/dataConvertor.js");
-			g.highlighter = new Worker(g.WORKERS_DIR + "/highlighter.js");
+			g.dataConvertor = new Worker(WORKERS_DIR + "/dataConvertor.js");
+			g.highlighter = new Worker(WORKERS_DIR + "/highlighter.js");
 
 			g.dataConvertor.onmessage = function (e) {
 				console.log("convert is finished.");

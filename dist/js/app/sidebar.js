@@ -1,6 +1,9 @@
 define(["core/util", "core/pubsub"], function (u, newPubSub) {
+	var ROOT = "#sidebar";
+	var sidebar = void 0,
+	    els = void 0;
+
 	var inst = u.extend(newPubSub());
-	var sidebar = void 0;
 
 	function open() {
 		if (!sidebar.is(":visible")) {
@@ -18,7 +21,8 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 		}
 	}
 	function init() {
-		sidebar = $("#newSide");
+		sidebar = $(ROOT);
+		els = u.getEls(ROOT);
 		sidebar.height(window.innerHeight);
 		// $("#newSide").toggle("slide");
 
@@ -26,10 +30,10 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 			sidebar.height(window.innerHeight);
 		});
 		$("#sidebar_btn").on("click", toggle);
-		$("#traceroute_item").on("click", function () {
+		els.traceroute.on("click", function () {
 			inst.emit("traceroute_item_clicked");
 		});
-		$("#discovery_item").on("click", function () {
+		els.discovery.on("click", function () {
 			inst.emit("discovery_item_clicked");
 		});
 	}
