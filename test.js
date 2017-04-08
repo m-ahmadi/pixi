@@ -11,9 +11,10 @@ const colors = require("colors/safe");
 let files = glob.sync(`${APP}**/temps/**/*.${EXT}`);
 
 files.forEach(i => {
-	let filename = path.baseName(i);
-	let t = fs.readFileSync(i, "utf-8");
-	fs.writeFileSync(`${TEMPS}${filename}`);
+	debugger
+	let filename = path.basename(i);
+	let c = fs.readFileSync(i, "utf-8");
+	fs.writeFileSync(`${TEMPS}${filename}`, c);
 });
 
 shell.cd("node_modules/.bin");
