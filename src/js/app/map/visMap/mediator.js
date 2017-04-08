@@ -165,7 +165,7 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		$(window).on("resize", function () {
 			g.container.height(window.innerHeight);
 		});
-		$.ajax({
+		/* $.ajax({
 			url: "http://localhost:3000",
 			type: "POST",
 			dataType: "json",
@@ -180,7 +180,7 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 			console.log(data);
 			t = data;
 			draw(data);
-		});
+		}); */
 		createWorker();
 	}
 	

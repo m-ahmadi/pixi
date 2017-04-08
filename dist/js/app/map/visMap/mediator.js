@@ -164,21 +164,22 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		$(window).on("resize", function () {
 			g.container.height(window.innerHeight);
 		});
-		$.ajax({
-			url: "http://localhost:3000",
-			type: "POST",
-			dataType: "json",
-			data: {
-				x1: -1000, // -hW
-				x2: 1000, // hW window.innerWidth,
-				y1: -600, // -hH
-				y2: 600 // hH window.innerHeight
-			}
-		}).done(function (data) {
-			console.log(data);
-			t = data;
-			draw(data);
-		});
+		/* $.ajax({
+  	url: "http://localhost:3000",
+  	type: "POST",
+  	dataType: "json",
+  	data: {
+  		x1: -1000,// -hW
+  		x2: 1000,// hW window.innerWidth,
+  		y1: -600, // -hH
+  		y2: 600 // hH window.innerHeight
+  	}
+  })
+  .done(function (data) {
+  	console.log(data);
+  	t = data;
+  	draw(data);
+  }); */
 		createWorker();
 	}
 
