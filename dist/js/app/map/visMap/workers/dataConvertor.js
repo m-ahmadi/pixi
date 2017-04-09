@@ -32,7 +32,7 @@ self.onmessage = function (e) {
 
 		newNodes.push({
 			id: node.id,
-			label: node.name || node.management_ip,
+			label: node.ipManagement || node.name,
 			group: nodeTypes[node.type],
 			x: node.x,
 			y: node.y,
