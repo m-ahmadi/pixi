@@ -1,0 +1,14 @@
+#sidebar {
+	position: absolute;
+	width: 20%;
+    height: 600px;
+    background: #333;// #2a3542;
+	z-index: 1;
+	padding-left: 15px;
+	a {
+		text-decoration: none;
+	}
+	ul.uk-nav-sub > li {
+		padding-left: 20px;
+	}
+}

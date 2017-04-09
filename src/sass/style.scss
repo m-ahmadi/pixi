@@ -1,4 +1,4 @@
-@import "materialize/color";
+@import "materialize-colors";
 
 body {
 	width: 100%;
@@ -6,42 +6,12 @@ body {
 	font: 'BYekan', Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
 	// direction: rtl;
 }
-
 #contents {
 	width: 100%;
 }
 
-#main_header {
-	width: 100%;
-	padding: 10px;
-	background: #f2f2f2;
-	position: relative;
-	z-index: 1;
-}
-#map {
-	height: 400px;
-	width: 100%;
-}
-
-#sidebar {
-	position: absolute;
-	width: 20%;
-    height: 600px;
-    background: #333;// #2a3542;
-	z-index: 1;
-	padding-left: 15px;
-	a {
-		text-decoration: none;
-	}
-	ul.uk-nav-sub > li {
-		padding-left: 20px;
-	}
-}
-
-.no-display {
-	display: none;
-}
-
-// @import "pixiMap";
-@import "visMap";
-@import "discovery_modal";
+@import "header";
+@import "sidebar";
+@import "visMap"; // "pixiMap"
+@import "discovery";
+@import "util";

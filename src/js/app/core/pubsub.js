@@ -71,7 +71,5 @@ define(function () {
 		return inst;
 	};
 	
-	
 	return newPubSub;
-
 });

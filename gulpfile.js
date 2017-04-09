@@ -3,33 +3,36 @@ const livereload = require("gulp-livereload");
 const shell = require("gulp-shell");
 const changed = require('gulp-changed');
 
-const UP = "../../";
+const SRC_APP = "src/js/app";
+const DIST_APP = "dist/js/app";
+const SASS = "src/sass/";
+const CSS = "dist/css/";
+const TEMP = "src/template/";
 
-gulp.task("sass", shell.task([
-	"sass src/sass/style.scss:dist/css/style.css"
+gulp.task("compile-sass", shell.task([
+	`sass ${SASS}style.scss : ${CSS}css/style.css`
 ]));
-gulp.task("sass-watch", shell.task([
-	"sass src/sass/style.scss:dist/css/style.css --watch"
+gulp.task("compile-sass-watch", shell.task([
+	`sass ${SASS}style.scss:${CSS}style.css --watch`
 ]));
+gulp.task("compile-temp", shell.task([
+	`handlebars ${TEMP} -f ${DIST_APP}/templates.js -e hbs -m`
+]));
+gulp.task("compile-temp-watch", function () {
+	livereload.listen();
+	gulp.watch(`${TEMP}**`, ["compile-temp"]);
+});
 gulp.task("compile-js", shell.task([
-	"cd node_modules/.bin/  &&  babel ../../src/js/app -d ../../dist/js/app -s"
+	`babel ${SRC_APP} -d ${DIST_APP} -s`
 ]));
 gulp.task("compile-js-watch", shell.task([
-	"cd node_modules/.bin/  &&  babel ../../src/js/app -d ../../dist/js/app -s -w"
+	`babel ${SRC_APP} -d ${DIST_APP} -s -w`
 ]));
 
-
-gulp.task("compile-temps", shell.task([
-	"cd node_modules/.bin/  &&  handlebars ../../src/template/dynamic/ > ../../src/js/app/templates.js -e hbs -m"
-	// "npm run compile-temps"
-]));
-gulp.task("watch-temps", function () {
-	livereload.listen();
-	gulp.watch("src/template/dynamic/**", ["compile-temps"]);
-});
+gulp.task( "default", ["livereload"] );
 gulp.task( "default", ["livereload"] );
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // livereload
 gulp.task("live-html", function () {
 	gulp.src("dist/index.html")
@@ -52,4 +55,4 @@ gulp.task("livereload", function () {
 	gulp.watch("dist/css/**/*", ["live-css"]);
 	gulp.watch("dist/js/app/**/*", ["live-js"]);
 });
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

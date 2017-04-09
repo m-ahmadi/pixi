@@ -2,7 +2,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 !function () {
   var t = Handlebars.template,
-      n = Handlebars.templates = Handlebars.templates || {};n.credrow = t({ compiler: [7, ">= 4.0.0"], main: function main(t, n, a, l, e) {
+      n = Handlebars.templates = Handlebars.templates || {};n["@"] = t({ compiler: [7, ">= 4.0.0"], main: function main(t, n, a, l, e) {
+      return "//";
+    }, useData: !0 }), n.credrow = t({ compiler: [7, ">= 4.0.0"], main: function main(t, n, a, l, e) {
       var r;return '<tr>\r\n\t<td><input class="uk-input" type="text" value="' + t.escapeExpression((r = null != (r = a.text || (null != n ? n.text : n)) ? r : a.helperMissing, "function" == typeof r ? r.call(null != n ? n : {}, { name: "text", hash: {}, data: e }) : r)) + '" placeholder="Type here..."/ data-input></td>\r\n\t<td><button class="uk-button uk-button-danger uk-button-small" type="button" data-delete>Delete</button></td>\r\n</tr>';
     }, useData: !0 }), n.ctxempty = t({ compiler: [7, ">= 4.0.0"], main: function main(t, n, a, l, e) {
       return '<div class="ctxmenu_wrap">\r\n\t<ul class="uk-list">\r\n\t\t<li><a href="#modal_traceroute" uk-toggle><span uk-icon="icon: bolt; ratio: 0.8;"></span> Traceroute</a></li>\r\n\t\t<li><a href="#modal_discovery" uk-toggle><span uk-icon="icon: server; ratio: 0.8;"></span> Discovery</a></li>\r\n\t\t<li><a class=""><span uk-icon="icon: cog; ratio: 0.8;"></span> Settings</a></li>\r\n\t</ul>\r\n</div>';

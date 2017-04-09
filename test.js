@@ -1,27 +1,18 @@
-const EXT = "hbs";
-const APP = "src/js/app/";
-const TEMPS = "src/template/dynamic/";
-
-const glob = require("glob");
-const fs = require("fs");
-const path = require("path");
-const shell = require("shelljs");
-const colors = require("colors/safe");
-
-let files = glob.sync(`${APP}**/temps/**/*.${EXT}`);
-
-files.forEach(i => {
-	debugger
-	let filename = path.basename(i);
-	let c = fs.readFileSync(i, "utf-8");
-	fs.writeFileSync(`${TEMPS}${filename}`, c);
-});
-
-shell.cd("node_modules/.bin");
-let res = shell.exec(`handlebars ../../${TEMPS} > ../../${APP}templates.js -e ${EXT} -m`);
-if (res.code !== 0) {
-	console.log(colorst.red.bold("Could not compile the templates."));
-}
-console.log(
-	colors.green.bold("Done.")
+var chokidar = require('chokidar');
+var watcher = chokidar.watch(
+	["src/template"],
+	{ignored: /[\/\\]\./, persistent: true}
 );
+var log = console.log;
+
+watcher
+  .on('add', path => log(`File ${path} has been added`))
+  .on('change', path => log(`File ${path} has been changed`))
+  .on('unlink', path => log(`File ${path} has been removed`))
+  .on('addDir', path => log(`Directory ${path} has been added`))
+  .on('unlinkDir', path => log(`Directory ${path} has been removed`))
+  .on('error', error => log(`Watcher error: ${error}`))
+  .on('ready', () => log('Initial scan complete. Ready for changes'))
+  .on('raw', (event, path, details) => {
+    log('Raw event info:', event, path, details);
+  });
