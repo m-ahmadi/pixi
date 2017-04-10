@@ -1,4 +1,4 @@
-define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, wuk, newPubSub, u) {
+define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 	var inst = u.extend(newPubSub());
 
 	var DISCOVERY = "#modal_discovery";

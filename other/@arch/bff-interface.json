@@ -1,4 +1,34 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// current
+{
+	nodes: {
+		nodeId Number: {
+			id:           Number,
+			lastSeen:     Number,
+			lastUpdate:   Number,
+			links:        Array | Boolean,
+			managementIp: String,
+			manufacturer: String,
+			mode:         String,
+			name:         String,
+			openPorts:    Array,
+			serial:       String,
+			type:         Number,
+			x:            Number,
+			y:            Number
+		}
+	},
+	links: {
+		linkId Number: {
+			id:   Number,
+			src:  Object | Number,
+			dest: Object | Number
+			
+		} 
+	}
+
+}
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 /*
 	One way (not completely sure):
 	Using node and link ids for the property names. (avoiding array searchs)

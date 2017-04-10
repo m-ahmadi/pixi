@@ -38,6 +38,36 @@ define([/* './pixiMap/mediator',  */'./visMap/mediator', 'core/util'], function 
 			get: function get() {
 				return map.clear;
 			}
+		},
+		"getSubscribers": {
+			get: function get() {
+				return map.getSubscribers;
+			}
+		},
+		"subscribe": {
+			get: function get() {
+				return map.subscribe;
+			}
+		},
+		"publish": {
+			get: function get() {
+				return map.publish;
+			}
+		},
+		"on": {
+			get: function get() {
+				return map.on;
+			}
+		},
+		"emit": {
+			get: function get() {
+				return map.emit;
+			}
+		},
+		"updateNode": {
+			get: function get() {
+				return map.updateNode;
+			}
 		}
 	});
 	inst.draw = function (a, b, c, d, e) {

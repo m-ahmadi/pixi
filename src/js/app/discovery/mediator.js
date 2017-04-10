@@ -1,4 +1,4 @@
-define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, wuk, newPubSub, u) {
+define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 	let inst = u.extend( newPubSub() );
 	
 	const DISCOVERY = "#modal_discovery";
@@ -19,8 +19,8 @@ define(["map/mediator", "core/wuk", "core/pubsub", "core/util"], function (map, 
 		MIN_SNMP_RETRIES: 1,
 		MAX_SNMP_RETRIES: 10
 	};
-	let host = window.location.host;
-	let substrBeforeLast = u.substrBeforeLast;
+	const host = window.location.host;
+	const substrBeforeLast = u.substrBeforeLast;
 	if ( isValidIp(host) ) {
 		d.DEFAULT_START_IP = substrBeforeLast(".", host) + ".1"; 
 		d.DEFAULT_END_IP = substrBeforeLast(".", host) + ".255";

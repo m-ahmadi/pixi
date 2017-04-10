@@ -1,4 +1,4 @@
-define(["core/util", "core/pubsub"], function (u, newPubSub) {
+define(["core/util", "core/pubsub", "core/wuk"], function (u, newPubSub, wuk) {
 	const ROOT = "#sidebar";
 	let sidebar, els;
 	
@@ -27,6 +27,15 @@ define(["core/util", "core/pubsub"], function (u, newPubSub) {
 		
 		$(window).on("resize", function () {
 			sidebar.height(window.innerHeight);
+		});
+		$(document).on("keydown", function (e) {
+			if (e.keyCode === 27) {
+				if ( !wuk.isAnyModalActive() ) {
+					if ( !sidebar.is(":animated") ) {
+						sidebar.toggle("slide");
+					}
+				}
+			}
 		});
 		$("#sidebar_btn").on("click", toggle);
 		els.traceroute.on("click", function () {

@@ -2,17 +2,17 @@ define(["./util", "./wuk"], function (u, wuk) {
 	var inst = {};
 
 	var URL = "ws://127.0.0.1:3000/socket/open";
-	var ws = void 0;
-	var opened = false;
-	var callbacks = {};
-	var counter = 0;
-	var note = wuk.note;
 	var msg = {
 		PROCESS: "Performing action...",
 		SUCCESS: "Action successfuly performed.",
 		FAILED: "Action could not be performed.",
 		DONE: "Done."
 	};
+	var note = wuk.note;
+
+	var ws = void 0;
+	var opened = false;
+
 	function isOpen() {
 		return opened;
 	}

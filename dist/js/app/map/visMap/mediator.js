@@ -1,15 +1,15 @@
-define(["config", "core/util", "./groups"], function (CONF, u, groups) {
+define(["core/config", "core/util", "core/pubsub", "core/mainSocket", "./groups"], function (CONF, u, newPubSub, mainSocket, groups) {
 	var WORKERS_DIR = CONF.ROOT + "js/app/map/visMap/workers";
 
-	var inst = {};
+	var inst = u.extend(newPubSub());
 	var g = {};
 	var tmpl = Handlebars.templates;
 
 	g.network = {};
 	g.options = {};
 	g.container = {};
-	g.nodes = new vis.DataSet();
-	g.edges = new vis.DataSet();
+	g.nodes = {};
+	g.edges = {};
 
 	g.nodeTypes = ["type0", "type1", "type2", "type3", "type4", "type5", "type6"];
 	g.dataConvertor = {};
@@ -62,7 +62,7 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		interaction: {
 			hideEdgesOnDrag: true,
 			hover: true,
-			tooltipDelay: 200
+			tooltipDelay: 300
 		},
 		//	manipulation: {},
 		physics: false // true false
@@ -76,7 +76,7 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 			g.highlighter = new Worker(WORKERS_DIR + "/highlighter.js");
 
 			g.dataConvertor.onmessage = function (e) {
-				console.log("convert is finished.");
+				//	console.log("convert is finished.");
 				var data = e.data;
 				g.nodes.update(data.nodes);
 				g.edges.update(data.edges);
@@ -84,7 +84,7 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 
 			g.highlighter.onmessage = function (e) {
 				t1 = performance.now();
-				console.log("worker is finished: " + (t1 - t0));
+				//	console.log("worker is finished: "+ (t1-t0) );
 				var data = e.data,
 				    nodes = data.nodes,
 				    edges = data.edges;
@@ -138,6 +138,9 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		newData.edges = newEdges;
 		return newData;
 	}
+	function updateNode(newInfo) {
+		g.nodes.update(newInfo);
+	}
 	function draw(data) {
 		// data = convertData(data);
 		data.nodeTypes = g.nodeTypes;
@@ -154,10 +157,14 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		    hW = width / 2;
 		hH = height / 2;
 
+		g.nodes = new vis.DataSet();
+		g.edges = new vis.DataSet();
+
 		g.container = $(elementId);
 		g.container.height(window.innerHeight);
 
 		g.network = new vis.Network(g.container[0], { nodes: g.nodes, edges: g.edges }, g.options);
+		g.network.on("dragEnd", changeNodePos);
 		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
 		window.network = g.network;
 
@@ -337,8 +344,22 @@ define(["config", "core/util", "./groups"], function (CONF, u, groups) {
 		t0 = performance.now();
 		g.highlighter.postMessage(data);
 	}
+	function changeNodePos(e) {
+		var targetId = e.nodes[0];
+		if (targetId) {
+			var node = g.nodes.get(targetId);
+			var c = e.pointer.canvas;
+			var nodeNew = {
+				id: targetId,
+				x: c.x,
+				y: c.y
+			};
+			inst.emit("node_position_changed", nodeNew);
+		}
+	}
 
 	inst.convertData = convertData;
+	inst.updateNode = updateNode;
 	inst.draw = draw;
 	inst.init = init;
 	inst.clear = function () {

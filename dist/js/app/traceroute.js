@@ -1,8 +1,8 @@
-define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
+define(["map/mediator", "core/wuk", "core/util"], function (map, wuk, u) {
 	// wpix, tpl, wuk, u
 	var note = wuk.note,
 	    ws = {},
-	    path = 'ws://' + baseRoot + '/network/icmp/traceroute',
+	    path = "ws://" + baseRoot + "/network/icmp/traceroute",
 	    // window.location.host
 	openCallback,
 	    coefficient = {},
@@ -13,7 +13,7 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 	    scanBtn = {},
 	    cancelBtn = {};
 
-	// var v = prompt('change the address if you want:', path);
+	// var v = prompt("change the address if you want:", path);
 	// if (v) { path = v;}
 
 	function filter(data) {
@@ -52,10 +52,10 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 		wuk.openModal("#modal_traceroute");
 	}
 	function closeSidebar() {
-		var sb = $('#newSide');
+		var sb = $("#newSide");
 
-		if (sb.is(':visible')) {
-			sb.toggle('slide');
+		if (sb.is(":visible")) {
+			sb.toggle("slide");
 		}
 	}
 	function prepare() {
@@ -76,9 +76,9 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 
 		noteMsgs.init.close();
 
-		note.success('Socket connected.');
+		note.success("Socket connected.");
 
-		noteMsgs.processing = note.process('Waiting for socket messages...', 0);
+		noteMsgs.processing = note.process("Waiting for socket messages...", 0);
 
 		// ws.send("Hello WebSocket!");
 
@@ -97,7 +97,7 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 
 		if (u.isStr(e.data)) {
 			console.log("String message received\n");
-			note.success('New socket message received.');
+			note.success("New socket message received.");
 
 			data = JSON.parse(e.data);
 			console.log(data);
@@ -116,7 +116,7 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 
 
 			if (msgCounter === 1) {
-				console.log('fud');
+				console.log("fud");
 				//	tpl.draw(data, "viewport", undefined, coefficient, true);
 				map.draw(data, "viewport", undefined, coefficient, true);
 			} else {
@@ -135,7 +135,7 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 		noteMsgs.init.close();
 		// noteMsgs.processing.close();
 
-		note.error('Socket error.');
+		note.error("Socket error.");
 	}
 	function onclose(e) {
 		console.log("Connection closed", e);
@@ -148,7 +148,7 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 			process.close();
 		}
 
-		note.info('Socket closed.', 2000);
+		note.info("Socket closed.", 2000);
 	}
 	function addHandlers(fn) {
 		openCallback = fn;
@@ -160,13 +160,13 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 	}
 	function createSock(opt) {
 		if (opt) {
-			path += '?portscanner=true';
+			path += "?portscanner=true";
 		}
 		ws = new WebSocket(path);
 		console.log(ws);
 	}
 	function trace(arr, opt) {
-		noteMsgs.init = wuk.note.process('Opening socket...', false, 'top-center');
+		noteMsgs.init = wuk.note.process("Opening socket...", false, "top-center");
 
 		wuk.disable(scanBtn);
 
@@ -176,16 +176,16 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 		});
 	}
 	function init() {
-		scanBtn = $('#traceroute_scan');
-		cancelBtn = $('#abort');
+		scanBtn = $("#traceroute_scan");
+		cancelBtn = $("#abort");
 
-		scanBtn.on('click', function (e) {
+		scanBtn.on("click", function (e) {
 			var txtarea, checkbox, txt, arr;
 
 			e.preventDefault();
 
-			txtarea = $('#txtarea_thing');
-			checkbox = $('input[type="checkbox"][name="secure"]').is(':checked');
+			txtarea = $("#txtarea_thing");
+			checkbox = $('input[type="checkbox"][name="secure"]").is(":checked');
 
 			txt = txtarea.val().trim();
 			if (txt) {
@@ -195,9 +195,9 @@ define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
 				trace(arr, checkbox);
 				//	mockTrace.trace();
 			}
-			cancelBtn.removeAttr('disabled');
+			cancelBtn.removeAttr("disabled");
 		});
-		cancelBtn.on('click', function (e) {
+		cancelBtn.on("click", function (e) {
 			e.preventDefault();
 			abort();
 		});

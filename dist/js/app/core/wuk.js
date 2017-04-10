@@ -46,6 +46,7 @@ define(["./util"], function (u) {
 		// return u.isEmptyObj(modals) ? false : true;
 	}
 	var note = function () {
+		var DEFAULT_MSG = "NO_MESSAGE_WAS_SPECIFIED";
 		var icons = {
 			INFO: '<i class="fa  fa-info-circle           fa-lg"  aria-hidden="true"></i>',
 			SUCCESS: '<i class="fa  fa-check-circle          fa-lg"  aria-hidden="true"></i>',
@@ -61,10 +62,7 @@ define(["./util"], function (u) {
 			return v;
 		}
 		function create(type, msg, timeout, pos) {
-			var icon,
-			    status,
-			    res,
-			    defaultMsg = "NO_MESSAGE_WAS_SPECIFIED";
+			var icon, status, res;
 
 			if (type === "info") {
 				// no such thing in uk3 but it works
@@ -81,11 +79,12 @@ define(["./util"], function (u) {
 				status = "danger";
 			} else if (type === "process") {
 				icon = icons.PROCESS;
+				timeout = 0;
 				status = "info" || "primary";
 			}
 
 			res = make({
-				message: icon + " " + (msg || defaultMsg),
+				message: icon + " " + (msg || DEFAULT_MSG),
 				status: status,
 				timeout: u.isNum(timeout) ? timeout : 1000,
 				pos: pos || "bottom-right"
@@ -117,16 +116,7 @@ define(["./util"], function (u) {
 		};
 	}();
 	function init() {
-		$(document).on("keydown", function (e) {
-			if (e.keyCode === 27) {
-				if (!isAnyModalActive()) {
-					var sb = $("#newSide");
-					if (!sb.is(":animated")) {
-						sb.toggle("slide");
-					}
-				}
-			}
-		});
+
 		/* $("a[href^="#modal_"]").on("click", function (e) {
   	modalState(true, e.target.hash.substr(1));
   }); */

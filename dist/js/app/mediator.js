@@ -1,7 +1,6 @@
-define([
-//	"core/whb",
-"./mainSocket", "core/wuk", "map/mediator", "./sidebar", "./header", "./traceroute", "./discovery/mediator", "./templates"], function (mainSocket, wuk, map, sidebar, header, traceroute, discovery) {
-	var inst = {};
+define(["core/util", "core/pubsub", "core/mainSocket", "core/wuk", "map/mediator", "./sidebar", "./header", "./traceroute", "./discovery/mediator", "./templates"], function (u, newPubSub, mainSocket, wuk, map, sidebar, header, traceroute, discovery) {
+	var inst = u.extend(newPubSub());
+	var note = wuk.note;
 
 	function addCustomEvts() {
 		header.on("menu_clicked", function () {
@@ -22,6 +21,21 @@ define([
 					console.log(data);
 				}
 				map.draw(data);
+			});
+		});
+		map.on("node_position_changed", function (nodeNew) {
+			var o = {
+				action: "changeNodePosition",
+				newX: nodeNew.x,
+				newY: nodeNew.y
+			};
+			mainSocket.send(JSON.stringify(o), function (e) {
+				var data = JSON.parse(e.data);
+			});
+			map.updateNode({
+				id: nodeNew.id,
+				x: nodeNew.x,
+				y: nodeNew.y
 			});
 		});
 	}
