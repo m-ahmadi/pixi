@@ -1,0 +1,26 @@
+<div id="modal_traceroute" uk-modal="center: true; esc-close: true; bg-close: false;">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">Traceroute to a node.</h2>
+        </div>
+        <div class="uk-modal-body">
+            <p class="uk-text-meta">Seperate the IP addresses (or domain names) with an enter (new-line character):</p>
+			<form>
+				<div class="uk-margin uk-form-horizontal">
+					<label>IP/Domain Name: <textarea class="uk-textarea" id="txtarea_thing" cols="24" rows="4" placeholder="Type Something" style="background: #f3f3f3;">google.com
+cvas.ir</textarea></label>
+				</div>
+				<div class="uk-margin">
+					<label class="ul-dark"><input class="uk-checkbox" type="checkbox" name="secure"> Secure-Scan</label>
+					<!-- <button id="abort" class="uk-button uk-button-danger uk-text-bold" disabled>Abort</button> -->
+				</div>
+			</form>
+			
+        </div>
+        <div class="uk-modal-footer uk-text-right">
+            <button class="uk-button uk-button-danger uk-modal-close uk-text-bold red lighten-1" type="button">Cancel</button> <!-- red lighten-1-->
+            <button id="traceroute_scan" class="uk-button uk-button-primary uk-text-bold light-green" type="button">Scan</button> <!-- light-green-->
+        </div>
+    </div>
+</div>

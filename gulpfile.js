@@ -1,54 +1,42 @@
+const CONF = require("./build/config");
+console.log( CONF.C.html );
 const gulp = require("gulp");
-const livereload = require("gulp-livereload");
 const shell = require("gulp-shell");
-const changed = require('gulp-changed');
 
-const SRC_APP = "src/js/app";
-const DIST_APP = "dist/js/app";
-const SASS = "src/sass/";
-const CSS = "dist/css/";
-const TEMP = "src/template/";
+gulp.task("sass", shell.task([ CONF.C.sass ]));
+gulp.task("html", shell.task([ CONF.C.html ]));
+gulp.task("temp", shell.task([ CONF.C.temp ]));
 
-gulp.task("compile-sass", shell.task([
-	`sass ${SASS}style.scss : ${CSS}css/style.css`
-]));
-gulp.task("compile-sass-watch", shell.task([
-	`sass ${SASS}style.scss:${CSS}style.css --watch`
-]));
-gulp.task("compile-temp", shell.task([
-	`handlebars ${TEMP} -f ${DIST_APP}/templates.js -e hbs -m`
-]));
-gulp.task("compile-temp-watch", function () {
+gulp.task("js", shell.task([ CONF.C.js ]));
+
+gulp.task("sass-w", shell.task([ CONF.C.w.sass ]));
+gulp.task("js-w", shell.task([ CONF.C.w.js ]));
+gulp.task("temp-w", () => {
 	livereload.listen();
-	gulp.watch(`${TEMP}**`, ["compile-temp"]);
+	gulp.watch(`${CONF.I.TEMP}/**`, ["temp"]);
 });
-gulp.task("compile-js", shell.task([
-	`babel ${SRC_APP} -d ${DIST_APP} -s`
-]));
-gulp.task("compile-js-watch", shell.task([
-	`babel ${SRC_APP} -d ${DIST_APP} -s -w`
-]));
 
-gulp.task( "default", ["livereload"] );
-gulp.task( "default", ["livereload"] );
-
+gulp.task( "default", ["sass", "temp", "js"] );
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // livereload
-gulp.task("live-html", function () {
+const livereload = require("gulp-livereload");
+const changed = require('gulp-changed');
+
+gulp.task("live-html", () => {
 	gulp.src("dist/index.html")
 		.pipe( livereload() );
 });
-gulp.task("live-css", function () {
+gulp.task("live-css", () => {
 	gulp.src("dist/css/**/*.css")
 	//	.pipe( changed("dist/css/") )
 		.pipe( livereload() );
 });
-gulp.task("live-js", function () {
+gulp.task("live-js", () => {
 	gulp.src("dist/js/app/**/*.js")
 	//	.pipe( changed("dist/js/app/") )
 		.pipe( livereload() );
 });
-gulp.task("livereload", function () {
+gulp.task("livereload", () => {
 	livereload.listen();
 	
 	gulp.watch("dist/index.html", ["live-html"]);

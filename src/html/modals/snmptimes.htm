@@ -1,0 +1,36 @@
+<div id="modal_snmptimes" uk-modal="center: true; esc-close: false; bg-close: false;">
+	<div class="uk-modal-dialog">
+		<div class="uk-modal-header">
+			<h2 class="uk-modal-title">Times Settings</h2>
+		</div>
+		<div class="uk-modal-body">
+			<form>
+				<div class="uk-margin">
+					<label class="uk-text-bold">Discovery Timeout:</label>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input1"/>
+					<label>ms</label>
+				</div>
+				<div data-el="slider1"></div>
+				
+				<div class="uk-margin">
+					<label class="uk-text-bold">SNPM Timeout:</label>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input2"/>
+					<label>ms</label>
+				</div>
+				<div data-el="slider2"></div>
+				
+				<div class="uk-margin">
+					<label class="uk-text-bold">SNPM Retries:</label>
+					<input class="uk-input uk-form-width-xsmall" type="text" data-el="input3"/>
+					<label>retry(s)</label>
+				</div>
+				<div data-el="slider3"></div>
+			</form>
+		</div>
+		<div class="uk-modal-footer uk-text-right">
+			<button class="uk-button uk-button-default uk-text-bold uk-modal-close" type="button" data-el="cancel">Cancel</button>
+			<button class="uk-button uk-button-secondary uk-text-bold" type="button" data-el="prev">Prev</button>
+			<button class="uk-button uk-button-primary uk-text-bold" type="button" data-el="submit">Start Discovery</button>
+		</div>
+	</div>
+</div>

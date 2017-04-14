@@ -7,7 +7,7 @@ const OUT_HTML = "index.html";
 const ASSETS = OUT_DIR+"/static";
 const ROOT = "dist/";
 const INPUT_HTML = ROOT+"index.html";
-const toMakeDirs = ["css", "fonts", "images", "js/lib", "js/app"];
+const toMakeDirs = ["css", "fonts", "images", "js"];
 
 const LineByLineReader = require("line-by-line");
 const copydir = require("copy-dir");
@@ -55,8 +55,8 @@ toMakeDirs.forEach(i => {
 });
 
 // handle edge cases
-change(ASSETS+"/js/app/config.js", "ROOT.*", 'ROOT: "/static/"');
-change(ASSETS+"/js/app/main.js", "baseUrl.*", 'baseUrl: "/static/js/app",');
+change(ASSETS+"/js/core/config.js", "ROOT.*", 'ROOT: "/static/"');
+change(ASSETS+"/js/main.js", "baseUrl.*", 'baseUrl: "/static/",');
 
 console.log(
 	colors.yellow("Release build"), colors.green.bold("done."),
