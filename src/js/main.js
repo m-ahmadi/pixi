@@ -1,9 +1,8 @@
 var baseRoot = "192.168.10.13:3000", t;
 var DEBUG = true;
 
-const BASE_URL = "js/";
 require.config({
-	baseUrl: BASE_URL,
+	baseUrl: "js/",
 	paths: {
 		lib: "lib"
 	}

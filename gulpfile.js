@@ -1,22 +1,21 @@
 const CONF = require("./build/config");
-console.log( CONF.C.html );
 const gulp = require("gulp");
 const shell = require("gulp-shell");
 
 gulp.task("sass", shell.task([ CONF.C.sass ]));
 gulp.task("html", shell.task([ CONF.C.html ]));
 gulp.task("temp", shell.task([ CONF.C.temp ]));
-
 gulp.task("js", shell.task([ CONF.C.js ]));
 
 gulp.task("sass-w", shell.task([ CONF.C.w.sass ]));
-gulp.task("js-w", shell.task([ CONF.C.w.js ]));
+gulp.task("html-w", shell.task([ CONF.C.w.html ]));
 gulp.task("temp-w", () => {
 	livereload.listen();
 	gulp.watch(`${CONF.I.TEMP}/**`, ["temp"]);
 });
+gulp.task("js-w", shell.task([ CONF.C.w.js ]));
 
-gulp.task( "default", ["sass", "temp", "js"] );
+gulp.task( "default", ["sass", "html", "temp", "js"] );
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // livereload
 const livereload = require("gulp-livereload");

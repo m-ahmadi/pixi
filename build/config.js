@@ -2,13 +2,13 @@ const fs = require("fs");
 let env  = fs.readFileSync("build/env", "utf8");
 
 const DEBUG_HARD    = "debug-hard";
+const DEBUG_NORMAL  = "debug-normal";
 const DEBUG_LIGHT   = "debug-light";
 const RELEASE_LIGHT = "release-light";
 const RELEASE_HARD  = "release-hard";
 const RJS           = "node node_modules/requirejs/bin/r.js";
 const RCONF         = "./rconfig.js"
 
-const R    = "../";
 const SRC  = "src/";
 const DIST = "dist/";
 const ST   = "main.handlebars";
@@ -26,7 +26,7 @@ const F = {
 	LINKS:   "links.htm",
 	SCRIPTS: "scripts.htm"
 };
-if (env === DEBUG_HARD) {
+if (env === DEBUG_HARD || env === DEBUG_NORMAL) {
 	F.CSS  += ".css";
 	F.APP  += ".js";
 } else {
@@ -62,6 +62,7 @@ O.SEPLJ = O.JLIB;
 O.CLIB += env !== DEBUG_HARD ? F.LIB+".css" : "";
 O.JLIB += env !== DEBUG_HARD ? F.LIB+".js"  : "";
 
+const R    = "../";
 const L = {
 	CSS: R + I.LIB + F.CLL,
 	JS:  R + I.LIB + F.JLL
@@ -73,13 +74,11 @@ C.sass  = `sass ${I.STYLE}:${O.STYLE}`;
 C.temp  = `handlebars ${I.TEMP} -f ${O.TEMP} -e hbs -m`;
 C.js    = `babel ${I.JS} -d ${O.JS} -s`;
 
-
-
-
-
-
 if (env === DEBUG_HARD) {
-	C.sass += " --style expanded --sourcemap=none";
+	C.sass += " --style expanded --sourcemap=auto";
+} else if (env === DEBUG_NORMAL) {
+	C.sass += " --style expanded --sourcemap=auto";
+	
 } else if (env === DEBUG_LIGHT) {
 	C.sass += " --style compressed --sourcemap=auto";
 	C.js   += " --minified";
@@ -96,19 +95,14 @@ if (env === DEBUG_HARD) {
 } else if (env === RELEASE_HARD) {
 	
 }
-
-
-var shell = require("shelljs");
-
-
 C.w = {};
-C.w.html  = C.html + " -w";
-C.w.sassW = C.sass + " --watch";
-C.w.jsW   = C.js   + " -w";
-
+C.w.html = C.html + " -w";
+C.w.sass = C.sass + " --watch";
+C.w.jsW  = C.js   + " -w";
 
 module.exports = {
 	DEBUG_HARD: DEBUG_HARD,
+	DEBUG_NORMAL: DEBUG_NORMAL,
 	DEBUG_LIGHT: DEBUG_LIGHT,
 	RELEASE_LIGHT: RELEASE_LIGHT,
 	RELEASE_HARD: RELEASE_HARD,

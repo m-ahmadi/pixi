@@ -1,60 +1,32 @@
 const CONF = require("./config");
 const c = require("colors/safe");
-const concat = require("concat");
 const fs = require("fs-extra");
 const shell = require("shelljs");
 const u = require("util-ma");
 const log = console.log;
-debugger
+
 let w = process.argv[2] || "css";
+let W = w.toUpperCase();
 let js = w === "js";
 let css = w === "css";
 
-let iDir, oDir, list, temp, app, sepLib,
-	listPath = CONF.L[ w.toUpperCase() ].slice(3);
-if (css) {
-	iDir = CONF.I.SLIBC;
-	oDir = CONF.O.CLIB;
-	list = CONF.L.CSS;
-	temp = CONF.I.LNKT;
-	app = CONF.F.CSS;
-	sepLib = CONF.O.SEPLC;
-} else if (js) {
-	iDir = CONF.I.SLIBJ;
-	oDir = CONF.O.JLIB;
-	list = CONF.L.JS;
-	temp = CONF.I.SCRT;
-	app = CONF.F.APP;
-	sepLib = CONF.O.SEPLJ;
-}
+let iDir, oDir, list, last, temp, app, sepLib,
+	listPath = CONF.L[W].slice(3),
+	rqName, rqSrc, rqDest;
 
-list = require(list);
-let last = list[ list.length - 1 ];
+setConfig();
+list = require(list),
+last = list[ list.length - 1 ];
 
-let rqName = "require";
-let rq = CONF.I.SLIBJ + rqName;
-let min = ".min.js";
-let unmin = ".js";
-let reqSrc, reqDest;
-if ( fs.existsSync(rq + min) ) {
-	rq += min;
-	rqName += min;
-	reqDest = CONF.O.SEPLJ + rqName;
-} else if ( fs.existsSync(rq + unmin) ) {
-	rq += unmin;
-	rqName += min;
-} else {
-	log( c.red.bold("The requirejs library is necessary, and it's not found.") );
-}
-reqSrc = rq;
-reqDest = CONF.O.SEPLJ + rqName;;
-
-log(c.white.bold("\n Current environment:"), c.black.bgWhite(" "+ CONF.env +" \n"));
-fs.emptyDirSync( CONF.O[ w.toUpperCase() ] );
+log(c.white.bold("Building", c.white.bold.bgBlue(` ${W} `), "libs for environment:"), c.black.bgWhite(` ${CONF.env} \n`));
+fs.emptyDirSync( CONF.O[ W ] );
+checkRq();
 
 if (CONF.env === CONF.DEBUG_HARD) {
 	debugHard();
 	
+} else if (CONF.env === CONF.DEBUG_NORMAL) {
+	common(false, true);
 } else if (CONF.env === CONF.DEBUG_LIGHT) {
 	common(true);
 } else if (CONF.env === CONF.RELEASE_LIGHT) {
@@ -62,12 +34,26 @@ if (CONF.env === CONF.DEBUG_HARD) {
 } else if (CONF.env === CONF.RELEASE_HARD) {
 	
 }
-makeSureRequire();
 
+function setConfig() {
+	if (css) {
+		iDir = CONF.I.SLIBC;
+		oDir = CONF.O.CLIB;
+		list = CONF.L.CSS;
+		temp = CONF.I.LNKT;
+		app = CONF.F.CSS;
+		sepLib = CONF.O.SEPLC;
+	} else if (js) {
+		iDir = CONF.I.SLIBJ;
+		oDir = CONF.O.JLIB;
+		list = CONF.L.JS;
+		temp = CONF.I.SCRT;
+		app = CONF.F.APP;
+		sepLib = CONF.O.SEPLJ;
+	}
+}
 function debugHard() {
-	debugger
 	if ( u.isArr(last) ) {
-		
 		list = list.concat( list.pop() );
 	}
 	
@@ -78,20 +64,19 @@ function debugHard() {
 	toWrite = forEachLib(list, true);
 	toWrite += css ? html(`${w}/style.css`) : appHtml("main");
 	
-	makeSureRequire();
+	fs.copySync(rqSrc, rqDest);
 	
 	fs.writeFileSync(temp, toWrite, "utf8");
 	log( "\nFile:", c.green(temp), "generated." );
 	log( c.green("Done.") );
 }
-function common(srcmap) {
-	
+function common(srcmap, unminApp) {
 	let separates = u.isArr(last) ? list.pop() : undefined;
 	
 	log( c.yellow("Libs...") );
 	let toCat = forEachLib(list, false); 
 	
-	let libDir = CONF.O[ w.toUpperCase() ] + "lib";
+	let libDir = CONF.O[W] + "lib";
 	fs.emptyDirSync(libDir);
 	
 	let outFile = oDir;
@@ -117,7 +102,7 @@ function common(srcmap) {
 	let toWrite = "";
 	
 	toWrite += html(`${w}/lib/${CONF.F.LIB}.${w}`) + "\n";
-	toWrite += w === "css" ? '<link rel="styleSheet" type="text/css" href="css/style.min.css" />' : "";
+	toWrite += css ? `<link rel="styleSheet" type="text/css" href="css/${app}" />` : "";
 	if (separates) {
 		log( c.yellow("Separate lib(s)...") );
 		toWrite += forEachLib(separates, true, true);
@@ -127,10 +112,10 @@ function common(srcmap) {
 		log( "\t File:", c.cyan(`${outFile}.map`), "created." );
 		toWrite += js ? appHtml("main") : "";
 	} else {
-		toWrite += js ? appHtml(app) : "";
+		toWrite += js && !unminApp ? appHtml(app) : js && unminApp ? appHtml("main") : "";
 	}
 	
-	makeSureRequire();
+	fs.copySync(rqSrc, rqDest);
 	
 	fs.writeFileSync(temp, toWrite, "utf8");
 	log( "\t File:", c.cyan(temp), "created." );
@@ -165,17 +150,34 @@ function forEachLib(list, sw, sep) {
 	return toRet;
 }
 function html(v) {
-	if (w === "css") {
+	if (css) {
 		return `<link rel="stylesheet" type="text/css" href="${v}" />`;
-	} else if (w === "js") {
+	} else if (js) {
 		return `<script type="text/javascript" src="${v}"></script>`;
 	}
 }
 function appHtml(v) {
 	return `<script data-main="js/${v}" src="js/lib/${rqName}"></script>`;
 }
-function makeSureRequire() {
-	fs.copySync(reqSrc, reqDest);
+function checkRq() {
+	let name = "require";
+	let path = CONF.I.SLIBJ + name;
+	let min = ".min.js";
+	let unmin = ".js";
+	if ( fs.existsSync(path + min) ) {
+		path += min;
+		name += min;
+		
+	} else if ( fs.existsSync(path + unmin) ) {
+		path += unmin;
+		name += min;
+		fs.copySync(path, CONF.O.SEPLJ + name);
+	} else {
+		log( c.red.bold("The RequireJS library is necessary, and it's not found.") );
+	}
+	rqName = name;
+	rqSrc = path;
+	rqDest = CONF.O.SEPLJ + name;
 }
 function msg(w, a, b) {
 	switch (w) {

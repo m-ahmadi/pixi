@@ -56,7 +56,7 @@ toMakeDirs.forEach(i => {
 
 // handle edge cases
 change(ASSETS+"/js/core/config.js", "ROOT.*", 'ROOT: "/static/"');
-change(ASSETS+"/js/main.js", "baseUrl.*", 'baseUrl: "/static/",');
+change(ASSETS+"/js/main.js", "baseUrl.*", 'baseUrl: "/static/js/",');
 
 console.log(
 	colors.yellow("Release build"), colors.green.bold("done."),
