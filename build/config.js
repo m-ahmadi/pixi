@@ -1,4 +1,5 @@
 const fs = require("fs");
+const shell = require("shelljs");
 let env  = fs.readFileSync("build/env", "utf8");
 
 const DEBUG_HARD    = "debug-hard";
@@ -68,22 +69,27 @@ const L = {
 	JS:  R + I.LIB + F.JLL
 };
 
+
 const C = {};
+let sas = `sass ${I.STYLE}:${O.STYLE}`;
+let nsas= `node-sass ${I.STYLE} > ${O.STYLE}`;
 C.html  = `htmlbilder ${I.HTML} -o ${O.HTML} -t ${ST} -e ${SD}`;
-C.sass  = `sass ${I.STYLE}:${O.STYLE}`;
 C.temp  = `handlebars ${I.TEMP} -f ${O.TEMP} -e hbs -m`;
 C.js    = `babel ${I.JS} -d ${O.JS} -s`;
 
 if (env === DEBUG_HARD) {
-	C.sass += " --style expanded --sourcemap=auto";
+	sas  += " --style expanded --sourcemap=auto";
+	nsas += " --output-style expanded --sourcemap --indent-type tab --indent-width 1";
 } else if (env === DEBUG_NORMAL) {
-	C.sass += " --style expanded --sourcemap=auto";
-	
+	sas  += " --style expanded --sourcemap=auto";
+	nsas += " --output-style expanded --sourcemap --indent-type tab --indent-width 1";
 } else if (env === DEBUG_LIGHT) {
-	C.sass += " --style compressed --sourcemap=auto";
-	C.js   += " --minified";
+	sas  += " --style compressed --sourcemap=auto";
+	nsas += " --output-style compressed --sourcemap";
+	C.js += " --minified";
 } else if (env === RELEASE_LIGHT) {
-	C.sass += " --style compressed --sourcemap=none";
+	sas  += " --style compressed --sourcemap=none";
+	nsas += " --output-style compressed";
 	
 	let rconf = JSON.parse( fs.readFileSync(RCONF, "utf8") );
 	rconf.baseUrl = I.JS;
@@ -95,9 +101,18 @@ if (env === DEBUG_HARD) {
 } else if (env === RELEASE_HARD) {
 	
 }
+
+if (shell.exec('sass -v').code !== 0) { // no sass
+	shell.exit(1);
+	C.sass = nsas;
+} else {
+	C.sass = sas;
+}
+
+
 C.w = {};
 C.w.html = C.html + " -w";
-C.w.sass = C.sass + " --watch";
+C.w.sass = sas    + " --watch";
 C.w.jsW  = C.js   + " -w";
 
 module.exports = {

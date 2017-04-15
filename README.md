@@ -34,7 +34,7 @@ Command                         | Description
 `build-debug-light`             | Build and compile everything according to `debug-light` environment.
 `build-release-light`           | Build and compile everything according to `release-light` environment.
 `build-release-hard`            | Build and compile everything according to `release-hard` environment.
-`fakeData`                      | Run fake data serv on localhost:3000
+`fakeData`                      | Run fake data server on localhost:3000
 
 
 
