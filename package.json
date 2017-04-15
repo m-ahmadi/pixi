@@ -30,8 +30,7 @@
 	"build-release-light": "npm run env-release-light && npm run build",
     "build-release-hard": "build-release-light && node build/release-hard",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fakeData": "node scripts/data",
-    "handlebars": "handlebars --help"
+    "fakeData": "node scripts/data"
   },
   "author": "Mohammad Ahmadi",
   "repository": {

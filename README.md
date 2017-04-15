@@ -1,7 +1,43 @@
 Topology Front
 ===================
 
-***
+
+### Dev Commands
+
+###### Go to project dir and run the following commands by prepending `npm run ` to them, for example:  
+	`npm run sass`
+
+Command                         | Description
+------------------------------- | ---------------------------------------------------------------------------------------
+`sass`                          | Compile sass files.
+`html`                          | Build `index.html` from static templates.
+`temp`                          | Precompile the dynamic Handlebars templates.
+`js`                            | Compile js files.
+`sass-w`                        | Watch sass
+`html-w`                        | Watch html
+`temp-w`                        | Watch temp
+`js-w`                          | Watch js
+`compile-all`                   | Compile everything.
+`livereload`                    | Enable livereload for: `dist/index.html`, `dist/css` and `dist/js`
+`env-debug-hard`                | Set current environment to debug-hard.
+`env-debug-normal`              | Set current environment to debug-normal.
+`env-debug-light`               | Set current environment to debug-light.
+`env-release`                   | Set current environment to release-light.
+`showenv`                       | Show current environment.
+`libcss`                        | Build CSS dependencies based on current environment.
+`libjs`                         | Build JS dependencies based on current environment.
+`build-libs`                    | Build CSS and JS dependencies based on current environment.
+`build`                         | Build dependencies and compile everything based on current environment.
+`release`                       | Mr. Sadeghzadeh custom release.
+`build-debug-hard`              | Build and compile everything according to `debug-hard` environment.
+`build-debug-normal`            | Build and compile everything according to `debug-normal` environment.
+`build-debug-light`             | Build and compile everything according to `debug-light` environment.
+`build-release-light`           | Build and compile everything according to `release-light` environment.
+`build-release-hard`            | Build and compile everything according to `release-hard` environment.
+`fakeData`                      | Run fake data serv on localhost:3000
+
+
+
 ### Documentation Page
 In order to see the documentation page:
 
@@ -17,22 +53,3 @@ git clone git@repo.ravanertebat.com:cvas/topology-front.git
 *http://server-address/topology-front/docs*
 
 *for example: http://127.0.0.1:3000/topology-front/docs*
-
-***
-### Dev Commands
-
-Command                         | What it does                                                 | When it should be run
-------------------------------- | -------------------------------------------------------------|--------------------------
-`npm run compile-js`            | compile js files                                             | After any changes to: `src/js/app/`
-`npm run compile-js-watch`      | compile js files and watch                                   | 
-`npm run compile-sass`          | compile sass files                                           | After any changes to: `src/sass/`
-`npm run compile-sass-watch`    | compile sass files and  watch                                | 
-`npm run compile-temps`         | compile dynamic templates                                    | After any changes to: `src/template/`
-`npm run compile-temps-watch`   | compile dynamic templates and watch                          | 
-`npm run build-html`            | compile static templates                                     | After any changes to: `src/html/`
-`npm run build-html-watch`      | compile static templates and watch                           | 
-`npm run compile-all`           | compile everything                                           | 
-`npm run setenv-debug`          | set environment to debug                                     | 
-`npm run setenv-release`        | set environment to release                                   | 
-`npm run setenv-release-custom` | set environment to custom-release                            | 
-`npm run livereload`            | livereload `dist/index.html`, `dist/css` and `dist/js`       | You want livereload enabled.
