@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "sway": "file:///E:\\xampp\\htdocs\\sway"
+    "sway": "github:m-ahmadi/sway"
   }
 }
