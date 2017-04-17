@@ -26,7 +26,7 @@ if (CONF.env === CONF.DEBUG_HARD) {
 	debugHard();
 	
 } else if (CONF.env === CONF.DEBUG_NORMAL) {
-	common(false, true);
+	common(true, true);
 } else if (CONF.env === CONF.DEBUG_LIGHT) {
 	common(true);
 } else if (CONF.env === CONF.RELEASE_LIGHT) {

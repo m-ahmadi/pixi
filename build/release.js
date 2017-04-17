@@ -18,6 +18,7 @@ const colors = require("colors/safe");
 
 const link = /<link {1}/;
 const script = /<script {1}/;
+const img = /<img {1}/;
 const href = 'href="/static/';
 const src = 'src="/static/';
 const dataMain = 'data-main="/static/';
@@ -27,10 +28,13 @@ lr.on("error", err => { console.log( colors.red.bold("Something went wrong!") );
 lr.on("line", line => {
 	let isLink = link.exec(line);
 	let isScript = script.exec(line);
+	let isImg = img.exec(lin);
 	
 	let newLine;
 	if (isLink) {
 		newLine = line.replace(/href="/, href);
+	} else if (isImg) {
+		newLine = line.replace(/src="/, src);
 	} else if (isScript) {
 		newLine = line.replace(/src="/ , src);
 		if ( /data-main="/.test(line) ) {

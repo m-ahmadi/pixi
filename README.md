@@ -4,8 +4,10 @@ Topology Front
 
 ### Dev Commands
 
-###### Go to project dir and run the following commands by prepending `npm run ` to them, for example:  
-	`npm run sass`
+You can run any of the commands in the the following table by going to the project dir and *`npm run`* them:
+  1. *`cd topology-front`*
+  2. Prepend *`npm run`* to the command and run it.  
+For example: *`npm run sass`*
 
 Command                         | Description
 ------------------------------- | ---------------------------------------------------------------------------------------

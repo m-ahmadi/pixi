@@ -27,9 +27,13 @@ const F = {
 	LINKS:   "links.htm",
 	SCRIPTS: "scripts.htm"
 };
-if (env === DEBUG_HARD || env === DEBUG_NORMAL) {
+if (env === DEBUG_HARD) {
 	F.CSS  += ".css";
 	F.APP  += ".js";
+} else if (env === DEBUG_NORMAL) {
+	F.CSS  += ".css";
+	F.APP  += ".js";
+	F.LIB  += ".min";
 } else {
 	F.CSS  += ".min.css";
 	F.APP  += ".min.js";
@@ -56,7 +60,7 @@ O.JLIB  = O.JS   + "lib/";
 O.HTML  = DIST   + F.HTML;
 O.STYLE = O.CSS  + F.CSS;
 O.APP   = O.JS   + F.APP;
-O.TEMP  = I.JS   + F.TEMP;
+O.TEMP  = O.JS   + F.TEMP;
 
 O.SEPLC = O.CLIB;
 O.SEPLJ = O.JLIB;
@@ -71,11 +75,11 @@ const L = {
 
 
 const C = {};
-let sas = `sass ${I.STYLE}:${O.STYLE}`;
-let nsas= `node-sass ${I.STYLE} > ${O.STYLE}`;
-C.html  = `htmlbilder ${I.HTML} -o ${O.HTML} -t ${ST} -e ${SD}`;
-C.temp  = `handlebars ${I.TEMP} -f ${O.TEMP} -e hbs -m`;
-C.js    = `babel ${I.JS} -d ${O.JS} -s`;
+let sas  = `sass ${I.STYLE}:${O.STYLE}`;
+let nsas = `node-sass ${I.STYLE} > ${O.STYLE}`;
+C.html   = `htmlbilder ${I.HTML} -o ${O.HTML} -t ${ST} -e ${SD}`;
+C.temp   = `handlebars ${I.TEMP} -f ${O.TEMP} -e hbs -m`;
+C.js     = `babel ${I.JS} -d ${O.JS} -s`;
 
 if (env === DEBUG_HARD) {
 	sas  += " --style expanded --sourcemap=auto";
@@ -98,22 +102,26 @@ if (env === DEBUG_HARD) {
 	fs.writeFileSync(RCONF, JSON.stringify(rconf, null, 4), "utf8");
 	
 	C.js = `${RJS} -o ${RCONF} && babel ${I.JS} -o ${O.APP} -s --minified --no-comments`;
+	
+	O.TEMP  = I.JS + F.TEMP;
+	C.temp  = `handlebars ${I.TEMP} -f ${O.TEMP} -e hbs -m`;
 } else if (env === RELEASE_HARD) {
 	
 }
 
-if (shell.exec('sass -v').code !== 0) { // no sass
+if (shell.exec("sass -v", {silent: true}).code !== 0) { // no sass
 	shell.exit(1);
 	C.sass = nsas;
 } else {
 	C.sass = sas;
 }
 
-
 C.w = {};
 C.w.html = C.html + " -w";
 C.w.sass = sas    + " --watch";
-C.w.jsW  = C.js   + " -w";
+C.w.js   = C.js   + " -w";
+
+C.all = `${C.html} && ${C.sass} && ${C.temp} && ${C.js}`;
 
 module.exports = {
 	DEBUG_HARD: DEBUG_HARD,
