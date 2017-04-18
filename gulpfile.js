@@ -1,6 +1,8 @@
-const CONF = require("./build/config");
+const CONF = require("./.sway/config");
+
 const gulp = require("gulp");
 const shell = require("gulp-shell");
+const livereload = require("gulp-livereload");
 
 gulp.task("html", shell.task([ CONF.C.html ]));
 gulp.task("sass", shell.task([ CONF.C.sass ]));
@@ -18,28 +20,23 @@ gulp.task("js-w", shell.task([ CONF.C.w.js ]));
 gulp.task( "default", ["all"] );
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // livereload
-const livereload = require("gulp-livereload");
-const changed = require('gulp-changed');
-
 gulp.task("live-html", () => {
-	gulp.src("dist/index.html")
+	gulp.src(CONF.O.HTML)
 		.pipe( livereload() );
 });
 gulp.task("live-css", () => {
-	gulp.src("dist/css/**/*.css")
-	//	.pipe( changed("dist/css/") )
+	gulp.src(`${CONF.O.CSS}**/*.css`)
 		.pipe( livereload() );
 });
 gulp.task("live-js", () => {
-	gulp.src("dist/js/**/*.js")
-	//	.pipe( changed("dist/js/") )
+	gulp.src(`${CONF.O.JS}**/*.js`)
 		.pipe( livereload() );
 });
 gulp.task("livereload", () => {
 	livereload.listen();
 	
-	gulp.watch("dist/index.html", ["live-html"]);
-	gulp.watch("dist/css/**/*", ["live-css"]);
-	gulp.watch("dist/js/**/*", ["live-js"]);
+	gulp.watch(CONF.O.HTML, ["live-html"]);
+	gulp.watch(`${CONF.O.CSS}**/*`, ["live-css"]);
+	gulp.watch(`${CONF.O.JS}**/*`, ["live-js"]);
 });
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
