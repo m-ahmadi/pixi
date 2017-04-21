@@ -1,6 +1,7 @@
 define(["./util"], function (u) {
 	var inst = {},
 		modals = {};
+	const DISPLAY = "no-display";
 	
 	function getModal(str) {
 		return UIkit.modal(str);
@@ -127,6 +128,15 @@ define(["./util"], function (u) {
 		});
 	}
 	
+	inst.toggleDisplay = ($el) => {
+		$el.hasClass(DISPLAY) ? $el.removeClass(DISPLAY): $el.addClass(DISPLAY);
+	};
+	inst.show = ($el) => {
+		$el.hasClass(DISPLAY) ? $el.removeClass(DISPLAY) : undefined;
+	};
+	inst.hide = ($el) => {
+		!$el.hasClass(DISPLAY) ? $el.addClass(DISPLAY) : undefined;
+	};
 	inst.note = note;
 	inst.disable = disable;
 	inst.enable = enable;

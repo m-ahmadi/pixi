@@ -1,4 +1,11 @@
-define(["core/config", "core/util", "core/pubsub", "core/mainSocket", "./groups"], function (CONF, u, newPubSub, mainSocket, groups) {
+define([
+	"core/config",
+	"core/util",
+	"core/pubsub",
+	"core/mainSocket",
+	"core/wuk",
+	"./groups"
+], (CONF, u, newPubSub, mainSocket, wuk, groups) => {
 	const WORKERS_DIR = `${CONF.ROOT}js/map/visMap/workers`;
 	
 	let inst = u.extend( newPubSub() );
@@ -162,7 +169,8 @@ define(["core/config", "core/util", "core/pubsub", "core/mainSocket", "./groups"
 		g.edges = new vis.DataSet();
 	
 		g.container = $(elementId);
-		g.container.height(window.innerHeight);
+		const conHeight = height - parseInt($("#header").css("height"), 10);
+		g.container.height(conHeight);
 		
 		g.network = new vis.Network(g.container[0], {nodes: g.nodes, edges: g.edges}, g.options);
 		g.network.on("dragEnd", changeNodePos);
@@ -170,7 +178,7 @@ define(["core/config", "core/util", "core/pubsub", "core/mainSocket", "./groups"
 		window.network = g.network;
 		
 		$(window).on("resize", function () {
-			g.container.height(window.innerHeight);
+			g.container.height(window.innerHeight - header);
 		});
 		/* $.ajax({
 			url: "http://localhost:3000",
@@ -365,9 +373,15 @@ define(["core/config", "core/util", "core/pubsub", "core/mainSocket", "./groups"
 	inst.updateNode = updateNode;
 	inst.draw = draw;
 	inst.init = init;
-	inst.clear = function () {
+	inst.clear = () => {
 		g.nodes.clear();
 		g.edges.clear();
+	};
+	inst.show = () => {
+		wuk.show(g.container);
+	};
+	inst.hide = () => {
+		wuk.hide(g.container);
 	};
 	inst.g = g;
 	

@@ -2,12 +2,12 @@
     "F": {
         "HTML": "index.html",
         "TEMP": "templates.js",
-        "CLL": "libcss.js",
-        "JLL": "libjs.js",
+        "CLL": "list.txt",
+        "JLL": "list.txt",
         "SASS": "style.scss",
         "CSS": "style.css",
         "APP": "app.js",
-        "LIB": "libs.min",
+        "LIB": "libs",
         "LINKS": "links.htm",
         "SCRIPTS": "scripts.htm"
     },
@@ -26,8 +26,8 @@
     "O": {
         "JS": "./dist/js/",
         "CSS": "./dist/css/",
-        "CLIB": "./dist/css/lib/libs.min.css",
-        "JLIB": "./dist/js/lib/libs.min.js",
+        "CLIB": "./dist/css/lib/",
+        "JLIB": "./dist/js/lib/",
         "HTML": "./dist/index.html",
         "STYLE": "./dist/css/style.css",
         "APP": "./dist/js/app.js",

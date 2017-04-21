@@ -1,0 +1,27 @@
+#members {
+	padding: 20px;
+	.wrap {
+		min-height: 100%;
+		overflow: auto;
+	}
+	table {
+		th {
+			font-weight: bold;
+			text-transform: capitalize;
+		}
+		.uk-button {
+			line-height: 1;
+			padding: 2px 8px;
+			border-radius: 20px;
+			text-transform: lowercase;
+			color: black;
+		}
+	}
+}
+
+#modal_member {
+	.uk-form-label {
+		margin-top: 0;
+	}
+	
+}

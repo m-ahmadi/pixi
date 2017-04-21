@@ -8,14 +8,23 @@ define([
 	"./header",
 	"./traceroute",
 	"./discovery/mediator",
+	"members/mediator",
 	"./templates"
-], function (u, newPubSub, mainSocket, wuk, map, sidebar, header, traceroute, discovery) {
+], function (u, newPubSub, mainSocket, wuk, map, sidebar, header, traceroute, discovery, members) {
 	const inst = u.extend( newPubSub() );
 	const note = wuk.note;
 	
 	function addCustomEvts() {
 		header.on("menu_clicked", () => {
 			sidebar.toggle();
+		});
+		header.on("map_clicked", () => {
+			members.hide();
+			map.show();
+		});
+		header.on("members_clicked", () => {
+			map.hide();
+			members.show();
 		});
 		sidebar.on("traceroute_item_clicked", () => {
 			traceroute.begin();
@@ -66,10 +75,9 @@ define([
 		header.init();
 		traceroute.init();
 		discovery.init();
+		members.init();
+		
 		addCustomEvts();
-		
-		
-		
 	}
 	inst.beforeReady = beforeReady;
 	inst.onReady = onReady;

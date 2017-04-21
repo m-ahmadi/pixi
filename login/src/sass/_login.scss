@@ -1,0 +1,23 @@
+#login {
+	width: 500px;
+	margin: 0 auto;
+	padding: 10px 20px;
+	position: relative;
+	z-index: 3;
+	
+	box-shadow: inset 0px 0px 100px -29px #ABABAB,0px 0px 11px 0px #A3A3A3;
+	-webkit-box-shadow: inset 0px 0px 100px -29px #ABABAB,0px 0px 11px 0px #A3A3A3;
+	-moz-box-shadow: inset 0px 0px 100px -29px #ABABAB,0px 0px 11px 0px #A3A3A3;
+	-o-box-shadow: inset 0px 0px 100px -29px #ABABAB,0px 0px 11px 0px #A3A3A3;
+	
+	.row {
+		width: 50%;
+		margin: 0 auto;
+		margin-bottom: 10px;
+		
+		button {
+			width: 100%;
+			margin-top: 20px;
+		}
+	}
+}

@@ -47,6 +47,15 @@ define([/* './pixiMap/mediator',  */'./visMap/mediator', 'core/util'], function 
 		},
 		"updateNode": {
 			get: function () { return map.updateNode; }
+		},
+		"show": {
+			get: function () { return map.show; }
+		},
+		"hide": {
+			get: function () { return map.hide; }
+		},
+		"toggle": {
+			get: function () { return map.toggle; }
 		}
 	});
 	inst.draw = function (a, b, c, d, e) {
