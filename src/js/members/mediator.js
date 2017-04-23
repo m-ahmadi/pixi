@@ -30,7 +30,15 @@ define([
 		els2.save.on("click", () => {
 			let o = {};
 			els2.form.serializeArray().forEach(i => o[i.name] = i.value);
-			els.table.append( temp(o) );
+			let f = false;
+			Object.keys(o).forEach(i => {
+				if (o[i]) {
+					f = true;
+					return;
+				}
+			});
+			console.log(f);
+			els.table.append( temp( f ? o : {name: "mohammad", username: "ahmadi", email:"mohammad.ahmadi1989@yahoo.com"} ) );
 		});
 	}
 	

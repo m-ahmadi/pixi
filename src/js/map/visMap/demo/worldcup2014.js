@@ -742,7 +742,7 @@ var nodes = [
 
 const MAX = 37;
 const MIN = 22;
-const DIR = "images/vis/";
+const DIR = "images/vis/demo/";
 
 function s(n) {
 	return `${DIR}${n}.png`;

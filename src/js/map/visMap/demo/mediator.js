@@ -1,5 +1,5 @@
-define(["core/util", "./worldcup2014", "./groups"], function (u, worldcup, groups) {
-	let inst = {};
+define(["core/util", "core/pubsub", "./worldcup2014", "./groups"], function (u, newPubSub, worldcup, groups) {
+	let inst = u.extend( newPubSub() );
 	
 	var network;
 	var allNodes;

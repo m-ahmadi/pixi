@@ -145,7 +145,7 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 		doValidation(els1.input1);
 		doValidation(els1.input2);
 		
-		els1.radios.on("click", function () {
+		els1.radios.on("click", () => {
 			let rangeType = parseInt(this.value, 10),
 				first, second;
 				
@@ -162,13 +162,13 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			doValidation( els1.input1 );
 			doValidation( els1.input2 );
 		});
-		els1.input1.on("keyup", function () {
+		els1.input1.on("keyup", () => {
 			doValidation( $(this) );
 		});
-		els1.input2.on("keyup", function () {
+		els1.input2.on("keyup", () => {
 			doValidation( $(this) );
 		});
-		els1.next.on("click", function () {
+		els1.next.on("click", () => {
 			let first, second, type;
 			
 			first = els1.input1.val();
@@ -189,31 +189,34 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			wuk.openModal(SNMP_CREDS);
 			els2.table.find("[data-input]:last").focus();
 		});
-		els2.addnew.on("click", function () {
+		els2.addnew.on("click", () => {
 			let temp = Handlebars.templates.credrow;
 			els2.table.append( temp({text:""}) );
 			els2.table.find("[data-input]").focus();
 		});
-		els2.table.on("click", "button[data-delete]", function () {
+		els2.table.on("click", "button[data-delete]", () => {
 			let el = $(this);
 			el.parent().parent().remove();
 			els2.table.find("[data-input]:last").focus();
 		});
-		els2.prev.on("click", function () {
+		els2.prev.on("click", () => {
 			toSend.snmpCredentials = [];
 			wuk.openModal(DISCOVERY);
 		});
-		els2.next.on("click", function () {
+		els2.next.on("click", () => {
 			toSend.snmpCredentials = [];
 			els2.table.find("[data-input]").each((i, j) => {
 				toSend.snmpCredentials.push( $(j).val() );
 			});
 			wuk.openModal(SNMP_TIMES);
 		});
-		els3.prev.on("click", function () {
+		els3.prev.on("click", () => {
 			wuk.openModal(SNMP_CREDS);
 		});
-		els3.submit.on("click", function () {
+		els3.input1.on("blur", e => els3.slider1[0].noUiSlider.set(e.target.value));
+		els3.input2.on("blur", e => els3.slider2[0].noUiSlider.set(e.target.value));
+		els3.input3.on("blur", e => els3.slider3[0].noUiSlider.set(e.target.value));
+		els3.submit.on("click", () => {
 			toSend.discoveryTimeout = parseInt( els3.slider1[0].noUiSlider.get(), 10 ).toFixed();
 			toSend.snmpTimeout      = parseInt( els3.slider2[0].noUiSlider.get(), 10 ).toFixed();
 			toSend.snmpRetries      = parseInt( els3.slider3[0].noUiSlider.get(), 10 ).toFixed();

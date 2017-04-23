@@ -167,7 +167,7 @@ define([
 		
 		g.nodes = new vis.DataSet();
 		g.edges = new vis.DataSet();
-	
+		
 		g.container = $(elementId);
 		const conHeight = height - parseInt($("#header").css("height"), 10);
 		g.container.height(conHeight);
@@ -178,9 +178,9 @@ define([
 		window.network = g.network;
 		
 		$(window).on("resize", function () {
-			g.container.height(window.innerHeight - header);
+			g.container.height(conHeight);
 		});
-		/* $.ajax({
+		$.ajax({
 			url: "http://localhost:3000",
 			type: "POST",
 			dataType: "json",
@@ -195,7 +195,7 @@ define([
 			console.log(data);
 			t = data;
 			draw(data);
-		}); */
+		});
 		createWorker();
 	}
 	

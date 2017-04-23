@@ -1,4 +1,4 @@
-define(["config"], function (conf) {
+define(["core/config"], function (conf) {
 	const ROOT = conf.ROOT;
 	const DIR = ROOT+"images/vis/demo/";
 	const EXT = ".png";
