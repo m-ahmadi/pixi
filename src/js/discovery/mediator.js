@@ -28,6 +28,7 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 	}
 	const getEls = u.getEls;
 	
+	let temp;
 	let els1, els2, els3;
 	let toSend;
 	
@@ -93,7 +94,8 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 		els1.radio1.prop("checked", true);
 		els1.input1.val( d.DEFAULT_START_IP );
 		els1.input2.val( d.DEFAULT_END_IP );
-		els2.table.find("tr").slice(2).remove();
+		els2.table.find("tr").remove();
+		els2.table.append( temp({text:""}) );
 		els3.slider1[0].noUiSlider.set( d.DEFAULT_DISCOVERY_TIMEOUT );
 		els3.slider2[0].noUiSlider.set( d.DEFAULT_SNMP_TIMEOUT );
 		els3.slider3[0].noUiSlider.set( d.DEFAULT_SNMP_RETRIES );
@@ -124,17 +126,18 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			}
 		});
 		
-		els3.slider1[0].noUiSlider.on("update", function (a, b, c) {
+		els3.slider1[0].noUiSlider.on("update", (a, b, c) => {
 			els3.input1.val( c[0].toFixed() );
 		});
-		els3.slider2[0].noUiSlider.on("update", function (a, b, c) {
+		els3.slider2[0].noUiSlider.on("update", (a, b, c) => {
 			els3.input2.val( c[0].toFixed() );
 		});
-		els3.slider3[0].noUiSlider.on("update", function (a, b, c) {
+		els3.slider3[0].noUiSlider.on("update", (a, b, c) => {
 			els3.input3.val( c[0].toFixed() );
 		});
 	}
 	function init() {
+		temp = Handlebars.templates.credrow;
 		els1 = getEls(DISCOVERY);
 		els2 = getEls(SNMP_CREDS);
 		els3 = getEls(SNMP_TIMES);
@@ -190,13 +193,11 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			els2.table.find("[data-input]:last").focus();
 		});
 		els2.addnew.on("click", () => {
-			let temp = Handlebars.templates.credrow;
 			els2.table.append( temp({text:""}) );
 			els2.table.find("[data-input]").focus();
 		});
-		els2.table.on("click", "button[data-delete]", () => {
-			let el = $(this);
-			el.parent().parent().remove();
+		els2.table.on("click", "button[data-delete]", (e) => {
+			$(e.target).parent().parent().remove();
 			els2.table.find("[data-input]:last").focus();
 		});
 		els2.prev.on("click", () => {

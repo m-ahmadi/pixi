@@ -119,7 +119,7 @@
 	height: $wh;
 	border-radius: 100px;
 	$del: random(15) + s;
-	$dur: random(50) + 4 + s;
+	$dur: random(80) + 4 + s;
 	-webkit-animation-delay: $del;
 	        animation-delay: $del;
 	-webkit-animation-duration: $dur;
@@ -134,8 +134,8 @@
             transform: translateY(0);
   }
   100% {
-    -webkit-transform: translateY(-1000px) rotate(600deg);
-            transform: translateY(-1000px) rotate(600deg);
+    -webkit-transform: translateY(-2000px) rotate(600deg);
+            transform: translateY(-2000px) rotate(600deg);
   }
 }
 @keyframes square {
@@ -144,7 +144,7 @@
             transform: translateY(0);
   }
   100% {
-    -webkit-transform: translateY(-1000px) rotate(600deg);
-            transform: translateY(-1000px) rotate(600deg);
+    -webkit-transform: translateY(-2000px) rotate(600deg);
+            transform: translateY(-2000px) rotate(600deg);
   }
 }
