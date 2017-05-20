@@ -2,12 +2,12 @@
     "F": {
         "HTML": "index.html",
         "TEMP": "templates.js",
-        "CLL": "list.txt",
-        "JLL": "list.txt",
+        "CLL": "css.list",
+        "JLL": "js.list",
         "SASS": "style.scss",
         "CSS": "style.css",
         "APP": "app.js",
-        "LIB": "libs.min",
+        "LIB": "libs",
         "LINKS": "links.htm",
         "SCRIPTS": "scripts.htm"
     },
@@ -17,8 +17,8 @@
         "HTML": "./src/html/",
         "TEMP": "./src/template/",
         "LIB": "./src/lib/",
-        "SLIBC": "./src/lib/css/",
-        "SLIBJ": "./src/lib/js/",
+        "SLIBC": "./src/lib/",
+        "SLIBJ": "./src/lib/",
         "STYLE": "./src/sass/style.scss",
         "LNKT": "./src/html/links.htm",
         "SCRT": "./src/html/scripts.htm"
@@ -26,13 +26,13 @@
     "O": {
         "JS": "./dist/js/",
         "CSS": "./dist/css/",
-        "CLIB": "./dist/css/lib/libs.min.css",
-        "JLIB": "./dist/js/lib/libs.min.js",
+        "CLIB": "./dist/css/",
+        "JLIB": "./dist/js/lib/",
         "HTML": "./dist/index.html",
         "STYLE": "./dist/css/style.css",
         "APP": "./dist/js/app.js",
         "TEMP": "./dist/js/templates.js",
-        "SEPLC": "./dist/css/lib/",
+        "SEPLC": "./dist/css/",
         "SEPLJ": "./dist/js/lib/"
     },
     "C": {
