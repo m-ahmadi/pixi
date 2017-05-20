@@ -3,7 +3,7 @@ Topology Front
 
 ### Building and Compiling:
 
-npm install m-ahmadi/sway -g
+npm install m-ahmadi/sway-cli -g
 
   1. *`cd topology-front`*
   2. Prepend *`sway`* to the command and run it.  
