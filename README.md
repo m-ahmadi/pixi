@@ -1,45 +1,44 @@
 Topology Front
 ===================
 
+### Building and Compiling:
 
-### Dev Commands
+npm install m-ahmadi/sway -g
 
-You can run any of the commands in the the following table by going to the project dir and *`npm run`* them:
   1. *`cd topology-front`*
-  2. Prepend *`npm run`* to the command and run it.  
-For example: *`npm run sass`*
+  2. Prepend *`sway`* to the command and run it.  
+For example: *`sway sass`*
+
+
+sway commands:
 
 Command                         | Description
 ------------------------------- | ---------------------------------------------------------------------------------------
-`sass`                          | Compile sass files.
-`html`                          | Build `index.html` from static templates.
-`temp`                          | Precompile the dynamic Handlebars templates.
-`js`                            | Compile js files.
-`sass-w`                        | Watch sass
-`html-w`                        | Watch html
-`temp-w`                        | Watch temp
-`js-w`                          | Watch js
-`compile-all`                   | Compile everything.
-`livereload`                    | Enable livereload for: `dist/index.html`, `dist/css` and `dist/js`
-`env-debug-hard`                | Set current environment to debug-hard.
-`env-debug-normal`              | Set current environment to debug-normal.
-`env-debug-light`               | Set current environment to debug-light.
-`env-release`                   | Set current environment to release-light.
-`showenv`                       | Show current environment.
-`libcss`                        | Build CSS dependencies based on current environment.
-`libjs`                         | Build JS dependencies based on current environment.
-`build-libs`                    | Build CSS and JS dependencies based on current environment.
-`build`                         | Build dependencies and compile everything based on current environment.
-`release`                       | Mr. Sadeghzadeh custom release.
-`build-debug-hard`              | Build and compile everything according to `debug-hard` environment.
-`build-debug-normal`            | Build and compile everything according to `debug-normal` environment.
-`build-debug-light`             | Build and compile everything according to `debug-light` environment.
-`build-release-light`           | Build and compile everything according to `release-light` environment.
-`build-release-hard`            | Build and compile everything according to `release-hard` environment.
-`fakeData`                      | Run fake data server on localhost:3000
+`html`           | Compile HTML.
+`sass`           | Compile Sass.
+`temp`           | Compile dynamic templates.
+`js`             | Compile JavaScript.
+`html-w`         | Watch HTML.
+`sass-w`         | Watch Sass.
+`temp-w`         | Watch dynamic templates.
+`js-w`           | Watch JavaScript
+`compile`        | Compile everything.
+`live`           | Enable livereload for: dist/index.html, dist/css and dist/js
+`env [name]`     | Show current environment, or change it.
+`lib [which]`    | Build lib based on current environment.
+`libs`           | Build all libs.
+`build [env]`    | Build libs and compile. You can specify another env.
+`release`        | Custom release.
+`release-hard`   | Build and compile release-hard.
+`sync`           | Sync the local Sway config with the global one.
 
+npm run commands
 
-
+Command                         | Description
+------------------------------- | ---------------------------------------------------------------------------------------
+`fakeData`       | Run fake data server on localhost:3000
+    
+    
 ### Documentation Page
 In order to see the documentation page:
 
