@@ -16,13 +16,13 @@ define([
 	
 	function request(o) {
 		$.ajax({
-			url: conf.BASE,
+			url: `${conf.BASE}cmd`,
 			method: "POST",
 			contentType: "application/json",
 			data: JSON.stringify(o)
 		})
 		.done()
-		.fail( () => note.error("requeste ke cmd mizane fail shod") );
+		.fail( () => note.error("requeste ke cmd mizane fail shod)") );
 	}
 	function addCustomEvts() {
 		header.on("menu_clicked", () => {
