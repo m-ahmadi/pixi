@@ -1,4 +1,4 @@
-define(["core/util", "core/pubsub", "core/wuk"], function (u, newPubSub, wuk) {
+define(["core/wuk"], function (wuk) {
 	const ROOT = "#sidebar";
 	let sidebar, els;
 	

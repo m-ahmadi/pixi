@@ -1,57 +1,40 @@
-define(["./util", "./wuk"], function (u, wuk) {
-	let inst = {};
+define(["./wuk"], function (wuk) {
+	const inst = u.extend( newPubSub() );
 	
 	const URL = "ws://127.0.0.1:3000/socket/open";
-	const msg = {
-		PROCESS: "Performing action...",
-		SUCCESS: "Action successfuly performed.",
-		FAILED: "Action could not be performed.",
-		DONE: "Done."
-	};
 	const note = wuk.note;
 	
-	let ws;
+	let ws = {};
 	let opened = false;
 	
 	function isOpen() {
 		return opened;
 	}
-	function send(str, fn) {
-		if ( isOpen() ) {
-			if ( u.isFn(fn) ) {
-				ws.onmessage = fn;
-			}
-			ws.send(str);
-		}
-	}
-	function init(callback, callbackArgs) {
-		let h1, h2;
+	function init() {
+		let processNote;
 		
-		h1 = note.process("Opening WebSocket connection...");
+		processNote = note.process("Opening WebSocket connection...");
 		ws = new WebSocket(URL);
 		
 		ws.onopen = function (e) {
-			h1.close();
-			note.success("WebSocket is opened.");
+			processNote.close();
+			note.success("WebSocket opened.");
 			console.log("Connection open...", e);
 			opened = true;
 			
-			if ( u.isFn(callback) ) {
-				h2 = note.process(msg.PROCESS);
-				callback.apply(undefined, callbackArgs);
-				h2.close();
-				note.info(msg.DONE);
-			}
+			inst.emit("open");
 		};
 		ws.onmessage = function (e) {
 			if ( u.isStr(e.data) ) {
 				console.log("String message received", e.data);
+				
+				inst.emit( "message", JSON.parse(e.data) );
 			} else {
 				console.log("Other message received", e.data);
 			}
 		};
 		ws.onerror = function (e) {
-			h1.close();
+			processNote.close();
 			note.error("WebSocket could not be opened.");
 			console.log("WebSocket Error: " , e);
 		};
@@ -63,7 +46,6 @@ define(["./util", "./wuk"], function (u, wuk) {
 	}
 	
 	inst.isOpen = isOpen;
-	inst.send = send;
 	inst.init = init;
 	
 	window.mainSocket = inst;

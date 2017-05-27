@@ -1,4 +1,4 @@
-define(['./wpix', './wani', 'core/util', './popupManager', './contextMenu'], function (wpix, wani, u, popupManager, contextMenu) {
+define(['./wpix', './wani', './popupManager', './contextMenu'], function (wpix, wani, popupManager, contextMenu) {
 	var inst = {},
 		p = {};
 	

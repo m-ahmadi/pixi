@@ -1,0 +1,22 @@
+{
+  "name": "Topology",
+  "description": "Network topology visualizer and tools.",
+  "main": "",
+  "authors": [
+    "Mohammad Ahmadi"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "uikit": "3.0.0-beta.24",
+    "pixi.js": "^4.5.2"
+  }
+}

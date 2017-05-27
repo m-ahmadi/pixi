@@ -1,8 +1,6 @@
 define([
-	"core/util",
-	"core/pubsub",
 	"core/wuk"
-] , (u, newPubSub, wuk) => {
+] , (wuk) => {
 	const inst = u.extend( newPubSub() );
 	const ROOT = "#members";
 	const MODAL = "#modal_member"

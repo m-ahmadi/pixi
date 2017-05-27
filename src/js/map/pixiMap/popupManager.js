@@ -1,4 +1,4 @@
-define(['./wpix', 'core/util', 'core/whb'], function (wpix, u, whb) {
+define(['./wpix', 'core/whb'], function (wpix, u, whb) {
 	var activeBox,
 		cbX = {
 			min: 0,

@@ -1,11 +1,9 @@
 define([
 	"core/config",
-	"core/util",
-	"core/pubsub",
 	"core/mainSocket",
 	"core/wuk",
 	"./groups"
-], (CONF, u, newPubSub, mainSocket, wuk, groups) => {
+], (CONF, mainSocket, wuk, groups) => {
 	const WORKERS_DIR = `${CONF.ROOT}js/map/visMap/workers`;
 	
 	let inst = u.extend( newPubSub() );

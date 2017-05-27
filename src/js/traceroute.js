@@ -1,4 +1,4 @@
-define(["map/mediator", "core/wuk", "core/util"], function (map, wuk, u) { // wpix, tpl, wuk, u
+define(["map/mediator", "core/wuk"], function (map, wuk) { // wpix, tpl, wuk, u
 	var note = wuk.note,
 		ws = {},
 		path = "ws://"+ baseRoot +"/network/icmp/traceroute", // window.location.host

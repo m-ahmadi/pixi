@@ -1,4 +1,4 @@
-define(["core/util", "core/pubsub"], function (u, newPubSub) {
+define([], function () {
 	var inst = u.extend( newPubSub() ),
 		p = {};
 	

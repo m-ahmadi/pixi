@@ -1,4 +1,4 @@
-define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
+define(["core/wuk"], function (wuk) {
 	let inst = u.extend( newPubSub() );
 	
 	const DISCOVERY = "#modal_discovery";
@@ -30,21 +30,21 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 	
 	let temp;
 	let els1, els2, els3;
-	let toSend;
+	let toSend = {};
 	
 	resetData();
 	function resetData() {
 		toSend = {
 			action: "discovery",
-			rangeType: 0,
-			startRange: d.DEFAULT_START_IP,
-			endRange: d.DEFAULT_END_IP,
+			range_type: 0,
+			start_range: d.DEFAULT_START_IP,
+			end_range: d.DEFAULT_END_IP,
 			ip: "",
 			subnet: "",
-			snmpCredentials: [],
-			discoveryTimeout: d.DEFAULT_DISCOVERY_TIMEOUT,
-			snmpTimeout: d.DEFAULT_SNMP_TIMEOUT,
-			snmpRetries: d.DEFAULT_SNMP_RETRIES
+			snmp_credentials: [],
+			discovery_timeout: d.DEFAULT_DISCOVERY_TIMEOUT,
+			snmp_timeout: d.DEFAULT_SNMP_TIMEOUT,
+			snmp_retries: d.DEFAULT_SNMP_RETRIES
 		};
 	}
 	function closeModal() {
@@ -68,22 +68,21 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 		
 		return rgx.ip.test(v);
 	}
-	function doValidation(inputEl) {
-		let el = inputEl;
-		let val = el.val();
-		let res = false;
+	function doValidation(els) {
+		let valid = true;
 		let startBtn = els1.next;
-		
-		res = isValidIp(val);
-		
-		inputEl.removeClass("uk-form-success uk-form-danger");
-		if (res) {
-			el.addClass("uk-form-success");
-			wuk.enable( startBtn );
-		} else {
-			el.addClass("uk-form-danger");
-			wuk.disable( startBtn );
-		}
+		els.removeClass("uk-form-success uk-form-danger");
+		els.each((i, l) => {
+			let el = $(l);
+			let res = isValidIp( el.val() );
+			if (res) {
+				el.addClass(res ? "uk-form-success" : "uk-form-danger");
+			} else {
+				el.addClass("uk-form-danger");
+				valid = false;
+			}
+		});
+		valid ? wuk.enable(startBtn) : wuk.disable(startBtn);
 	}
 	function discover() {
 		// discover( first, second, parseInt(type, 10) );
@@ -145,8 +144,7 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 		els1.radio1.prop("checked", true);
 		els1.input1.attr("value", d.DEFAULT_START_IP);
 		els1.input2.attr("value", d.DEFAULT_END_IP);
-		doValidation(els1.input1);
-		doValidation(els1.input2);
+		doValidation(els1.inputs);
 		
 		els1.radios.on("click", () => {
 			let rangeType = parseInt(this.value, 10),
@@ -162,14 +160,13 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 				first.val( d.DEFAULT_IP );
 				second.val( d.DEFAULT_SUBNET );
 			}
-			doValidation( els1.input1 );
-			doValidation( els1.input2 );
+			doValidation(els1.inputs);
 		});
-		els1.input1.on("keyup", () => {
-			doValidation( $(this) );
+		els1.input1.on("keyup", e => {
+			doValidation( els1.inputs );
 		});
-		els1.input2.on("keyup", () => {
-			doValidation( $(this) );
+		els1.input2.on("keyup", e => {
+			doValidation( els1.inputs );
 		});
 		els1.next.on("click", () => {
 			let first, second, type;
@@ -183,11 +180,11 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			type = els1.radios.filter(":checked").val();
 			type = parseInt(type, 10);
 			
-			toSend.rangeType  = type;
-			toSend.startRange = type === 0 ? first  : "";
-			toSend.endRange   = type === 0 ? second : "";
-			toSend.ip         = type === 1 ? first  : "";
-			toSend.subnet     = type === 1 ? second : "";
+			toSend.range_type  = type;
+			toSend.start_range = type === 0 ? first  : "";
+			toSend.end_range   = type === 0 ? second : "";
+			toSend.ip          = type === 1 ? first  : "";
+			toSend.subnet      = type === 1 ? second : "";
 			
 			wuk.openModal(SNMP_CREDS);
 			els2.table.find("[data-input]:last").focus();
@@ -201,13 +198,13 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 			els2.table.find("[data-input]:last").focus();
 		});
 		els2.prev.on("click", () => {
-			toSend.snmpCredentials = [];
+			toSend.snmp_credentials = [];
 			wuk.openModal(DISCOVERY);
 		});
 		els2.next.on("click", () => {
-			toSend.snmpCredentials = [];
+			toSend.snmp_credentials = [];
 			els2.table.find("[data-input]").each((i, j) => {
-				toSend.snmpCredentials.push( $(j).val() );
+				toSend.snmp_credentials.push( $(j).val() );
 			});
 			wuk.openModal(SNMP_TIMES);
 		});
@@ -218,9 +215,9 @@ define(["core/wuk", "core/pubsub", "core/util"], function (wuk, newPubSub, u) {
 		els3.input2.on("blur", e => els3.slider2[0].noUiSlider.set(e.target.value));
 		els3.input3.on("blur", e => els3.slider3[0].noUiSlider.set(e.target.value));
 		els3.submit.on("click", () => {
-			toSend.discoveryTimeout = parseInt( els3.slider1[0].noUiSlider.get(), 10 ).toFixed();
-			toSend.snmpTimeout      = parseInt( els3.slider2[0].noUiSlider.get(), 10 ).toFixed();
-			toSend.snmpRetries      = parseInt( els3.slider3[0].noUiSlider.get(), 10 ).toFixed();
+			toSend.discovery_timeout = parseInt( els3.slider1[0].noUiSlider.get(), 10 ).toFixed();
+			toSend.snmp_timeout      = parseInt( els3.slider2[0].noUiSlider.get(), 10 ).toFixed();
+			toSend.snmp_retries      = parseInt( els3.slider3[0].noUiSlider.get(), 10 ).toFixed();
 			
 			inst.emit("submit", toSend);
 			wuk.closeModal(SNMP_TIMES);

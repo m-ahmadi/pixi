@@ -1,4 +1,4 @@
-define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/util', 'core/ajax'], function (wpix, tpl, navigation, popupManager, wuk, u, ajax) {
+define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/ajax'], function (wpix, tpl, navigation, popupManager, wuk, ajax) {
 	var inst = {},
 		p = {};
 	

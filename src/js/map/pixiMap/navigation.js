@@ -1,4 +1,4 @@
-define(['./wpix', 'core/pubsub', 'core/util'], function (wpix, newPubSub, u) {
+define(['./wpix'], function (wpix) {
 	
 	var inst = u.extend( newPubSub() ),
 		p = {};

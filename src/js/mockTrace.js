@@ -1,4 +1,4 @@
-define(['map/mediator', 'core/wuk', 'core/util'], function (map, wuk, u) {
+define(['map/mediator', 'core/wuk'], function (map, wuk) {
 	var note = wuk.note;
 	var msgCounter = 0;
 	

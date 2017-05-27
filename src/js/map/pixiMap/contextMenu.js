@@ -1,4 +1,4 @@
-define(['core/whb', 'core/util'], function (whb, u) {
+define(['core/whb'], function (whb) {
 	var inst = {},
 	//	tmpl = whb.tmpl;
 		tmpl = Handlebars.templates;

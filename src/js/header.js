@@ -1,8 +1,6 @@
 define([
-	"core/util",
-	"core/pubsub",
 	"core/wuk"
-], (u, newPubSub, wuk) => {
+], (wuk) => {
 	const ROOT = "#header";
 	const c = {
 		DEFAULT: " ", // amber lighten-5
