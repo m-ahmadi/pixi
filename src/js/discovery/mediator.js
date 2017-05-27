@@ -32,7 +32,6 @@ define(["core/wuk"], function (wuk) {
 	let els1, els2, els3;
 	let toSend = {};
 	
-	resetData();
 	function resetData() {
 		toSend = {
 			action: "discovery",
