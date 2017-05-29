@@ -16,7 +16,7 @@ define([
 	
 	function request(o) {
 		$.ajax({
-			url: `${conf.BASE}cmd`,
+			url: `${conf.JAX}cmd`,
 			method: "POST",
 			contentType: "application/json",
 			data: JSON.stringify(o)
@@ -49,7 +49,13 @@ define([
 		mainSocket.on("message", e => {
 			if (e.type === "graph_response") {
 				delete e.type;
-				map.draw(e);
+				if (e.append) {
+					delete e.append;
+					map.draw(e);
+				} else {
+					map.clear();
+					map.draw(e);
+				}
 			}
 		});
 		discovery.on("submit", toSend => {

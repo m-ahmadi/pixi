@@ -178,7 +178,7 @@ define([
 		$(window).on("resize", function () {
 			g.container.height(conHeight);
 		});
-		$.ajax({
+		/* $.ajax({
 			url: "http://localhost:3000",
 			type: "POST",
 			dataType: "json",
@@ -193,7 +193,7 @@ define([
 			console.log(data);
 			t = data;
 			draw(data);
-		});
+		}); */
 		createWorker();
 	}
 	

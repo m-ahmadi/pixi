@@ -1,7 +1,8 @@
-define(["./wuk"], function (wuk) {
+define(["./config", "./wuk"], function (conf, wuk) {
 	const inst = u.extend( newPubSub() );
 	
-	const URL = "ws://127.0.0.1:3000/socket/open";
+	console.log(conf)
+	const URL = conf.WS + "socket/open";
 	const note = wuk.note;
 	
 	let ws = {};
