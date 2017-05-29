@@ -59,7 +59,6 @@ define([
 			}
 		});
 		discovery.on("submit", toSend => {
-			console.log(toSend);
 			request(toSend);
 		});
 		map.on("node_position_changed", nodeNew => {

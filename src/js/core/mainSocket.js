@@ -1,7 +1,6 @@
 define(["./config", "./wuk"], function (conf, wuk) {
 	const inst = u.extend( newPubSub() );
 	
-	console.log(conf)
 	const URL = conf.WS + "socket/open";
 	const note = wuk.note;
 	
