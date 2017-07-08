@@ -1,6 +1,6 @@
 const JS = "../../../";
-importScripts(JS+ "lib/handlebars.runtime.js")
-importScripts(JS+ "templates.js");
+importScripts("/pixi/dist/lib/handlebars/handlebars.runtime.js")
+importScripts("/pixi/dist/lib/templates.js");
 
 // let template = nodepopup;
 let template = Handlebars.templates.nodepopup;

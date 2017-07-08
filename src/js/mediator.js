@@ -7,8 +7,7 @@ define([
 	"./header",
 	"./traceroute",
 	"./discovery/mediator",
-	"members/mediator",
-	"./templates"
+	"members/mediator"
 ], function (conf, mainSocket, wuk, map, sidebar, header, traceroute, discovery, members) {
 	const inst = u.extend( newPubSub() );
 	const note = wuk.note;
@@ -79,7 +78,6 @@ define([
 		mainSocket.init();
 	}
 	function onReady() {
-		wuk.init();
 		map.init("visMap", "#map_container");
 		sidebar.init();
 		header.init();

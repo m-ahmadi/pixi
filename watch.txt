@@ -1,0 +1,6 @@
+/icon "%CMDER_ROOT%\icons\cmder.ico" cmd /k "%ConEmuDir%\..\init.bat"
+
+/icon "%CMDER_ROOT%\icons\cmder.ico" cmd /k "%ConEmuDir%\..\init.bat" && htmlbilder ./src/html/        -o ./dist/index.html        -w
+/icon "%CMDER_ROOT%\icons\cmder.ico" cmd /k "%ConEmuDir%\..\init.bat" && handlebars ./src/templates/   -f ./dist/lib/templates.js  -e hbs -m -o
+/icon "%CMDER_ROOT%\icons\cmder.ico" cmd /k "%ConEmuDir%\..\init.bat" && babel      ./src/js/          -d ./dist/js/               -s -w
+/icon "%CMDER_ROOT%\icons\cmder.ico" cmd /k "%ConEmuDir%\..\init.bat" && sass       ./src/sass/style.scss:./dist/css/style.css     --style expanded --sourcemap=auto -w

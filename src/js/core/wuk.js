@@ -1,4 +1,4 @@
-define(["./util"], function (u) {
+define(() => {
 	var inst = {},
 		modals = {};
 	const DISPLAY = "no-display";
@@ -19,32 +19,15 @@ define(["./util"], function (u) {
 	}
 	function closeModal(s) {
 		let m = getModal(s);
-		if ( m.isActive() ) {
+		if ( m.isToggled() ) {
 			m.hide();
 		}
 	}
 	function openModal(s) {
 		let m = getModal(s);
-		if ( !m.isActive() ) {
+		if ( !m.isToggled() ) {
 			m.show();
 		}
-	}
-	function modalState(state, id) {
-		if (state === true) {
-			modals[id] = true;
-		} else if (!state) {
-			modals[id] = false;
-		}
-	}
-	function isAnyModalActive() {
-		var result = false;
-		Object.keys(modals).forEach(function (k) {
-			if ( modals[k] === true ) {
-				result = true;
-			}
-		});
-		return result;
-		// return u.isEmptyObj(modals) ? false : true;
 	}
 	let note = (function () {
 		const DEFAULT_MSG = "NO_MESSAGE_WAS_SPECIFIED";
@@ -87,7 +70,7 @@ define(["./util"], function (u) {
 				message:  icon +" "+ (msg || DEFAULT_MSG),
 				status:   status,
 				timeout:  u.isNum(timeout) ? timeout : 1000,
-				pos:      pos     || "bottom-right"
+				pos:      pos || "top-right"
 			});
 			
 			return res;
@@ -115,18 +98,6 @@ define(["./util"], function (u) {
 			process: process
 		};
 	}());
-	function init() {
-		
-		/* $("a[href^="#modal_"]").on("click", function (e) {
-			modalState(true, e.target.hash.substr(1));
-		}); */
-		$("div[id^='modal_']").on("beforeshow", function (e) {
-			modalState(true, e.target.id);
-		});
-		$("div[id^='modal_']").on("hide", function (e) {
-			modalState(false, e.target.id);
-		});
-	}
 	
 	inst.toggleDisplay = ($el) => {
 		$el.hasClass(DISPLAY) ? $el.removeClass(DISPLAY): $el.addClass(DISPLAY);
@@ -140,14 +111,9 @@ define(["./util"], function (u) {
 	inst.note = note;
 	inst.disable = disable;
 	inst.enable = enable;
-	inst.getModal = getModal;
 	inst.closeModal = closeModal;
 	inst.openModal = openModal;
-	inst.isAnyModalActive = isAnyModalActive;
-	inst.modalState = modalState;
-	inst.init = init;
 	
-	window.mmm = modals;
-	window.wuk = inst;
+	window.uk = inst;
 	return inst;
 });

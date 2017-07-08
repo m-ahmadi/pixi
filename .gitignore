@@ -1,6 +1,5 @@
 node_modules/
 .sass-cache/*
 release/*
-dist/css/*
-dist/js/*
-dist/index.html
+src/lib/*/
+dist/*
