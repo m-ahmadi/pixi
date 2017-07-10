@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es3",
+    "module": "none",
+    "allowJs": false,
+	"baseUrl": "./src/ts/",
+    "outDir": "./dist/js/",
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+	"./dist",
+    "**/@*.ts"
+  ]
+}

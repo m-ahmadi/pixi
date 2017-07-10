@@ -1,42 +1,45 @@
-const CONF = require("./.sway/config");
-
 const gulp = require("gulp");
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// watching templates
 const shell = require("gulp-shell");
-const livereload = require("gulp-livereload");
+const p = "handlebars ./src/templates/partial/ -f ./dist/lib/partials.js -p -e hbs -m -o";
+const t = "handlebars ./src/templates/template/ -f ./dist/lib/templates.js -e hbs -m -o";
 
-gulp.task("html", shell.task([ CONF.C.html ]));
-gulp.task("sass", shell.task([ CONF.C.sass ]));
-gulp.task("temp", shell.task([ CONF.C.temp ]));
-gulp.task("js", shell.task([ CONF.C.js ]));
-gulp.task("all", shell.task( [CONF.C.all] ));
+gulp.task("part", shell.task([ p ]));
+gulp.task("temp", shell.task([ t ]));
 
-gulp.task("html-w", shell.task([ CONF.C.w.html ]));
-gulp.task("sass-w", shell.task([ CONF.C.w.sass ]));
-gulp.task("temp-w", () => {
-	gulp.watch(`${CONF.I.TEMP}/**`, ["temp"]);
+gulp.task("part-w", () => {
+	gulp.start("part");
+	gulp.watch("./src/templates/partial/**", ["part"]);
 });
-gulp.task("js-w", shell.task([ CONF.C.w.js ]));
-
-gulp.task( "default", ["all"] );
+gulp.task("temp-w", () => {
+	gulp.start("temp");
+	gulp.watch("./src/templates/template/**", ["temp"]);
+});
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // livereload
+const livereload = require("gulp-livereload");
+const h = "./dist/index.html";
+const c = "./dist/css/**/*.css";
+const j = "./dist/js/**/*.js";
+
 gulp.task("live-html", () => {
-	gulp.src(CONF.O.HTML)
+	gulp.src(h)
 		.pipe( livereload() );
 });
 gulp.task("live-css", () => {
-	gulp.src(`${CONF.O.CSS}**/*.css`)
+	gulp.src(c)
 		.pipe( livereload() );
 });
 gulp.task("live-js", () => {
-	gulp.src(`${CONF.O.JS}**/*.js`)
+	gulp.src(j)
 		.pipe( livereload() );
 });
-gulp.task("livereload", () => {
+gulp.task("live", () => {
 	livereload.listen();
 	
-	gulp.watch(CONF.O.HTML, ["live-html"]);
-	gulp.watch(`${CONF.O.CSS}**/*`, ["live-css"]);
-	gulp.watch(`${CONF.O.JS}**/*`, ["live-js"]);
+	gulp.watch(h, ["live-html"]);
+	gulp.watch(c, ["live-css"]);
+	gulp.watch(j, ["live-js"]);
 });
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
