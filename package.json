@@ -16,6 +16,7 @@
     "@types/jquery": "^3.2.6",
     "@types/jquery-mousewheel": "^3.1.7",
     "@types/pixi.js": "^4.5.1",
+    "@types/requirejs": "^2.1.29",
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "body-parser": "^1.17.1",

@@ -2,11 +2,14 @@
   "compilerOptions": {
     "target": "es3",
     "module": "none",
-    "allowJs": false,
 	"baseUrl": "./src/ts/",
     "outDir": "./dist/js/",
+	"typeRoots" : ["./node_modules/@types", "./src/ts/typings"],
     "strict": true
   },
+  "include": [
+    "./src/ts/**/*"
+  ],
   "exclude": [
     "node_modules",
 	"./dist",
