@@ -4,11 +4,13 @@ interface MapConfig {
 	height?: number;
 	bgColor?: number;
 }
-
+ 
 export default class Map {
+	private container: HTMLElement | JQuery;
 	private renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 	
     constructor(conf: MapConfig) {
+		this.container = <HTMLElement>conf.container;
 		this.renderer = PIXI.autoDetectRenderer(
 			window.innerWidth,
 			window.innerHeight,
@@ -17,7 +19,7 @@ export default class Map {
 				antialias: true
 			}
 		);
-		document.body.appendChild( this.renderer.view );
+		this.container.appendChild(this.renderer.view);
 
     }
 
