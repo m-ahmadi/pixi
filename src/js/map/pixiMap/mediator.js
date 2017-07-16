@@ -1,5 +1,17 @@
-define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/ajax'], function (wpix, tpl, navigation, popupManager, wuk, ajax) {
-	var inst = {},
+define([
+	"./wpix",
+	"./tpl",
+	"./navigation",
+	"./popupManager",
+	"core/uk"
+], function (
+	wpix,
+	tpl,
+	navigation,
+	popupManager,
+	uk
+) {
+	var inst = u.extend( newPubSub() ),
 		p = {};
 	
 	p.GLOBAL_BOUNDS = {
@@ -26,11 +38,11 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/a
 		
 		if (el) {
 			if (incX) {
-				pLeft = parseInt( el.css('left'), 10);
-				el.css('left', pLeft += incX);
+				pLeft = parseInt( el.css("left"), 10);
+				el.css("left", pLeft += incX);
 			} else if (incY) {
-				pTop = parseInt( el.css('top'), 10);
-				el.css('top', pTop += incY);
+				pTop = parseInt( el.css("top"), 10);
+				el.css("top", pTop += incY);
 			}
 		}
 	}
@@ -42,13 +54,13 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/a
 			abort();
 		}
 		
-		p.ajax = ajax({
+		/* p.ajax = ajax({
 			data: p.data
 		})
 		.done(function (data) {
 			wpix.clearContainer(container || "viewport");
 			tpl.draw(data, container || "viewport", p.bounds);
-		});
+		}); */
 	}
 	function pixiCallback(width, height) {
 		var w = width,
@@ -84,7 +96,7 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/a
 		console.log(p.data);
 		
 		// dataLoader.load(p.data);
-		var xhr = ajax({
+		/* var xhr = ajax({
 			data: p.data
 		})
 		.done(function ( data ) { // {url: "js/d.txt"}
@@ -93,8 +105,8 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/a
 			tpl.draw(data, "viewport");
 		})
 		.fail(function (a, b, c) {
-			wuk.note.error('Request for initial draw has failed.')
-		});
+			uk.note.error("Request for initial draw has failed.")
+		}); */
 	}
 	function panCallback(pos) {
 		movePopup(pos);
@@ -285,17 +297,17 @@ define(['./wpix', './tpl', './navigation', './popupManager', 'core/wuk', 'core/a
 	function addCustomEvents() {
 		// wpix.on("pan", panCallback);
 		// wpix.on("zoom", zoomCallback);
-		wpix.on('inboundPanX', function (dx) {
+		wpix.on("inboundPanX", function (dx) {
 			movePopup(dx);
 		});
-		wpix.on('inboundPanY', function (dy) {
+		wpix.on("inboundPanY", function (dy) {
 			movePopup(undefined, dy);
 		});
-		wpix.on('zoom', popup);
-		/* wpix.on('panMouseDown', function () {
+		wpix.on("zoom", popup);
+		/* wpix.on("panMouseDown", function () {
 			popupManager.hideActive();
 		});
-		wpix.on('panMouseUp', function () {
+		wpix.on("panMouseUp", function () {
 			popupManager.showActive();
 		}); */
 		

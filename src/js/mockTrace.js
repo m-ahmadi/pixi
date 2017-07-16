@@ -1,5 +1,5 @@
-define(['map/mediator', 'core/wuk'], function (map, wuk) {
-	var note = wuk.note;
+define(['map/mediator', 'core/uk'], function (map, uk) {
+	var note = uk.note;
 	var msgCounter = 0;
 	
 	function onmessage(v) {

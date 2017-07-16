@@ -1,5 +1,5 @@
-define(["map/mediator", "core/wuk"], function (map, wuk) { // wpix, tpl, wuk, u
-	var note = wuk.note,
+define(["map/mediator", "core/uk"], function (map, uk) { // wpix, tpl, uk, u
+	var note = uk.note,
 		ws = {},
 		path = "ws://"+ baseRoot +"/network/icmp/traceroute", // window.location.host
 		openCallback,
@@ -44,10 +44,10 @@ define(["map/mediator", "core/wuk"], function (map, wuk) { // wpix, tpl, wuk, u
 		}
 	}
 	function closeModal() {
-		wuk.closeModal("#modal_traceroute");
+		uk.closeModal("#modal_traceroute");
 	}
 	function begin() {
-		wuk.openModal("#modal_traceroute");
+		uk.openModal("#modal_traceroute");
 	}
 	function closeSidebar() {
 		var sb = $("#newSide")
@@ -142,7 +142,7 @@ define(["map/mediator", "core/wuk"], function (map, wuk) { // wpix, tpl, wuk, u
 	}
 	function onclose(e) {
 		console.log("Connection closed", e);
-		wuk.enable(scanBtn);
+		uk.enable(scanBtn);
 		
 		
 		noteMsgs.init.close();
@@ -171,9 +171,9 @@ define(["map/mediator", "core/wuk"], function (map, wuk) { // wpix, tpl, wuk, u
 		console.log(ws);
 	}
 	function trace(arr, opt) {
-		noteMsgs.init = wuk.note.process("Opening socket...", false, "top-center");
+		noteMsgs.init = uk.note.process("Opening socket...", false, "top-center");
 		
-		wuk.disable(scanBtn);
+		uk.disable(scanBtn);
 		
 		createSock(opt);
 		addHandlers(function () {

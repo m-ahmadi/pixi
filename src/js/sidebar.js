@@ -1,4 +1,4 @@
-define(["core/wuk"], function (wuk) {
+define(["core/uk"], function (uk) {
 	const ROOT = "#sidebar";
 	let sidebar, els;
 	
@@ -30,7 +30,7 @@ define(["core/wuk"], function (wuk) {
 		});
 		$(document).on("keydown", function (e) {
 			if (e.keyCode === 27) {
-				if ( !wuk.isAnyModalActive() ) {
+				if ( !uk.isAnyModalActive() ) {
 					if ( !sidebar.is(":animated") ) {
 						sidebar.toggle("slide");
 					}

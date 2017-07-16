@@ -1,11 +1,11 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var app = require("express")();
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
+var u = require("util-ma");
 var port = 2000;
-var u = require('./u');
 var MAX_DRAWING_ITERATIONS = 90;
 
-app.get('/', function (req, res) {
+app.get("/", function (req, res) {
 	// 
 });
 
@@ -23,7 +23,7 @@ function generate(socket) {
 	
 	for (i=0; i<max; i+=1 ) {
 		node = {};
-		id = 'node_'+ (nodeCounter+=1);
+		id = "node_"+ (nodeCounter+=1);
 			
 		ids.push(id);
 		
@@ -40,7 +40,7 @@ function generate(socket) {
 	
 	for (i=0; i<max; i+=1 ) {
 		link = {};
-		id = 'link_'+ (linkCounter+=1);
+		id = "link_"+ (linkCounter+=1);
 		
 		d = rand();
 		while ( d.srcId === d.destId ||
@@ -79,14 +79,14 @@ function generate(socket) {
 	data.links = links;
 	
 	
-	socket.emit('server msg', data);
+	socket.emit("server msg", data);
 }
 
 var timeoutId;
 var count = 0;
-io.on('connection', function (socket) {
-	console.log('a user connected');
-	socket.on('start sending', function () {
+io.on("connection", function (socket) {
+	console.log("a user connected");
+	socket.on("start sending", function () {
 		ttt();
 		function ttt() {
 			if (count < MAX_DRAWING_ITERATIONS) {
@@ -98,12 +98,12 @@ io.on('connection', function (socket) {
 			count += 1;
 		}
 	});
-	socket.on('disconnect', function () {
-		console.log('user disconnected');
+	socket.on("disconnect", function () {
+		console.log("user disconnected");
 		clearTimeout(timeoutId);
 	});
 });
 
 http.listen(port, function () {
-	console.log('listening on *:'+port);
+	console.log("listening on *:"+port);
 });

@@ -1,4 +1,4 @@
-define([/* './pixiMap/mediator',  */'./visMap/mediator'], function (/* pixiMap,  */ visMap) {
+define(['./pixiMap/mediator', './visMap/mediator'], function (pixiMap, visMap) {
 	var inst = {},
 		mapType = '',
 		map = {};

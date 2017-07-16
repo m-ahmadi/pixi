@@ -1,6 +1,6 @@
 define([
-	"core/wuk"
-], (wuk) => {
+	"core/uk"
+], (uk) => {
 	const ROOT = "#header";
 	const c = {
 		DEFAULT: " ", // amber lighten-5

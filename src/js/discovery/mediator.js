@@ -1,4 +1,4 @@
-define(["core/wuk"], function (wuk) {
+define(["core/uk"], function (uk) {
 	let inst = u.extend( newPubSub() );
 	
 	const DISCOVERY = "#modal_discovery";
@@ -47,10 +47,10 @@ define(["core/wuk"], function (wuk) {
 		};
 	}
 	function closeModal() {
-		wuk.closeModal(DISCOVERY);
+		uk.closeModal(DISCOVERY);
 	}
 	function begin() {
-		wuk.openModal(DISCOVERY);
+		uk.openModal(DISCOVERY);
 		reset();
 	}
 	function closeSidebar() {
@@ -81,7 +81,7 @@ define(["core/wuk"], function (wuk) {
 				valid = false;
 			}
 		});
-		valid ? wuk.enable(startBtn) : wuk.disable(startBtn);
+		valid ? uk.enable(startBtn) : uk.disable(startBtn);
 	}
 	function discover() {
 		// discover( first, second, parseInt(type, 10) );
@@ -185,7 +185,7 @@ define(["core/wuk"], function (wuk) {
 			toSend.ip          = type === 1 ? first  : "";
 			toSend.subnet      = type === 1 ? second : "";
 			
-			wuk.openModal(SNMP_CREDS);
+			uk.openModal(SNMP_CREDS);
 			els2.table.find("[data-input]:last").focus();
 		});
 		els2.addnew.on("click", () => {
@@ -198,17 +198,17 @@ define(["core/wuk"], function (wuk) {
 		});
 		els2.prev.on("click", () => {
 			toSend.snmp_credentials = [];
-			wuk.openModal(DISCOVERY);
+			uk.openModal(DISCOVERY);
 		});
 		els2.next.on("click", () => {
 			toSend.snmp_credentials = [];
 			els2.table.find("[data-input]").each((i, j) => {
 				toSend.snmp_credentials.push( $(j).val() );
 			});
-			wuk.openModal(SNMP_TIMES);
+			uk.openModal(SNMP_TIMES);
 		});
 		els3.prev.on("click", () => {
-			wuk.openModal(SNMP_CREDS);
+			uk.openModal(SNMP_CREDS);
 		});
 		els3.input1.on("blur", e => els3.slider1[0].noUiSlider.set(e.target.value));
 		els3.input2.on("blur", e => els3.slider2[0].noUiSlider.set(e.target.value));
@@ -219,7 +219,7 @@ define(["core/wuk"], function (wuk) {
 			toSend.snmp_retries      = parseInt( els3.slider3[0].noUiSlider.get(), 10 ).toFixed();
 			
 			inst.emit("submit", toSend);
-			wuk.closeModal(SNMP_TIMES);
+			uk.closeModal(SNMP_TIMES);
 			reset();
 		});
 		

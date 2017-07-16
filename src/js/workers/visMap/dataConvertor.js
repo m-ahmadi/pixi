@@ -1,9 +1,9 @@
-const JS = "../../../";
-importScripts("/pixi/dist/lib/handlebars/handlebars.runtime.js")
-importScripts("/pixi/dist/lib/templates.js");
+var ROOT = "../../../";
+importScripts(ROOT+"lib/handlebars/handlebars.runtime.js")
+importScripts(ROOT+"lib/templates.js");
 
 // let template = nodepopup;
-let template = Handlebars.templates.nodepopup;
+var template = Handlebars.templates.nodepopup;
 
 self.onmessage = function (e) {
 	var data = e.data,

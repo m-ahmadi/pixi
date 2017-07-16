@@ -1,4 +1,4 @@
-define(['./wpix', 'core/whb'], function (wpix, u, whb) {
+define(['./wpix'], function (wpix, u) {
 	var activeBox,
 		cbX = {
 			min: 0,
@@ -25,7 +25,6 @@ define(['./wpix', 'core/whb'], function (wpix, u, whb) {
 	});
 	function create(data, pos) {
 		removeAll();
-	//	var div = whb.tmpl.bubble(data),
 		var div = Handlebars.templates.bubble(data),
 			left, top;
 		

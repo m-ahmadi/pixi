@@ -1,6 +1,6 @@
 define([
-	"core/wuk"
-] , (wuk) => {
+	"core/uk"
+] , (uk) => {
 	const inst = u.extend( newPubSub() );
 	const ROOT = "#members";
 	const MODAL = "#modal_member"
@@ -17,10 +17,10 @@ define([
 		els.wrap.height(window.innerHeight - header);
 		
 		els.add.on("click", () => {
-			wuk.openModal(MODAL);
+			uk.openModal(MODAL);
 		});
 		els.table.on("click", "button[data-edit]", () => {
-			wuk.openModal(MODAL);
+			uk.openModal(MODAL);
 		});
 		els.table.on("click", "button[data-remove]", (e) => {
 			$(e.target).parent().parent().remove();
@@ -43,10 +43,10 @@ define([
 	
 	
 	inst.show = () => {
-		wuk.show(root);
+		uk.show(root);
 	};
 	inst.hide = () => {
-		wuk.hide(root);
+		uk.hide(root);
 	};
 	
 	inst.init = init;

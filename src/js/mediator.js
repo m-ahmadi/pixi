@@ -1,27 +1,40 @@
 define([
 	"core/config",
 	"core/mainSocket",
-	"core/wuk",
+	"core/uk",
 	"map/mediator",
 	"./sidebar",
 	"./header",
 	"./traceroute",
 	"./discovery/mediator",
 	"members/mediator"
-], function (conf, mainSocket, wuk, map, sidebar, header, traceroute, discovery, members) {
+], function (
+	conf,
+	mainSocket,
+	uk,
+	map,
+	sidebar,
+	header,
+	traceroute,
+	discovery,
+	members
+) {
 	const inst = u.extend( newPubSub() );
-	const note = wuk.note;
+	const note = uk.note;
 	
 	
 	function request(o) {
 		$.ajax({
-			url: `${conf.JAX}cmd`,
+			url: `${conf.JX}cmd`,
 			method: "POST",
 			contentType: "application/json",
 			data: JSON.stringify(o)
 		})
 		.done()
-		.fail( () => note.error("requeste ke cmd mizane fail shod)") );
+		.fail( x => {
+			debugger
+			note.error("")
+		} );
 	}
 	function addCustomEvts() {
 		header.on("menu_clicked", () => {
@@ -78,7 +91,8 @@ define([
 		mainSocket.init();
 	}
 	function onReady() {
-		map.init("visMap", "#map_container");
+	//	map.init("visMap", "#map_container");
+		map.init("pixiMap", "#map_container");
 		sidebar.init();
 		header.init();
 		traceroute.init();

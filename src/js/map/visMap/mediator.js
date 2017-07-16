@@ -1,9 +1,9 @@
 define([
 	"core/config",
 	"core/mainSocket",
-	"core/wuk",
+	"core/uk",
 	"./groups"
-], (CONF, mainSocket, wuk, groups) => {
+], (CONF, mainSocket, uk, groups) => {
 	const WORKERS_DIR = `${CONF.ROOT}js/map/visMap/workers`;
 	
 	let inst = u.extend( newPubSub() );
@@ -160,7 +160,7 @@ define([
 	function init(elementId) {
 		var width = window.innerWidth,
 			height = window.innerHeight,
-			hW = width / 2;
+			hW = width / 2,
 			hH = height / 2;
 		
 		g.nodes = new vis.DataSet();
@@ -376,10 +376,10 @@ define([
 		g.edges.clear();
 	};
 	inst.show = () => {
-		wuk.show(g.container);
+		uk.show(g.container);
 	};
 	inst.hide = () => {
-		wuk.hide(g.container);
+		uk.hide(g.container);
 	};
 	inst.g = g;
 	

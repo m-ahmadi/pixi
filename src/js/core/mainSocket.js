@@ -1,8 +1,8 @@
-define(["./config", "./wuk"], function (conf, wuk) {
+define(["./config", "./uk"], function (conf, uk) {
 	const inst = u.extend( newPubSub() );
 	
 	const URL = conf.WS + "socket/open";
-	const note = wuk.note;
+	const note = uk.note;
 	
 	let ws = {};
 	let opened = false;
