@@ -32,7 +32,6 @@ define([
 		})
 		.done()
 		.fail( x => {
-			debugger
 			note.error("")
 		} );
 	}

@@ -336,6 +336,8 @@ define([
 	inst.bounds = p.bounds;
 	
 	// getters
+	inst.hide = wpix.hide;
+	inst.show = wpix.show;
 	Object.defineProperties(inst, {
 		"width": {
 			get: function () { return wpix.renderer.width; }

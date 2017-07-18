@@ -718,6 +718,12 @@ define([], function () {
 		}
 	});
 	
+	inst.hide = () => {
+		p.renderer.view.style.display = "none";
+	};
+	inst.show = () => {
+		p.renderer.view.style.display = "";
+	};
 	inst.init = init;
 	inst.coPoint = coPoint;
 	inst.clearContainer = clearContainer;

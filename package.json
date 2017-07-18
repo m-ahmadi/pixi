@@ -20,6 +20,7 @@
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
     "express": "^4.15.3",
     "gulp": "^3.9.1",
     "gulp-cli": "^1.3.0",
@@ -28,8 +29,8 @@
     "handlebars": "^4.0.10",
     "htmlbilder": "^0.1.6",
     "requirejs": "^2.3.3",
-    "socket.io": "^1.7.2",
-    "util-ma": "^1.0.9"
+    "util-ma": "^1.0.9",
+    "ws": "^3.0.0"
   },
   "dependencies": {}
 }

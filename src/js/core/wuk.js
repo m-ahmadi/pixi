@@ -1,7 +1,6 @@
 define(() => {
-	let inst = {};
-	let modals = {};
-	
+	var inst = {},
+		modals = {};
 	const DISPLAY = "no-display";
 	
 	function getModal(str) {
@@ -20,13 +19,13 @@ define(() => {
 	}
 	function closeModal(s) {
 		let m = getModal(s);
-		if ( m.isToggled() ) {
+		if ( m.isActive() ) {
 			m.hide();
 		}
 	}
 	function openModal(s) {
 		let m = getModal(s);
-		if ( !m.isToggled() ) {
+		if ( !m.isActive() ) {
 			m.show();
 		}
 	}
@@ -38,11 +37,14 @@ define(() => {
 		}
 	}
 	function isAnyModalActive() {
-		let res = false;
-		Object.keys(modals).forEach(k => {
-			if ( modals[k] === true ) res = true;
+		var result = false;
+		Object.keys(modals).forEach(function (k) {
+			if ( modals[k] === true ) {
+				result = true;
+			}
 		});
-		return res;
+		return result;
+		// return u.isEmptyObj(modals) ? false : true;
 	}
 	let note = (function () {
 		const DEFAULT_MSG = "NO_MESSAGE_WAS_SPECIFIED";
@@ -85,7 +87,7 @@ define(() => {
 				message:  icon +" "+ (msg || DEFAULT_MSG),
 				status:   status,
 				timeout:  u.isNum(timeout) ? timeout : 1000,
-				pos:      pos || "top-right"
+				pos:      pos     || "bottom-right"
 			});
 			
 			return res;
@@ -113,6 +115,18 @@ define(() => {
 			process: process
 		};
 	}());
+	function init() {
+		
+		/* $("a[href^="#modal_"]").on("click", function (e) {
+			modalState(true, e.target.hash.substr(1));
+		}); */
+		$("div[id^='modal_']").on("beforeshow", function (e) {
+			modalState(true, e.target.id);
+		});
+		$("div[id^='modal_']").on("hide", function (e) {
+			modalState(false, e.target.id);
+		});
+	}
 	
 	inst.toggleDisplay = ($el) => {
 		$el.hasClass(DISPLAY) ? $el.removeClass(DISPLAY): $el.addClass(DISPLAY);
@@ -126,25 +140,14 @@ define(() => {
 	inst.note = note;
 	inst.disable = disable;
 	inst.enable = enable;
+	inst.getModal = getModal;
 	inst.closeModal = closeModal;
 	inst.openModal = openModal;
 	inst.isAnyModalActive = isAnyModalActive;
-	inst.init = () => {
-		$("div[id^='modal_']").on("beforeshow", e => {
-			modalState(true, e.target.id);
-		});
-		$("div[id^='modal_']").on("hide", e => {
-			modalState(false, e.target.id);
-		});
-	};
-	window.uk = inst;
+	inst.modalState = modalState;
+	inst.init = init;
+	
+	window.mmm = modals;
+	window.wuk = inst;
 	return inst;
 });
-
-
-
-
-
-
-
-

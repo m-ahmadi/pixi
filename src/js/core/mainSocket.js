@@ -26,11 +26,11 @@ define(["./config", "./uk"], function (conf, uk) {
 		};
 		ws.onmessage = function (e) {
 			if ( u.isStr(e.data) ) {
-				console.log("String message received", e.data);
+				// console.log("String message received", e.data);
 				
 				inst.emit( "message", JSON.parse(e.data) );
 			} else {
-				console.log("Other message received", e.data);
+				// console.log("Other message received", e.data);
 			}
 		};
 		ws.onerror = function (e) {
