@@ -1,3 +1,5 @@
+import "./interfaces";
+
 interface LineConfig {
 	start: Point;
 	end: Point;
@@ -20,7 +22,6 @@ function createElement(): PIXI.Sprite {
 	let line = new Sprite();
 	line.interactive = true;
 	line.buttonMode = true;
-	line.lineStyle(0);
 	return line;
 }
 function calcProps(start: Point, end: Point): SpriteLineProps {

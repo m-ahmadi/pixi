@@ -4,6 +4,38 @@ interface MapConfig {
 	height?: number;
 	bgColor?: number;
 }
+interface Node {
+	id: number;
+	name: string;
+	x: number;
+	y: number;
+	links: number[] | boolean;
+	type: number;
+	management_ip: string;
+	manufacturer: string;
+	mode: string;
+	open_ports: number[];
+	serial: string;
+	last_seen: number;
+	last_update: number;
+}
+interface Link {
+	id: number;
+	src: number;
+	dest: number;
+}
+interface Nodes {
+	[key: string]: Node;
+}
+interface Links {
+	[key: string]: Link;
+}
+interface MapData {
+	type: string;
+	append: boolean;
+	nodes: Nodes;
+	links: Links;
+}
  
 export default class Map {
 	private container: HTMLElement | JQuery;
@@ -21,6 +53,12 @@ export default class Map {
 		);
 		this.container.appendChild(this.renderer.view);
 
-    }
+	}
+	public clear() {
+		
+	}
+	public draw() {
+
+	}
 
 }
