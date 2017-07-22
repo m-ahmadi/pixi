@@ -1,44 +1,12 @@
 Topology Front
 ===================
 
-### Building and Compiling:
+### Build:
 
-npm install m-ahmadi/sway-cli -g
+`npm install`  
+`bower install` (if failed add: `--allow-root`)  
+`bash buildr.sh`  
 
-  1. *`cd topology-front`*
-  2. Prepend *`sway`* to the command and run it.  
-For example: *`sway sass`*
-
-
-sway commands:
-
-Command                         | Description
-------------------------------- | ---------------------------------------------------------------------------------------
-`html`           | Compile HTML.
-`sass`           | Compile Sass.
-`temp`           | Compile dynamic templates.
-`js`             | Compile JavaScript.
-`html-w`         | Watch HTML.
-`sass-w`         | Watch Sass.
-`temp-w`         | Watch dynamic templates.
-`js-w`           | Watch JavaScript
-`compile`        | Compile everything.
-`live`           | Enable livereload for: dist/index.html, dist/css and dist/js
-`env [name]`     | Show current environment, or change it.
-`lib [which]`    | Build lib based on current environment.
-`libs`           | Build all libs.
-`build [env]`    | Build libs and compile. You can specify another env.
-`release`        | Custom release.
-`release-hard`   | Build and compile release-hard.
-`sync`           | Sync the local Sway config with the global one.
-
-npm run commands
-
-Command                         | Description
-------------------------------- | ---------------------------------------------------------------------------------------
-`fakeData`       | Run fake data server on localhost:3000
-    
-    
 ### Documentation Page
 In order to see the documentation page:
 

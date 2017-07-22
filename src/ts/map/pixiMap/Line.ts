@@ -1,4 +1,4 @@
-import "./interfaces";
+import "./global-interfaces";
 
 interface LineConfig {
 	start: Point;

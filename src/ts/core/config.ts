@@ -1,21 +1,16 @@
-define(() => {
-	const t = {
-		HTTP:   "http://",
-		WS:     "ws://"
-	};
-	const h = {
-		LOCAL:  "127.0.0.1",
-		REMOTE: "192.168.10.13"
-	};
-	const p = {
-		MAIN:   3000
-	};
+const PROT_1 = "http://";
+const PROT_2 = "ws://";
+const HOST_1 = "127.0.0.1";
+const HOST_2 = "192.168.10.13";
+const PORT = 3000;
+
+const config = {
+	ROOT:    "",
+	JX:      PROT_1 + HOST_1 +":"+ PORT + "/",
+	WS:      PROT_2 + HOST_1 +":"+ PORT + "/",
 	
-	return {
-		ROOT:    "",
-		JAX:     t.HTTP + h.LOCAL  + `:${p.MAIN}/`,
-		WS:      t.WS   + h.LOCAL  + `:${p.MAIN}/`,
-		JAX_ALT: t.HTTP + h.REMOTE + `:${p.MAIN}/`,
-		WS_ALT:  t.WS   + h.REMOTE  + `:${p.MAIN}/`
-	};
-});
+	JX_ALT:  PROT_1 + HOST_2 +":"+ PORT + "/",
+	WS_ALT:  PROT_2 + HOST_2 +":"+ PORT + "/",
+};
+
+export default config

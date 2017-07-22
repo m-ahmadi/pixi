@@ -77,7 +77,7 @@ define([], function () {
 			}
 		});
 		$('#contextmenu').on('contextmenu', function (e) {
-			e.preventDefault(); // ctxmenu_wrap
+			// e.preventDefault(); // ctxmenu_wrap
 		});
 		
 		createContainers();
