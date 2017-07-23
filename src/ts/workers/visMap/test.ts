@@ -1,4 +1,4 @@
 onmessage = function (e) {
 	console.log(e.data);
-	postMessage("worker says hello");
+	postMessage("worker says hello", "");
 };

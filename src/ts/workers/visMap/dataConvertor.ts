@@ -10,9 +10,9 @@ self.onmessage = function (e) {
 		oldNodes = data.nodes,
 		oldLinks = data.links,
 		nodeTypes = data.nodeTypes,
-		newData = {},
-		newNodes = [],
-		newEdges = [],
+		newData: any = {},
+		newNodes: any = [],
+		newEdges: any = [],
 		keys, i, len,
 		node, link, src, dest, status;
 	
@@ -84,7 +84,7 @@ self.onmessage = function (e) {
 	newData.nodes = newNodes;
 	newData.edges = newEdges;
 	
-	postMessage(newData);
+	postMessage(newData, "");
 };
 
 function nodepopup(ctx) {

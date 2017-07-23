@@ -1,13 +1,14 @@
-define([
-	"core/config",
-	"core/mainSocket",
-	"core/uk",
-	"./groups"
-], (CONF, mainSocket, uk, groups) => {
-	const WORKERS_DIR = `${CONF.ROOT}js/map/visMap/workers`;
+import {u, newPubSub} from "global-vars";
+
+import conf from "core/config";
+import mainSocket from "core/config";
+import uk from "core/uk";
+import groups from "./groups";
+
+	const WORKERS_DIR = `${conf.ROOT}js/map/visMap/workers`;
 	
 	let inst = u.extend( newPubSub() );
-	let g = {};
+	let g: any = {};
 	let tmpl = Handlebars.templates;
 	
 	g.network = {};
@@ -173,7 +174,6 @@ define([
 		g.network = new vis.Network(g.container[0], {nodes: g.nodes, edges: g.edges}, g.options);
 		g.network.on("dragEnd", changeNodePos);
 		g.network.on("click", workerHighlight); // workerHighlight neighbourhoodHighlight
-		window.network = g.network;
 		
 		$(window).on("resize", function () {
 			g.container.height(conHeight);
@@ -209,10 +209,10 @@ define([
 		var t0 = performance.now();
 		
 		var network,
-			nodes,
-			edges,
+			nodes: any,
+			edges: any,
 			k, i, node, edge, hiddenLabel, len, originalColor,
-			keys,
+			keys: any,
 			targetId,
 			connectedNodes, connectedEdges,
 			o = {returnType: "Object"},
@@ -383,6 +383,4 @@ define([
 	};
 	inst.g = g;
 	
-	window.visMap = g;
-	return inst;
-});
+export default inst

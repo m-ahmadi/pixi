@@ -1,5 +1,3 @@
-define(function () {
-	
 var nodes = [
   {id: 1, label: 'Abdelmoumene Djabou', title: 'Country: ' + 'Algeria' + '<br>' + 'Team: ' + 'Club Africain', value: 22, group: 24, x: -1392.5499, y: 1124.1614},
   {id: 2, label: 'Abel Aguilar', title: 'Country: ' + 'Colombia' + '<br>' + 'Team: ' + 'Toulouse', value: 24, group: 11, x: -660.82574, y: 1009.18976},
@@ -747,7 +745,7 @@ const DIR = "images/vis/demo/";
 function s(n) {
 	return `${DIR}${n}.png`;
 }
-nodes.forEach(function (itm, idx, arr) {
+nodes.forEach(function (itm:any, idx, arr) {
 	let val = itm.value;
 	itm.shape = "image";
 	itm.label = undefined;
@@ -10001,7 +9999,6 @@ var edges = [
   {from: 732, to: 733},
   {from: 734, to: 735}
 ];
-	
-	console.log(nodes.length, edges.length);
-	return {nodes, edges};
-});
+
+console.log(nodes.length, edges.length);
+export default {nodes, edges}

@@ -9,9 +9,9 @@ self.onmessage = function (e) {
 		edges = d.edges,
 		connectedNodes = d.connectedNodes,
 		connectedEdges = d.connectedEdges,
-		i, keys, len, node, edge,
-		toUpdateNodes = [],
-		toUpdateEdges = [];
+		i, keys, len, node, edge, hiddenLabel, originalColor,
+		toUpdateNodes: any = [],
+		toUpdateEdges: any = [];
 	
 	if (len > 0) {
 		highlightActive = true;
@@ -113,5 +113,5 @@ self.onmessage = function (e) {
 	self.postMessage({
 		nodes: toUpdateNodes,
 		edges: toUpdateEdges
-	});
+	}, "");
 }

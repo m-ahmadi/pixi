@@ -58,7 +58,7 @@ function begin() {
 function closeSidebar() {
 	let sb = $("#newSide")
 	if ( sb.is(":visible") ) {
-		sb.toggle("slide");
+		sb.toggle("fast");
 	}
 }
 function isValidIp(v) {
