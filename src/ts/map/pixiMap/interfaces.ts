@@ -18,15 +18,15 @@ interface TLink {
 	src: number;
 	dest: number;
 }
-interface TNodes {
-	[key: string]: Node;
+interface Nodes {
+	[key: string]: TNode;
 }
-interface TLinks {
+interface Links {
 	[key: string]: TLink;
 }
-interface T_MapData {
+interface MapData {
 	type: string;
 	append: boolean;
-	nodes: TNodes;
-	links: TLinks;
+	nodes: Nodes;
+	links: Links;
 }

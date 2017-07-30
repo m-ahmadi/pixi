@@ -6,8 +6,8 @@ interface RendererConfig {
 }
 
 export default class Renderer {
-	private container: HTMLElement;
 	private renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
+	public container: HTMLElement;
 	public topLayer: PIXI.Container;
 	
     constructor(conf: RendererConfig) {

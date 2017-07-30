@@ -43,9 +43,6 @@ function addCustomEvts() {
 	sidebar.on("discovery_item_clicked", () => {
 		discovery.begin();
 	});
-	mainSocket.on("open", (e: any) => {
-		request({action: "all_nodes"});
-	});
 	mainSocket.on("message", (e: any) => {
 		if (e.type === "graph_response") {
 			delete e.type;
@@ -76,6 +73,9 @@ function addCustomEvts() {
 	});
 }
 function beforeReady() {
+	mainSocket.on("open", (e: any) => {
+		request({action: "all_nodes"});
+	});
 	mainSocket.init();
 }
 function onReady() {

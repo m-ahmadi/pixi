@@ -16,8 +16,6 @@ var makeDraggable = (function () {
 	var isDragging, prevX, prevY;
 	function start(e) {
 		var pos = e.data.global;
-		isDragging = true;
-		
 		this.alpha = 0.5;
 		prevX = pos.x;
 		prevY = pos.y;

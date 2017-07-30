@@ -1,4 +1,4 @@
-import pixiMap from "./pixiMap/mediator/main";
+import pixiMap from "./pixiMap/main";
 import visMap from "./visMap/mediator";
 
 var inst: any = {},

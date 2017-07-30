@@ -22,7 +22,6 @@ function init() {
 		note.success("WebSocket opened.");
 		console.log("Connection open...", e);
 		opened = true;
-		
 		inst.emit("open");
 	};
 	ws.onmessage = function (e: any) {
