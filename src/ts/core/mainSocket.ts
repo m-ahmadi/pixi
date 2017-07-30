@@ -1,4 +1,3 @@
-import {u, newPubSub} from "global-vars";
 import conf from "core/config";
 import uk from "core/uk";
 
@@ -18,7 +17,7 @@ function init() {
 	processNote = note.process("Opening WebSocket connection...");
 	ws = new WebSocket(URL);
 	
-	ws.onopen = function (e) {
+	ws.onopen = function (e: JQueryEventObject) {
 		processNote.close();
 		note.success("WebSocket opened.");
 		console.log("Connection open...", e);
@@ -26,7 +25,7 @@ function init() {
 		
 		inst.emit("open");
 	};
-	ws.onmessage = function (e) {
+	ws.onmessage = function (e: any) {
 		if ( u.isStr(e.data) ) {
 			// console.log("String message received", e.data);
 			
@@ -35,12 +34,12 @@ function init() {
 			// console.log("Other message received", e.data);
 		}
 	};
-	ws.onerror = function (e) {
+	ws.onerror = function (e: any) {
 		processNote.close();
 		note.error("WebSocket could not be opened.");
 		console.log("WebSocket Error: " , e);
 	};
-	ws.onclose = function (e) {
+	ws.onclose = function (e: any) {
 		opened = false;
 		console.log("Connection closed", e);
 	};

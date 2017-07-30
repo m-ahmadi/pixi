@@ -1,4 +1,3 @@
-import {u, newPubSub, noUiSlider} from "global-vars";
 import uk from "core/uk";
 
 let inst = u.extend( newPubSub() );

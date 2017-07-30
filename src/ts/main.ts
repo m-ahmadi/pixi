@@ -6,7 +6,7 @@ require.config({
 });
 
 require(["./mediator"], function (page: any) {
-	
+	page = page.default;
 	page.beforeReady();
 	
 	$(function () {

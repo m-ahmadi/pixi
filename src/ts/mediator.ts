@@ -1,5 +1,3 @@
-import {u, newPubSub} from "global-vars";
-
 import conf from "core/config";
 import mainSocket from "core/mainSocket";
 import uk from "core/uk";

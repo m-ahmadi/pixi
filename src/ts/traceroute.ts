@@ -1,4 +1,3 @@
-import {u, newPubSub, noUiSlider} from "global-vars";
 import uk from "core/uk";
 import map from "map/mediator";
 
@@ -56,7 +55,7 @@ function closeSidebar() {
 	var sb = $("#newSide")
 	
 	if ( sb.is(":visible") ) {
-		sb.toggle("slide");
+		sb.toggle("fast");
 	}
 }
 function prepare() {
@@ -212,9 +211,11 @@ function init() {
 	});
 }
 
-export {
+const inst = {
 	abort,
 	trace,
 	begin,
 	init
 };
+
+export default inst

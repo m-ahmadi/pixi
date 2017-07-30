@@ -4,7 +4,8 @@
   "description": "Network topology visualizer and tools.",
   "version": "1.0.0",
   "scripts": {
-    "fakeData": "node scripts/data"
+    "fakeData": "node scripts/data",
+    "newSer": "node scripts/newServer/server"
   },
   "author": "Mohammad Ahmadi",
   "repository": {
@@ -13,6 +14,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/handlebars": "^4.0.34",
     "@types/jquery": "^3.2.6",
     "@types/jquery-mousewheel": "^3.1.7",
     "@types/pixi.js": "^4.5.1",
@@ -32,8 +34,5 @@
     "util-ma": "^1.0.9",
     "ws": "^3.0.0"
   },
-  "dependencies": {
-    "@types/handlebars": "^4.0.34",
-    "@types/vis": "^4.18.3"
-  }
+  "dependencies": {}
 }

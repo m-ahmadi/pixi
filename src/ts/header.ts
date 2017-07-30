@@ -1,4 +1,3 @@
-import {u, newPubSub} from "global-vars";
 const inst = u.extend( newPubSub() );
 const ROOT = "#header";
 const c = {

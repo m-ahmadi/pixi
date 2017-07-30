@@ -1,5 +1,3 @@
-import {u, newPubSub, UIkit} from "global-vars";
-
 let inst: any = {};
 let modals: any = {};
 
@@ -54,7 +52,7 @@ let note = (function () {
 		ERROR:   '<i class="fa  fa-exclamation-triangle  fa-lg"  aria-hidden="true"></i>',
 		PROCESS: '<i class="fa  fa-refresh               fa-lg   fa-fw fa-spin"></i>',
 	};
-	function make(o) {
+	function make(o: any) {
 		var v;
 		
 		v = UIkit.notification(o);
@@ -114,7 +112,7 @@ let note = (function () {
 		process: process
 	};
 }());
-	
+
 inst.toggleDisplay = ($el: JQuery) => {
 	$el.hasClass(DISPLAY) ? $el.removeClass(DISPLAY): $el.addClass(DISPLAY);
 };

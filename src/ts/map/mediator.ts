@@ -1,9 +1,9 @@
-import pixiMap from "./pixiMap/mediator";
+import pixiMap from "./pixiMap/mediator/main";
 import visMap from "./visMap/mediator";
 
 var inst: any = {},
 	mapType = '',
-	map = {};
+	map:any = {};
 
 
 function init(type, conf) {

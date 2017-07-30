@@ -1,4 +1,3 @@
-import {u, newPubSub} from "global-vars";
 import uk from "core/uk";
 
 const inst = u.extend( newPubSub() );

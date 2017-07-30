@@ -1,5 +1,3 @@
-import {u, newPubSub} from "global-vars";
-
 import conf from "core/config";
 import mainSocket from "core/config";
 import uk from "core/uk";
@@ -75,7 +73,8 @@ import groups from "./groups";
 	};
 	
 	var t0, t1;
-	
+
+	declare var window: any;
 	function createWorker() {
 		if (window.Worker) {
 			g.dataConvertor = new Worker(`${WORKERS_DIR}/dataConvertor.js`);
@@ -110,7 +109,7 @@ import groups from "./groups";
 	function convertData(data) {
 		var oldNodes = data.nodes,
 			oldLinks = data.links,
-			newData = {},
+			newData: any = {},
 			newNodes = [],
 			newEdges = [];
 		
@@ -216,8 +215,8 @@ import groups from "./groups";
 			targetId,
 			connectedNodes, connectedEdges,
 			o = {returnType: "Object"},
-			toUpdateNodes = [],
-			toUpdateEdges = [];
+			toUpdateNodes: any = [],
+			toUpdateEdges: any = [];
 			
 		
 		nodes = g.nodes.get(o);

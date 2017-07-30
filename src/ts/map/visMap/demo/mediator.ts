@@ -1,4 +1,3 @@
-import {u, newPubSub} from "global-vars";
 import worldcup from "./worldcup2014";
 import groups from "./groups";
 
@@ -126,7 +125,7 @@ function neighbourhoodHighlight(params) {
 	}
 
 	// transform the object into an array
-	var updateArray = [];
+	var updateArray: any = [];
 	for (nodeId in allNodes) {
 		if (allNodes.hasOwnProperty(nodeId)) {
 			updateArray.push(allNodes[nodeId]);
