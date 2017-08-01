@@ -1,42 +1,48 @@
 PIXI.utils.skipHello();
-var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {backgroundColor: 0xf6e495, antialias: true});
+var renderer = PIXI.autoDetectRenderer(
+	window.innerWidth,
+	window.innerHeight,
+	{
+		backgroundColor : 0x1099bb
+	}
+);
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
-stage.x = window.innerWidth/2;
-stage.y = window.innerHeight/2;
 
-var text = new PIXI.Text( "127.0.0.1", {
-	fontFamily: "Arial",
-	fontSize: "20px",
-	fill: "black"
+
+
+var sprite = new PIXI.Sprite.fromImage( '../images/computer.png' );
+sprite.interactive = true;
+sprite.buttonMode = true;
+sprite.anchor.set(0.5);
+sprite.alpha = 1;
+sprite.scale.set( 0.2 );
+sprite.position.set(0);
+
+var text = new PIXI.Text( "ghoromdang", {
+	fontFamily: 'Arial',
+	fontSize: '20px',
+	fill: 'black'
 });
 text.interactive = true;
 text.buttonMode = true;
-text.anchor.set(0.5);
-text.position.set(0, 0);
 
-var sprite = new PIXI.Sprite.fromImage( "images/computer.png" );
-sprite.interactive = true;
-sprite.buttonMode = true;
-sprite.alpha = 1;
-sprite.anchor.set(0.5);
-sprite.scale.set(0.1);
-sprite.position.set(0, 0);
-console.log(text.height);
+
 
 var box = new PIXI.Container();
 box.interactive = true;
 box.buttonMode = true;
-box.position.x = 0;
-box.position.y = 0;
-// box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
+//box.scale.set(0);
+box.alpha = 1;
+box.position.x = 400;
+box.position.y = 50;
+box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
 
-
-box.addChild(text);
 box.addChild(sprite); 
-
+box.addChild(text);
 addDragDrop(box)
 stage.addChild(box);
+
 
 
 
@@ -73,18 +79,18 @@ function dragEnd() {
 }
 function addDragDrop(el) {
 	el
-		.on("mousedown", dragStart)
-		.on("touchstart", dragStart)
-		.on("mouseup", dragEnd)
-		.on("mouseupoutside", dragEnd)
-		.on("touchend", dragEnd)
-		.on("touchendoutside", dragEnd)
-		.on("mousemove", dragMove)
-		.on("touchmove", dragMove);
+		.on('mousedown', dragStart)
+		.on('touchstart', dragStart)
+		.on('mouseup', dragEnd)
+		.on('mouseupoutside', dragEnd)
+		.on('touchend', dragEnd)
+		.on('touchendoutside', dragEnd)
+		.on('mousemove', dragMove)
+		.on('touchmove', dragMove);
 }
 function bringToFront(el) {
 	// reorder children for z-index
-	var arr = el.parent.children;
+	var arr = stage.children;
 	arr.splice( arr.indexOf(el), 1 );
 	arr.push(el);
 }

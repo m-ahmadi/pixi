@@ -5,7 +5,7 @@ var stage = new PIXI.Container();
 
 var x = new PIXI.Graphics();
 // x.beginFill(0xff0000, 1);
-x.lineStyle(1, 0xff0000, 1);
+x.lineStyle(2, 0xff0000, 1);
 x.moveTo(0, 0);
 x.lineTo(100, 100);
 x.lineTo(600, 200);
@@ -96,9 +96,9 @@ function setProps(el, props) {
 	el.width = props.width;
 	el.height = props.height;
 }
-function Line(texture) {
-	this.start = conf.start || defaultPoint;
-	this.end = conf.end || defaultPoint;
+function Line(conf) {
+	this.start = conf.start;
+	this.end = conf.end;
 	this.thickness = conf.thickness || 2;
 	this.color = conf.color || 0x000000;
 	this.alpha = conf.alpha || 1;

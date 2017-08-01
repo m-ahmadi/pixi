@@ -6,7 +6,7 @@ import Line from "./components/Line/main";
 import zoom from "./stageZoom";
 
 const inst = u.extend( newPubSub() );
-const ATLAS_PATH = "images/n/atlas64.json";
+const ATLAS_PATH = conf.ROOT+ "images/n/atlas64.json";
 let textures: PIXI.loaders.TextureDictionary | undefined;
 let renderer: Renderer;
 let worker: Worker;
@@ -26,12 +26,12 @@ function initWorker(): void {
 		}
 	};
 }
-inst.init = () => {
+inst.init = (container: string) => {
 	initWorker();
 	
 	PIXI.utils.skipHello();
 	renderer = new Renderer({
-		container: <HTMLElement>document.getElementById("map_container")
+		container: $(container)[0]
 	});
 	PIXI.loader.add( conf.ROOT+ ATLAS_PATH );
 	PIXI.loader.load(cb => {
@@ -45,7 +45,7 @@ inst.init = () => {
 };
 
 inst.draw = (data: MapData) => {
-	debugger
+	
 };
 inst.hide = () => {
 

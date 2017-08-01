@@ -1,18 +1,18 @@
 export default function calcProps(start: Point, end: Point): SpriteLineProps {
-	let r: any = {}; // result
-	let sX: number = start.x;
-	let	sY: number = start.y;
-	let	eX: number = end.x;
-	let	eY: number = end.y;
+	const r: any = {}; // result
+	const sX: number = start.x;
+	const sY: number = start.y;
+	const eX: number = end.x;
+	const eY: number = end.y;
 
-	let	pow = Math.pow;
-	let	sqrt = Math.sqrt;
-	let	atan = Math.atan;
-	let	abs = Math.abs;
-	let	PI = Math.PI;
-
-	let dx: number = abs(eX-sX);
-	let dy: number = abs(eY-sY);
+	const pow = Math.pow;
+	const sqrt = Math.sqrt;
+	const atan = Math.atan;
+	const abs = Math.abs;
+	const PI = Math.PI;
+	
+	const dx: number = abs(eX-sX);
+	const dy: number = abs(eY-sY);
 
 	r.height = 1;
 	if (sY === eY) { // horizontal
