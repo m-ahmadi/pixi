@@ -1,0 +1,7 @@
+0	generic
+1	PC
+2	ADSLModem
+3	Printer
+4	SwitchLayer2
+5	SwitchLayer3
+6	Router

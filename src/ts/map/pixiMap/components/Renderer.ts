@@ -8,7 +8,7 @@ interface RendererConfig {
 export default class Renderer {
 	private renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 	public container: HTMLElement;
-	public topLayer: PIXI.Container;
+	public stage: PIXI.Container;
 	
     constructor(conf: RendererConfig) {
 		this.container = conf.container;
@@ -16,18 +16,18 @@ export default class Renderer {
 			window.innerWidth,
 			window.innerHeight,
 			{
-				backgroundColor: 0xAB9988,
+				backgroundColor: 0xf6e495, // 0xAB9988,
 				antialias: true
 			}
 		);
-		this.topLayer = new PIXI.Container();
+		this.stage = new PIXI.Container();
 
 		let ren = this.renderer;
-		let topLayer = this.topLayer;
+		let stage = this.stage;
 		
 
-		topLayer.interactive = true;
-		topLayer.hitArea = new PIXI.Rectangle(
+		stage.interactive = true;
+		stage.hitArea = new PIXI.Rectangle(
 			-100000,
 			-100000,
 			ren.width / ren.resolution * 100000,
@@ -37,6 +37,6 @@ export default class Renderer {
 		this.container.appendChild(this.renderer.view);
 	}
 	public render(): void {
-		this.renderer.render(this.topLayer);
+		this.renderer.render(this.stage);
 	}
 }

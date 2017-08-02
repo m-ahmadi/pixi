@@ -1,7 +1,6 @@
 import conf from "core/config";
 import Renderer from "./components/Renderer";
-import Layer from "./components/Layer";
-import Node from "./components/Node";
+import Node from "./components/Node/main";
 import Line from "./components/Line/main";
 import zoom from "./stageZoom";
 
@@ -19,13 +18,9 @@ function initWorker(): void {
 	worker = new Worker(conf.WRKR+ "pixiMap/main.js");
 	worker.onmessage = (e: MessageEvent) => {
 		let d = e.data;
-		switch (d.action) {
-			case "dool":
-
-			break;
-		}
 	};
 }
+
 inst.init = (container: string) => {
 	initWorker();
 	
@@ -39,7 +34,7 @@ inst.init = (container: string) => {
 		if ( u.isFn(cb) ) cb();
 	});
 	$(renderer.container).on("mousewheel", (e: JQueryMousewheel.JQueryMousewheelEventObject) => {
-		zoom(e.pageX, e.pageY, e.deltaY > 0, renderer.topLayer);
+		zoom(e.pageX, e.pageY, e.deltaY > 0, renderer.stage);
 	});
 	requestAnimationFrame(animate);
 };

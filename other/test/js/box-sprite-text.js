@@ -7,12 +7,13 @@ stage.y = window.innerHeight/2;
 
 var text = new PIXI.Text( "127.0.0.1", {
 	fontFamily: "Arial",
-	fontSize: "20px",
+	fontSize: "40px",
 	fill: "black"
 });
 text.interactive = true;
 text.buttonMode = true;
 text.anchor.set(0.5);
+text.scale.set(0.5);
 text.position.set(0, 0);
 
 var sprite = new PIXI.Sprite.fromImage( "images/computer.png" );
@@ -27,13 +28,12 @@ console.log(text.height);
 var box = new PIXI.Container();
 box.interactive = true;
 box.buttonMode = true;
-box.position.x = 0;
-box.position.y = 0;
+
 // box.hitArea = new PIXI.Rectangle(0, 0, sprite.width, sprite.height);
 
 
 box.addChild(text);
-box.addChild(sprite); 
+box.addChild(sprite);
 
 addDragDrop(box)
 stage.addChild(box);
