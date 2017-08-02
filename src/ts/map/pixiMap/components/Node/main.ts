@@ -49,5 +49,6 @@ export default class Node {
 		this.box = createBox();
 		this.box.addChild(this.text);
 		this.box.addChild(this.sprite);
+		// addDragDrop(this.box);
 	}
 }

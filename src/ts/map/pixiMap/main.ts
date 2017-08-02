@@ -1,6 +1,7 @@
 import conf from "core/config";
 import Renderer from "./components/Renderer";
 import Node from "./components/Node/main";
+import nodeEventManager from "./components/Node/EventManager";
 import Line from "./components/Line/main";
 import zoom from "./stageZoom";
 
