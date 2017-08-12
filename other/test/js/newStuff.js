@@ -3,13 +3,20 @@ var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {b
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
-var x = new PIXI.Graphics();
+/* var rect = new PIXI.Graphics();
+rect.beginFill(0xff0000);
+rect.drawRect(0,0,200,200);
+rect.endFill();
+
+stage.addChild(rect); */
+
+var line = new PIXI.Graphics();
 // x.beginFill(0xff0000, 1);
-x.lineStyle(2, 0xff0000, 1);
-x.moveTo(0, 0);
-x.lineTo(100, 100);
-x.lineTo(600, 200);
-stage.addChild(x);
+line.lineStyle(2, 0x00ff00, 1);
+line.moveTo(0, 0);
+line.lineTo(100, 100);
+line.lineTo(600, 200);
+stage.addChild(line);
 
 
 function animate() {
