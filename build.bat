@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 path=%PATH%;./node_modules/.bin/
 set INP=./src
 set OUT=./dist
